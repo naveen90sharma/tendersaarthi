@@ -4,7 +4,7 @@ import { Suspense, use } from 'react';
 import TenderListing from '@/components/TenderListing';
 import { RefreshCw } from 'lucide-react';
 
-export default function AuthorityTendersPage({ params }: { params: Promise<{ slug: string }> }) {
+export default function WebsiteTendersPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);
     const niceName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 

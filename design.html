@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>NHAI Highway Rehabilitation Tender – NH-46, Madhya Pradesh</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: #f3f6fa;
+            color: #0f172a;
+        }
+
+        a {
+            text-decoration: none;
+            color: #0b5ed7;
+        }
+
+        /* HEADER */
+        .header {
+            background: #ffffff;
+            border-bottom: 3px solid #0b5ed7;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand span {
+            color: #0b5ed7;
+        }
+
+        .search {
+            width: 360px;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* LAYOUT */
+        .wrapper {
+            max-width: 1250px;
+            margin: 22px auto;
+            display: grid;
+            grid-template-columns: 3fr 1.2fr;
+            gap: 22px;
+        }
+
+        /* MAIN CARD */
+        .main {
+            background: #fff;
+            border: 1px solid #dbe1ea;
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            font-size: 13px;
+            color: #64748b;
+            padding: 14px 22px;
+            border-bottom: 1px solid #e5e9f0;
+        }
+
+        /* TITLE */
+        .title {
+            padding: 22px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #e8f0ff;
+            color: #0b5ed7;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .subtitle {
+            margin-top: 6px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        /* SUMMARY */
+        .summary {
+            background: #f8fafc;
+            border-left: 5px solid #0b5ed7;
+            padding: 18px 22px;
+        }
+
+        .summary h3 {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .summary p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* STATS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid #e5e9f0;
+            border-bottom: 1px solid #e5e9f0;
+        }
+
+        .stat {
+            padding: 16px;
+            text-align: center;
+            border-right: 1px solid #e5e9f0;
+        }
+
+        .stat:last-child {
+            border-right: none;
+        }
+
+        .stat label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .stat strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .danger strong {
+            color: #b91c1c;
+        }
+
+        /* SECTION */
+        .section {
+            padding: 22px;
+            border-bottom: 1px solid #e5e9f0;
+        }
+
+        .section h3 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .box {
+            background: #f9fafb;
+            border: 1px solid #e5e9f0;
+            padding: 14px;
+        }
+
+        .box span {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .box p {
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        /* DATES */
+        .date-list div {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e5e9f0;
+            font-size: 14px;
+        }
+
+        /* DOCS */
+        .doc {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px;
+            border: 1px dashed #cbd5e1;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .doc small {
+            color: #64748b;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* CARD BASE */
+        .side-card {
+            background: #ffffff;
+            border: 1px solid #dbe1ea;
+            padding: 16px;
+        }
+
+        /* ACTION CARD */
+        .action-card {
+            background: #f8fafc;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: #0b5ed7;
+            color: #fff;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .reminder-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 11px;
+            background: #ffffff;
+            border: 1px solid #0b5ed7;
+            color: #0b5ed7;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .helper-text {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* SUITABILITY */
+        .side-card h4 {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .fit-item {
+            padding: 8px 10px;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .fit-item.good {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .fit-item.warn {
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .fit-note {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        /* SIMILAR */
+        .similar-link {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #e5e9f0;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+        .similar-link span {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+
+        /* LIST */
+        ul {
+            padding-left: 18px;
+            font-size: 14px;
+        }
+
+        ul li {
+            margin-bottom: 6px;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 22px;
+            font-size: 13px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="brand">Tender<span>Saarthi</span></div>
+        <input class="search" placeholder="Search NHAI, road, EPC, solar…">
+    </header>
+
+    <div class="wrapper">
+
+        <!-- MAIN -->
+        <div class="main">
+
+            <div class="breadcrumb">
+                Home > NHAI Tenders > Highway Tenders > Madhya Pradesh
+            </div>
+
+            <div class="title">
+                <div class="badge">NHAI • Highway Project</div>
+                <h1>NHAI Highway Rehabilitation Tender – NH-46, Madhya Pradesh</h1>
+                <div class="subtitle">
+                    Strengthening & rehabilitation of rigid and flexible pavement with 4 years maintenance (Km
+                    324–394.923)
+                </div>
+            </div>
+
+            <div class="summary">
+                <h3>TENDER SUMMARY</h3>
+                <p>
+                    Issued by NHAI for rehabilitation of NH-46 in Madhya Pradesh covering approximately 64 km.
+                    Scope includes flexible overlay, reconstruction and 4 years routine maintenance.
+                    Suitable for established EPC contractors with highway pavement experience.
+                </p>
+            </div>
+
+            <div class="stats">
+                <div class="stat"><label>Tender Value</label><strong>₹215.04 Cr</strong></div>
+                <div class="stat"><label>EMD</label><strong>₹2.16 Cr</strong></div>
+                <div class="stat danger"><label>Bid Closing</label><strong>09 Feb 2026</strong></div>
+                <div class="stat"><label>Work Duration</label><strong>730 Days</strong></div>
+            </div>
+
+            <div class="section">
+                <h3>Critical Dates</h3>
+                <div class="date-list">
+                    <div><span>Published Date</span><span>18 Dec 2025</span></div>
+                    <div><span>Bid Submission Start</span><span>18 Dec 2025</span></div>
+                    <div><span>Bid Submission End</span><span>09 Feb 2026 – 11:00 AM</span></div>
+                    <div><span>Bid Opening Date</span><span>10 Feb 2026 – 11:30 AM</span></div>
+                    <div><span>Bid Validity</span><span>120 Days</span></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Eligibility Snapshot</h3>
+                <ul>
+                    <li>Highway EPC experience required</li>
+                    <li>Rigid & flexible pavement works</li>
+                    <li>Maintenance obligation included</li>
+                    <li>Large-value infrastructure project</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Project Location & Scope</h3>
+                <div class="grid">
+                    <div class="box"><span>Highway</span>
+                        <p>NH-46</p>
+                    </div>
+                    <div class="box"><span>State</span>
+                        <p>Madhya Pradesh</p>
+                    </div>
+                    <div class="box"><span>From Chainage</span>
+                        <p>Km 324</p>
+                    </div>
+                    <div class="box"><span>To Chainage</span>
+                        <p>Km 394.923</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Project Details</h3>
+                <div class="grid">
+                    <div class="box"><span>Authority</span>
+                        <p>NHAI</p>
+                    </div>
+                    <div class="box"><span>Contract</span>
+                        <p>Item Rate</p>
+                    </div>
+                    <div class="box"><span>Tender Type</span>
+                        <p>Open Tender</p>
+                    </div>
+                    <div class="box"><span>Form of Contract</span>
+                        <p>Works</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Documents</h3>
+                <div class="doc">📄 View NIT on Official Portal <small>NHAI</small></div>
+                <div class="doc">📘 Download BOQ from CPPP <small>CPPP</small></div>
+                <small>Documents are accessed directly from official government portals.</small>
+            </div>
+
+            <div class="section">
+                <h3>Why this Tender Matters</h3>
+                <p style="font-size:14px;line-height:1.6;color:#475569;">
+                    High-value NHAI highway rehabilitation project with long maintenance scope,
+                    offering stable execution opportunity for experienced EPC contractors.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <!-- ACTION CARD -->
+            <div class="side-card action-card">
+                <button class="save-btn">⭐ Save Tender</button>
+                <button class="reminder-btn">🔔 Set Deadline Reminder</button>
+                <p class="helper-text">
+                    Save this tender to track updates & deadline changes.
+                </p>
+            </div>
+
+            <!-- SUITABILITY -->
+            <div class="side-card">
+                <h4>🧠 Suitability Check</h4>
+
+                <div class="fit-item good">
+                    ✔ Highway EPC experience
+                </div>
+                <div class="fit-item good">
+                    ✔ Rigid & flexible pavement work
+                </div>
+                <div class="fit-item warn">
+                    ⚠ Maintenance capability required
+                </div>
+
+                <p class="fit-note">
+                    Best suited for established EPC contractors.
+                </p>
+            </div>
+
+            <!-- SIMILAR -->
+            <div class="side-card">
+                <h4>🔁 Similar Tenders</h4>
+
+                <a class="similar-link" href="#">
+                    NHAI Road Maintenance – MP
+                    <span>₹120+ Cr</span>
+                </a>
+                <a class="similar-link" href="#">
+                    NH-44 Pavement Strengthening
+                    <span>Closes in 18 days</span>
+                </a>
+                <a class="similar-link" href="#">
+                    MP PWD Road Project
+                    <span>Item Rate</span>
+                </a>
+            </div>
+
+        </aside>
+
+
+    </div>
+
+    <footer>
+        Data sourced from official government portals • © TenderSaarthi
+    </footer>
+
+</body>
+
+</html>
