@@ -79,10 +79,14 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     }
 
     return (
-        <div className="bg-gray-50 min-h-screen py-8 font-sans">
-            <div className="container mx-auto px-4 max-w-4xl">
-                <Breadcrumb />
+        <div className="bg-gray-50 min-h-screen pb-16 font-sans">
+            <div className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90">
+                <div className="container mx-auto px-4 py-4">
+                    <Breadcrumb />
+                </div>
+            </div>
 
+            <div className="container mx-auto px-4 max-w-4xl py-8">
                 <article className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <img
                         src={newsItem.image}

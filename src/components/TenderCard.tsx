@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import type { Tender } from '../types';
-import { MapPin, Clock, Share2, Heart, ArrowRight, Building2, FileText, CalendarDays, Tag, Wallet } from 'lucide-react';
+import { MapPin, Clock, Share2, Building2, CalendarDays, Wallet, ChevronRight, Gavel, FileCheck } from 'lucide-react';
+import SaveTenderButton from './SaveTenderButton';
 
 interface TenderCardProps {
     tender: Tender;
@@ -10,142 +11,150 @@ interface TenderCardProps {
 }
 
 export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
-    // Helper to calculate days left based on tender.date (bid_submission_end)
-    const calculateTimeLeft = (dateStr: string) => {
+    // Robust date parsing for "Time Left"
+    const calculateDaysLeft = (dateStr?: string) => {
         if (!dateStr || dateStr === 'N/A') return null;
         try {
-            // Format "19-Mar-2026 11:00 AM" -> "19 Mar 2026 11:00 AM"
-            const dateParts = dateStr.replace(/-/g, ' ');
-            const targetDate = new Date(dateParts);
+            const cleanDate = dateStr.replace(/-/g, '/');
+            const targetDate = new Date(cleanDate);
             const now = new Date();
-
-            if (isNaN(targetDate.getTime())) return 'Check Date';
-
+            if (isNaN(targetDate.getTime())) return null;
             const diff = targetDate.getTime() - now.getTime();
-
             if (diff <= 0) return 'Expired';
-
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-            if (days > 0) return `${days} Days Left`;
-            if (hours > 0) return `${hours} Hours Left`;
-            if (minutes > 0) return `${minutes} Mins Left`;
-            return 'Closing Now';
+            if (days < 0) return 'Expired';
+            return days > 0 ? `${days} Days` : 'Closing Today';
         } catch (e) {
             return null;
         }
     };
 
-    const formatAmount = (amount: string | undefined) => {
+    const formatDisplayAmount = (amount?: string) => {
         if (!amount || amount === 'N/A' || amount === '0') return 'N/A';
         const clean = amount.toString().trim();
-        if (clean.startsWith('₹')) return clean;
-        if (clean.toLowerCase().startsWith('rs')) return clean.replace(/rs\.?/i, '₹').trim();
+        if (clean.startsWith('₹') || clean.toLowerCase().includes('crore') || clean.toLowerCase().includes('lakh')) {
+            return clean.replace(/Rs\.?/i, '₹').trim();
+        }
         return `₹ ${clean}`;
     };
 
-    const timeLeft = calculateTimeLeft(tender.date);
-
-    // Mock EMD (Placeholder, should ideally come from DB if available)
-    const emdValue = "₹ 1.5 Lakhs";
+    const daysLeft = calculateDaysLeft(tender.bid_submission_end);
+    const isClosingSoon = daysLeft && (daysLeft === 'Closing Today' || (typeof daysLeft === 'string' && parseInt(daysLeft) <= 5));
+    const isExpired = daysLeft === 'Expired';
 
     return (
-        <div className="group relative bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden font-sans mb-5">
-            {/* Left Accent Decoration */}
-            <div className={`absolute left-0 top-0 bottom-0 w-1 transition-opacity ${timeLeft === 'Expired' ? 'bg-[#EE3124]' : 'bg-tj-blue'} opacity-0 group-hover:opacity-100`}></div>
+        <div className="group relative bg-white border border-gray-100 rounded-2xl p-0 mb-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(16,62,104,0.1)] hover:border-primary/20 overflow-hidden">
+            {/* Index Badge & Floating Action */}
+            <div className="absolute top-0 left-0 w-12 h-12 bg-gray-50 flex items-center justify-center rounded-br-2xl border-b border-r border-gray-100 group-hover:bg-primary group-hover:text-white transition-colors duration-500 z-10">
+                <span className="text-xs font-black tracking-tighter">#{index}</span>
+            </div>
 
-            <div className="p-6">
-                {/* Header: Badges & Meta */}
-                <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="bg-gray-100 text-gray-600 text-[10px] font-black px-2 py-1 rounded border border-gray-200">
-                            #{index}
-                        </span>
-                        <span className="bg-[#f0f7ff] text-tj-blue text-[10px] font-black px-2 py-1 rounded border border-blue-100 flex items-center gap-1 uppercase">
-                            <FileText size={12} />
-                            {tender.referenceNo?.split(' ')[0] || 'REF-N/A'}
-                        </span>
-                        <span className="bg-purple-50 text-purple-700 text-[10px] font-black px-2 py-1 rounded border border-purple-100 flex items-center gap-1 uppercase">
-                            <Tag size={12} />
-                            {tender.category || 'General'}
-                        </span>
+            <div className="absolute top-4 right-4 z-10">
+                <SaveTenderButton tenderId={tender.id.toString()} variant="icon" />
+            </div>
+
+            <div className="flex flex-col md:flex-row h-full">
+                {/* Authority & Identification Column */}
+                <div className="md:w-[220px] bg-[#f8fafc] p-6 pt-16 flex flex-col justify-between border-r border-gray-50">
+                    <div className="space-y-4">
+                        <div className="p-3 bg-white rounded-xl border border-gray-100 shadow-sm group-hover:scale-105 transition-transform duration-500">
+                            <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">ID / Ref</span>
+                            <span className="block text-[11px] font-black text-primary truncate">
+                                {tender.reference_no?.split(' ')[0] || `TS-${tender.id.toString().slice(0, 8).toUpperCase()}`}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2.5 text-gray-500">
+                            <Building2 size={14} className="text-primary/60 shrink-0" />
+                            <span className="text-[11px] font-bold uppercase tracking-tight line-clamp-2 leading-tight">
+                                {tender.authority || 'Contracting Authority'}
+                            </span>
+                        </div>
                     </div>
 
-                    {timeLeft && (
-                        <span className={`text-[10px] font-black px-3 py-1 rounded-full border flex items-center gap-1 uppercase ${timeLeft === 'Expired' ? 'bg-gray-100 text-gray-500 border-gray-200' : 'bg-red-50 text-[#EE3124] border-red-100 animate-pulse'}`}>
-                            <Clock size={12} />
-                            {timeLeft}
-                        </span>
-                    )}
+                    <div className="hidden md:block">
+                        <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${isClosingSoon ? 'bg-red-50 text-red-600 border border-red-100' :
+                                isExpired ? 'bg-gray-100 text-gray-500' : 'bg-green-50 text-green-700 border border-green-100'
+                            }`}>
+                            <Clock size={12} className={isClosingSoon ? 'animate-pulse' : ''} />
+                            {daysLeft || 'Active'}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Title */}
-                <h3 className="mb-3">
+                {/* Main Content Column */}
+                <div className="flex-1 p-6 md:p-8 flex flex-col justify-between bg-white relative">
+                    <div className="mb-6">
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            <span className="px-2 py-0.5 bg-primary/5 text-primary text-[9px] font-black rounded border border-primary/10 uppercase tracking-widest">
+                                {tender.tender_type || 'Open Tender'}
+                            </span>
+                            <span className="px-2 py-0.5 bg-gray-50 text-gray-500 text-[9px] font-black rounded border border-gray-200 uppercase tracking-widest">
+                                {tender.tender_category || 'Procurement'}
+                            </span>
+                        </div>
+
+                        <Link href={`/tender/${tender.id}`}>
+                            <h3 className="text-xl font-extrabold text-[#1e293b] group-hover:text-primary transition-colors leading-tight mb-3 tracking-tight">
+                                {tender.title}
+                            </h3>
+                        </Link>
+
+                        <p className="text-sm text-gray-500 font-medium line-clamp-2 leading-relaxed opacity-80">
+                            {tender.summary || `Strategic project requiring expert ${tender.tender_category?.toLowerCase() || 'service'} solutions for ${tender.authority?.toLowerCase()}. Targeted completion within specified timelines.`}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 pt-6 border-t border-gray-50">
+                        {/* Value */}
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-gray-400">
+                                <Wallet size={13} strokeWidth={2.5} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Estimated Value</span>
+                            </div>
+                            <p className="text-[15px] font-black text-[#1e293b] truncate">
+                                {formatDisplayAmount(tender.tender_value || tender.value)}
+                            </p>
+                        </div>
+
+                        {/* Location */}
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-gray-400">
+                                <MapPin size={13} strokeWidth={2.5} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Job Location</span>
+                            </div>
+                            <p className="text-[15px] font-black text-[#1e293b] truncate">
+                                {tender.state || 'Pan India'}
+                            </p>
+                        </div>
+
+                        {/* End Date - Only on Large */}
+                        <div className="space-y-1 hidden lg:block">
+                            <div className="flex items-center gap-1.5 text-gray-400">
+                                <CalendarDays size={13} strokeWidth={2.5} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Closing Date</span>
+                            </div>
+                            <p className={`text-[15px] font-black truncate ${isClosingSoon ? 'text-red-600' : 'text-[#1e293b]'}`}>
+                                {tender.bid_submission_end || 'N/A'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Action Column */}
+                <div className="md:w-[80px] border-t md:border-t-0 md:border-l border-gray-100 flex md:flex-col items-center justify-center p-4 bg-gray-50/50 gap-4">
                     <Link
                         href={`/tender/${tender.id}`}
-                        className="text-lg font-extrabold text-[#0f172a] leading-snug group-hover:text-tj-blue transition-colors line-clamp-2 uppercase"
-                        title={tender.title}
+                        className="flex-1 md:w-12 md:h-12 bg-primary text-white flex items-center justify-center rounded-xl md:rounded-full hover:scale-110 active:scale-95 transition-all shadow-lg shadow-primary/20 group/btn"
                     >
-                        {tender.title}
+                        <ChevronRight size={24} className="group-hover/btn:translate-x-0.5 transition-transform" />
                     </Link>
-                </h3>
-
-                {/* Authority & Location */}
-                <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-sm text-[#475569] mb-6">
-                    <div className="flex items-center gap-1.5">
-                        <Building2 size={15} className="text-tj-blue" />
-                        <span className="font-bold truncate max-w-[200px] uppercase">{tender.authority || 'Unknown Authority'}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <MapPin size={15} className="text-tj-blue" />
-                        <span className="font-bold">{tender.location || 'India'}</span>
-                    </div>
-                </div>
-
-                {/* Key Stats Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-[#f8fafc] p-4 rounded-xl border border-[#e2e8f0] group-hover:border-blue-100 transition-colors">
-                    <div>
-                        <p className="text-[10px] uppercase tracking-wider text-[#64748b] font-black mb-1">Tender Value</p>
-                        <p className="text-tj-blue font-black text-base">{formatAmount(tender.value)}</p>
-                    </div>
-                    <div>
-                        <p className="text-[10px] uppercase tracking-wider text-[#64748b] font-black mb-1">EMD Amount</p>
-                        <p className="text-gray-800 font-black text-base">{emdValue}</p>
-                    </div>
-                    <div>
-                        <p className="text-[10px] uppercase tracking-wider text-[#64748b] font-black mb-1 flex items-center gap-1">
-                            <Wallet size={12} /> Tender Fee
-                        </p>
-                        <p className="text-gray-800 font-black text-base">{formatAmount(tender.tenderFee)}</p>
-                    </div>
-                    <div>
-                        <p className="text-[10px] uppercase tracking-wider text-[#64748b] font-black mb-1 flex items-center gap-1">
-                            <CalendarDays size={12} /> Closing Date
-                        </p>
-                        <p className="text-[#EE3124] font-black text-base">{tender.date}</p>
-                    </div>
-                </div>
-
-                {/* Action Footer */}
-                <div className="flex items-center justify-between pt-2">
-                    <div className="flex gap-1">
-                        <button className="p-2 text-gray-400 hover:text-[#EE3124] hover:bg-red-50 rounded-full transition-all" title="Save">
-                            <Heart size={20} />
-                        </button>
-                        <button className="p-2 text-gray-400 hover:text-tj-blue hover:bg-blue-50 rounded-full transition-all" title="Share">
-                            <Share2 size={20} />
-                        </button>
-                    </div>
-
-                    <Link
-                        href={`/tender/${tender.id}`}
-                        className="bg-tj-blue text-white text-[12px] font-black px-6 py-2.5 rounded-lg shadow-md hover:brightness-110 hover:shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center gap-2 group/btn uppercase tracking-widest"
-                    >
-                        View Details
-                        <ArrowRight size={16} className="transition-transform group-hover/btn:translate-x-1" />
-                    </Link>
+                    <button className="flex-1 md:w-12 md:h-12 bg-white text-gray-400 border border-gray-200 flex items-center justify-center rounded-xl md:rounded-full hover:text-primary hover:border-primary/30 transition-all shadow-sm">
+                        <Share2 size={18} />
+                    </button>
+                    <button className="flex-1 md:w-12 md:h-12 bg-white text-gray-400 border border-gray-200 flex items-center justify-center rounded-xl md:rounded-full hover:text-primary hover:border-primary/30 transition-all shadow-sm">
+                        <FileCheck size={18} />
+                    </button>
                 </div>
             </div>
         </div>

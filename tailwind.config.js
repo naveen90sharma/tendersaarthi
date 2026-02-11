@@ -8,12 +8,12 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                primary: '#EE3124', // TJ Red
-                'tj-blue': '#103E68', // Dark Blue from screenshot
-                'tj-yellow': '#FFC212', // Yellow from screenshot
-                'tj-dark': '#212121',
-                'tj-light-gray': '#F6F6F6',
-                'tj-orange': '#F37021',
+                primary: '#103e68', // Dark Navy Blue
+                'soft-blue': '#f0f7ff',
+                'border-light': '#edf2f7',
+                'text-main': '#111827',
+                'text-muted': '#64748b',
+                'tj-yellow': '#FFC212', // Keep for support accents
                 secondary: '#1a1a1a',
             },
             fontFamily: {

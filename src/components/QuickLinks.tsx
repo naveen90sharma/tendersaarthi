@@ -78,7 +78,7 @@ export default function QuickLinks() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
                     {linkGroups.map((group, index) => (
                         <div key={index} className="space-y-4">
-                            <h3 className="text-lg font-bold text-gray-800 border-l-4 border-tj-blue pl-3 uppercase">
+                            <h3 className="text-lg font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase">
                                 {group.title}
                             </h3>
                             <div className="flex flex-wrap gap-2 text-[13px] leading-relaxed text-gray-600">
@@ -90,7 +90,7 @@ export default function QuickLinks() {
                                         >
                                             {link}
                                         </Link>
-                                        <span className="text-gray-300 mx-1.5">|</span>
+                                        <span className="text-gray-400 mx-1.5 font-light">|</span>
                                     </span>
                                 ))}
                                 <span className="inline-block">

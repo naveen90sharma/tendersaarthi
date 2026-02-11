@@ -9,9 +9,8 @@ export default function Breadcrumb() {
     const pathnames = pathname ? pathname.split('/').filter((x) => x) : [];
 
     return (
-        <nav className="flex items-center text-sm text-gray-500 mb-6 overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
-            <Link href="/" className="hover:text-primary flex items-center gap-1">
-                <Home size={14} />
+        <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider overflow-x-auto whitespace-nowrap scrollbar-hide mb-6 pb-2 md:pb-0">
+            <Link href="/" className="hover:text-primary transition-colors flex-shrink-0">
                 Home
             </Link>
             {pathnames.map((name, index) => {
@@ -20,16 +19,16 @@ export default function Breadcrumb() {
                 const displayName = decodeURIComponent(name.replace(/-/g, ' ')).replace(/\b\w/g, l => l.toUpperCase());
 
                 return (
-                    <span key={name} className="flex items-center">
-                        <ChevronRight size={14} className="mx-2 text-gray-400" />
+                    <div key={name} className="flex items-center gap-2 flex-shrink-0">
+                        <ChevronRight size={12} />
                         {isLast ? (
-                            <span className="font-semibold text-gray-800">{displayName}</span>
+                            <span className="text-primary truncate max-w-[200px]">{displayName}</span>
                         ) : (
                             <Link href={routeTo} className="hover:text-primary transition-colors">
                                 {displayName}
                             </Link>
                         )}
-                    </span>
+                    </div>
                 );
             })}
         </nav>

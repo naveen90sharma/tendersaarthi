@@ -1,65 +1,87 @@
 'use client';
 
-import { Search, Filter, Bell, FileCheck } from 'lucide-react';
+import { Search, Filter, Bell, FileCheck, ArrowRight } from 'lucide-react';
 
 export default function HowItWorks() {
     const steps = [
         {
             icon: Search,
-            title: 'Search Tenders',
-            description: 'Browse through thousands of active government and private sector tenders',
-            color: 'bg-blue-500',
+            title: 'Search Database',
+            description: 'Intelligent AI-powered search through 1M+ archived and 10k+ live tenders.',
+            tag: 'Discovery'
         },
         {
             icon: Filter,
-            title: 'Filter by Preference',
-            description: 'Use advanced filters to find tenders matching your business criteria',
-            color: 'bg-purple-500',
+            title: 'Precision Filter',
+            description: 'Narrow down by EMD, Value, Location, and Department in milliseconds.',
+            tag: 'Filtering'
         },
         {
             icon: Bell,
-            title: 'Get Instant Alerts',
-            description: 'Set up notifications for new tenders in your categories of interest',
-            color: 'bg-green-500',
+            title: 'Smart Alerts',
+            description: 'Get notified via WhatsApp and Email for tenders matching your DNA.',
+            tag: 'Updates'
         },
         {
             icon: FileCheck,
-            title: 'Submit Your Bid',
-            description: 'Access tender documents and submit bids directly through official portals',
-            color: 'bg-orange-500',
+            title: 'Download & Bid',
+            description: 'Access BOQ, NIT, and Tender documents with single-click direct links.',
+            tag: 'Success'
         },
     ];
 
     return (
-        <section className="py-16 bg-white">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl font-black text-gray-800 mb-2">How It Works</h2>
-                    <p className="text-gray-500 text-sm max-w-2xl mx-auto">
-                        Simple and efficient process to find and bid on tenders
+        <section className="py-24 bg-[#f8fafc] relative overflow-hidden">
+            {/* Background Grid Accent */}
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] pointer-events-none" />
+
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="max-w-3xl mx-auto text-center mb-20 space-y-4">
+                    <div className="inline-block px-4 py-1.5 bg-primary/5 rounded-full text-[11px] font-black text-primary uppercase tracking-[0.2em] border border-primary/10 mb-4">
+                        Workflow Process
+                    </div>
+                    <h2 className="text-4xl md:text-6xl font-black text-primary tracking-tighter leading-none">Simple Path to Success</h2>
+                    <p className="text-slate-400 text-sm md:text-base font-bold uppercase tracking-wider">
+                        From discovery to submission in four high-efficiency steps
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-                    {/* Connection Line - Hidden on mobile */}
-                    <div className="hidden md:block absolute top-12 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 via-purple-200 to-orange-200 -z-10" />
-
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
                     {steps.map((step, index) => (
-                        <div key={index} className="text-center group">
-                            {/* Icon Circle */}
-                            <div className="relative inline-block mb-6">
-                                <div className={`w-24 h-24 ${step.color} rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg`}>
-                                    <step.icon size={36} className="text-white" />
+                        <div key={index} className="relative group">
+                            {/* Card Decorative Background */}
+                            <div className="absolute inset-0 bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200 group-hover:shadow-primary/10 transition-all duration-500 scale-95 group-hover:scale-100" />
+
+                            {/* Main Content */}
+                            <div className="relative p-8 text-center flex flex-col items-center h-full min-h-[380px] justify-between z-10">
+                                <div className="space-y-6 flex flex-col items-center">
+                                    <div className="relative">
+                                        <div className="w-20 h-20 bg-[#f8fafc] rounded-3xl flex items-center justify-center text-primary border border-slate-100 group-hover:bg-primary group-hover:text-white group-hover:rotate-12 transition-all duration-500">
+                                            <step.icon size={32} strokeWidth={2.5} />
+                                        </div>
+                                        <div className="absolute -top-3 -left-3 w-10 h-10 bg-white rounded-2xl flex items-center justify-center font-black text-xs text-primary shadow-lg border border-slate-50">
+                                            0{index + 1}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="text-[10px] font-black text-[#FFC212] uppercase tracking-[0.3em]">{step.tag}</div>
+                                        <h3 className="text-2xl font-black text-primary tracking-tight">{step.title}</h3>
+                                        <p className="text-sm text-slate-400 font-bold leading-relaxed">{step.description}</p>
+                                    </div>
                                 </div>
-                                {/* Step Number */}
-                                <div className="absolute -top-2 -right-2 w-8 h-8 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center font-black text-sm text-gray-700">
-                                    {index + 1}
+
+                                <div className="w-10 h-10 rounded-full border-2 border-slate-100 flex items-center justify-center text-slate-200 group-hover:border-primary group-hover:text-primary transition-all">
+                                    <ArrowRight size={18} />
                                 </div>
                             </div>
 
-                            {/* Content */}
-                            <h3 className="text-lg font-bold text-gray-800 mb-2">{step.title}</h3>
-                            <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
+                            {/* Connection Arrow (Except Last) */}
+                            {index < 3 && (
+                                <div className="hidden lg:flex absolute top-1/4 -right-4 w-8 h-8 items-center justify-center text-slate-200 z-0">
+                                    <div className="w-full h-[2px] bg-slate-100" />
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

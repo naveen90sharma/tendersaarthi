@@ -176,3 +176,119 @@ export async function getUserDrafts(userId: string) {
         return { success: false, data: null, error: error.message };
     }
 }
+// Get metadata for filters (unique categories, locations, authorities, states, and min/max value)
+export async function getFilterMetadata() {
+    try {
+        const [
+            { data: categories },
+            { data: states },
+            { data: authorities },
+            { data: types },
+            { data: priceStats }
+        ] = await Promise.all([
+            supabase.from('tenders').select('tender_category').not('tender_category', 'is', null),
+            supabase.from('tenders').select('state').not('state', 'is', null),
+            supabase.from('tenders').select('authority').not('authority', 'is', null),
+            supabase.from('tenders').select('tender_type').not('tender_type', 'is', null),
+            supabase.from('tenders').select('tender_value_numeric').not('tender_value_numeric', 'is', null)
+        ]);
+
+        const unique = (items: any[], key: string) =>
+            Array.from(new Set(items?.map(item => item[key]).filter(Boolean))).sort();
+
+        // Calculate min/max price from all tenders
+        const numericValues = (priceStats || []).map(p => Number(p.tender_value_numeric)).filter(v => v > 0);
+        const minPrice = numericValues.length > 0 ? Math.min(...numericValues) : 0;
+        const maxPrice = numericValues.length > 0 ? Math.max(...numericValues) : 1000000000; // 1000 Cr default max
+
+        return {
+            success: true,
+            data: {
+                categories: unique(categories || [], 'tender_category'),
+                states: unique(states || [], 'state'),
+                authorities: unique(authorities || [], 'authority'),
+                types: unique(types || [], 'tender_type'),
+                minPrice,
+                maxPrice
+            },
+            error: null
+        };
+    } catch (error: any) {
+        console.error('Error fetching filter metadata:', error);
+        return { success: false, data: null, error: error.message };
+    }
+}
+// Toggle Save Tender
+export async function toggleSaveTender(tenderId: string, userId: string) {
+    try {
+        // Check if already saved
+        const { data: existing, error: checkError } = await supabase
+            .from('saved_tenders')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('tender_id', tenderId)
+            .maybeSingle();
+
+        if (checkError) throw checkError;
+
+        if (existing) {
+            // Unsave
+            const { error: deleteError } = await supabase
+                .from('saved_tenders')
+                .delete()
+                .eq('id', existing.id);
+            if (deleteError) throw deleteError;
+            return { success: true, saved: false };
+        } else {
+            // Save
+            const { error: insertError } = await supabase
+                .from('saved_tenders')
+                .insert([{ user_id: userId, tender_id: tenderId }]);
+            if (insertError) throw insertError;
+            return { success: true, saved: true };
+        }
+    } catch (error: any) {
+        console.error('Error toggling save tender:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Check if tender is saved
+export async function isTenderSaved(tenderId: string, userId: string) {
+    try {
+        const { data, error } = await supabase
+            .from('saved_tenders')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('tender_id', tenderId)
+            .maybeSingle();
+
+        if (error) return false;
+        return !!data;
+    } catch (error) {
+        return false;
+    }
+}
+
+// Get user's saved tenders
+export async function getSavedTenders(userId: string) {
+    try {
+        const { data, error } = await supabase
+            .from('saved_tenders')
+            .select(`
+                id,
+                tenders (*)
+            `)
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Flatten the data
+        const formattedTenders = (data || []).map((item: any) => item.tenders).filter(Boolean);
+        return { success: true, data: formattedTenders, error: null };
+    } catch (error: any) {
+        console.error('Error fetching saved tenders:', error);
+        return { success: false, data: null, error: error.message };
+    }
+}

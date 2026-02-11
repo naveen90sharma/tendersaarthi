@@ -23,10 +23,14 @@ export default function RegionDirectory() {
     const filteredRegions = regionsData.filter(r => r.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return (
-        <div className="bg-gray-50 min-h-screen py-8 font-sans">
-            <div className="container mx-auto px-4">
-                <Breadcrumb />
+        <div className="bg-gray-50 min-h-screen pb-16 font-sans">
+            <div className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90">
+                <div className="container mx-auto px-4 py-4">
+                    <Breadcrumb />
+                </div>
+            </div>
 
+            <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800 mb-2">Tenders by Region</h1>
