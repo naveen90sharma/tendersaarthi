@@ -29,49 +29,67 @@ const news = [
 
 export default function NewsSection() {
     return (
-        <section className="py-24 bg-white">
-            <div className="container mx-auto px-4">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="h-1 w-12 bg-primary rounded-full" />
-                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Market Intelligence</span>
+        <section className="py-24 bg-white relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-soft-blue rounded-full blur-[120px] -mr-32 -mt-32 opacity-50" />
+
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-8">
+                    <div className="text-center md:text-left space-y-3">
+                        <div className="inline-flex items-center gap-2 bg-primary/5 px-4 py-1.5 rounded-full border border-primary/10 mb-2">
+                            <BookOpen size={14} className="text-primary" />
+                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.25em]">Market Intelligence</span>
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black text-[#0f172a] tracking-tighter leading-none">Tender Insights</h2>
-                        <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Stay ahead with the latest industry moves and policy changes</p>
+                        <h2 className="text-4xl md:text-6xl font-black text-[#103e68] tracking-tighter leading-none">
+                            Tender <span className="text-tj-yellow font-black">Insights</span>
+                        </h2>
+                        <p className="text-slate-500 text-lg font-medium max-w-xl">
+                            Stay ahead with the latest industry moves, policy changes, and procurement trends.
+                        </p>
                     </div>
-                    <Link href="/news" className="group text-primary font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:underline underline-offset-8 transition-all">
+                    <Link href="/news" className="group h-12 px-8 bg-white border-2 border-[#f1f5f9] text-[#103e68] font-black text-xs uppercase tracking-widest flex items-center gap-3 rounded-2xl hover:bg-[#103e68] hover:text-white hover:border-[#103e68] transition-all shadow-sm">
                         View All Stories
-                        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
                     {news.map((item) => (
-                        <Link href={`/news/${item.id}`} key={item.id} className="group flex flex-col bg-white rounded-3xl overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-[0_20px_50px_rgba(15,23,42,0.08)] transition-all duration-500">
-                            <div className="relative h-60 overflow-hidden">
+                        <Link
+                            href={`/news/${item.id}`}
+                            key={item.id}
+                            className="group flex flex-col bg-white rounded-[32px] overflow-hidden border border-[#e2e8f0]/60 hover:shadow-[0_40px_80px_-20px_rgba(16,62,104,0.15)] transition-all duration-500 h-full"
+                        >
+                            <div className="relative h-64 overflow-hidden">
                                 <img
                                     src={item.image}
                                     alt={item.title}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                                 />
-                                <div className="absolute top-4 left-4">
-                                    <span className="px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[10px] font-black text-primary uppercase tracking-widest shadow-sm">
+                                <div className="absolute top-6 left-6">
+                                    <span className="px-4 py-2 bg-white/95 backdrop-blur-md rounded-xl text-[10px] font-black text-[#103e68] uppercase tracking-widest shadow-lg shadow-black/5">
                                         {item.category}
                                     </span>
                                 </div>
                             </div>
-                            <div className="p-8 flex flex-col flex-1">
-                                <div className="flex items-center gap-2 text-slate-400 mb-4">
-                                    <Calendar size={14} />
-                                    <span className="text-[11px] font-bold uppercase tracking-widest">{item.date}</span>
+
+                            <div className="p-8 md:p-10 flex flex-col flex-1">
+                                <div className="flex items-center gap-2 text-[#94a3b8] mb-6">
+                                    <Calendar size={15} strokeWidth={2.5} />
+                                    <span className="text-[11px] font-black uppercase tracking-widest pt-0.5">{item.date}</span>
                                 </div>
-                                <h3 className="text-xl font-black text-[#1e293b] leading-tight mb-6 group-hover:text-primary transition-colors flex-1 line-clamp-3">
+
+                                <h3 className="text-[22px] font-black text-[#103e68] leading-[1.3] mb-8 group-hover:text-primary transition-colors flex-1 line-clamp-3 tracking-tight">
                                     {item.title}
                                 </h3>
-                                <div className="flex items-center gap-2 text-primary text-[11px] font-black uppercase tracking-[0.2em] group-hover:gap-4 transition-all">
-                                    Read Article
-                                    <ArrowRight size={14} />
+
+                                <div className="pt-8 border-t border-[#f1f5f9] flex items-center justify-between">
+                                    <span className="text-[11px] font-black text-primary uppercase tracking-[0.2em] group-hover:text-[#103e68]">
+                                        Read Article
+                                    </span>
+                                    <div className="w-10 h-10 rounded-xl bg-[#f8fafc] text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                                        <ArrowRight size={20} />
+                                    </div>
                                 </div>
                             </div>
                         </Link>
