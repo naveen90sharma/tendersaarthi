@@ -11,19 +11,55 @@ interface NavItem {
     path: string;
     icon?: React.ReactNode;
     badge?: string;
-    dropdown?: { label: string; path: string }[];
+    dropdown?: {
+        label: string;
+        path: string;
+        subItems?: { label: string; path: string }[]
+    }[];
 }
 
 const navItems: NavItem[] = [
     {
-        label: 'Active Tenders',
+        label: 'Tenders',
         path: '/active-tenders',
         icon: <Briefcase size={20} />,
         dropdown: [
             { label: 'Latest Tenders', path: '/active-tenders/latest' },
-            { label: 'Closing Soon', path: '/active-tenders/closing-soon' },
-            { label: 'High Value', path: '/active-tenders/high-value' },
-            { label: 'State-wise Tenders', path: '/active-tenders' },
+            { label: 'Active Tenders', path: '/active-tenders' },
+            { label: 'Tenders by Value', path: '/active-tenders/high-value' },
+            {
+                label: 'Tenders by State',
+                path: '/active-tenders',
+                subItems: [
+                    { label: 'Uttar Pradesh', path: '/tenders/state/uttar-pradesh' },
+                    { label: 'Maharashtra', path: '/tenders/state/maharashtra' },
+                    { label: 'Delhi', path: '/tenders/state/delhi' },
+                    { label: 'Madhya Pradesh', path: '/tenders/state/madhya-pradesh' },
+                    { label: 'View All States', path: '/active-tenders' },
+                ]
+            },
+            {
+                label: 'Tenders by Dept/Authority',
+                path: '/active-tenders',
+                subItems: [
+                    { label: 'NHAI', path: '/tenders/authority/nhai' },
+                    { label: 'CPWD', path: '/tenders/authority/cpwd' },
+                    { label: 'MES', path: '/tenders/authority/mes' },
+                    { label: 'Railways', path: '/tenders/authority/railways' },
+                    { label: 'View All Depts', path: '/active-tenders' },
+                ]
+            },
+            {
+                label: 'Tenders by Category',
+                path: '/active-tenders',
+                subItems: [
+                    { label: 'Construction', path: '/tenders/category/construction' },
+                    { label: 'Electrical', path: '/tenders/category/electrical' },
+                    { label: 'Transport', path: '/tenders/category/transport' },
+                    { label: 'Consultancy', path: '/tenders/category/consultancy' },
+                    { label: 'View All Categories', path: '/active-tenders' },
+                ]
+            },
         ]
     },
     {
@@ -45,19 +81,6 @@ const navItems: NavItem[] = [
             { label: 'My Tenders', path: '/my-tenders' },
             { label: 'Drafts', path: '/my-drafts' },
         ]
-    },
-    {
-        label: 'By Category',
-        path: '/categories',
-        icon: <LayoutDashboard size={20} />,
-        dropdown: [
-            { label: 'Construction', path: '/tenders/category/construction' },
-            { label: 'IT & Software', path: '/tenders/category/it-software' },
-            { label: 'Electrical', path: '/tenders/category/electrical' },
-            { label: 'Transport', path: '/tenders/category/transport' },
-            { label: 'View All', path: '/active-tenders' },
-        ]
-
     },
     {
         label: 'Bid Support',
@@ -290,16 +313,41 @@ export default function Header() {
 
                                     {/* Dropdown Menu */}
                                     {item.dropdown && (
-                                        <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[200px]">
-                                            <div className="bg-white border-t-2 border-primary shadow-lg rounded-b-md py-2 px-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                            <div className="bg-white border-t-2 border-primary shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] rounded-b-2xl py-4 min-w-[240px] animate-in fade-in slide-in-from-top-4 duration-300">
                                                 {item.dropdown.map((subItem) => (
-                                                    <Link
-                                                        key={subItem.label}
-                                                        href={subItem.path}
-                                                        className="block px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-primary rounded font-medium normal-case transition-colors"
-                                                    >
-                                                        {subItem.label}
-                                                    </Link>
+                                                    <div key={subItem.label} className="relative group/sub">
+                                                        <Link
+                                                            href={subItem.path}
+                                                            className="flex items-center justify-between px-6 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary transition-all font-bold group/item"
+                                                        >
+                                                            <span className="relative">
+                                                                {subItem.label}
+                                                                <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all group-hover/item:w-full"></span>
+                                                            </span>
+                                                            {subItem.subItems && <ArrowRight size={14} className="opacity-40 group-hover/sub:translate-x-1 group-hover/sub:opacity-100 transition-all" />}
+                                                        </Link>
+
+                                                        {/* Level 2 Submenu (SubItems) */}
+                                                        {subItem.subItems && (
+                                                            <div className="absolute left-full top-0 ml-0.5 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-300 z-[60]">
+                                                                <div className="bg-white border border-slate-100 shadow-[20px_20px_40px_-15px_rgba(0,0,0,0.1)] rounded-2xl py-4 min-w-[220px] animate-in fade-in slide-in-from-left-4 duration-300">
+                                                                    <div className="px-6 pb-2 mb-2 border-b border-slate-50">
+                                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{subItem.label}</span>
+                                                                    </div>
+                                                                    {subItem.subItems.map((deepItem) => (
+                                                                        <Link
+                                                                            key={deepItem.label}
+                                                                            href={deepItem.path}
+                                                                            className="block px-6 py-2.5 text-[13px] text-slate-600 hover:text-primary hover:bg-slate-50/80 transition-all font-bold"
+                                                                        >
+                                                                            {deepItem.label}
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
