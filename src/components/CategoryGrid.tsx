@@ -16,28 +16,28 @@ export default function CategoryGrid() {
     ];
 
     return (
-        <section className="py-24 bg-[#f8fafc]">
+        <section className="py-12 md:py-24 bg-[#f8fafc]">
             <div className="container mx-auto px-4">
-                <div className="max-w-2xl mb-16 space-y-4">
-                    <div className="flex items-center gap-2 mb-2">
+                <div className="max-w-2xl mb-8 md:mb-16 space-y-4 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
                         <div className="h-1 w-12 bg-primary rounded-full" />
                         <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Sectoral Catalog</span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-[#1e293b] tracking-tighter leading-none">Browse by Core Categories</h2>
-                    <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Targeted opportunities specialized by industry excellence</p>
+                    <h2 className="text-3xl md:text-5xl font-black text-[#1e293b] tracking-tighter leading-tight md:leading-none">Browse by Core Categories</h2>
+                    <p className="text-slate-400 text-[10px] md:text-sm font-bold uppercase tracking-wider">Targeted opportunities specialized by industry excellence</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                     {categories.map((category, index) => (
                         <Link
                             key={index}
                             href={`/active-tenders?category=${encodeURIComponent(category.name)}`}
-                            className="group relative bg-white rounded-[2rem] p-8 border border-slate-100 hover:border-primary/20 hover:shadow-[0_30px_60px_rgba(15,23,42,0.1)] transition-all duration-500 overflow-hidden"
+                            className="group relative bg-white rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 border border-slate-100 hover:border-primary/20 hover:shadow-[0_30px_60px_rgba(15,23,42,0.1)] transition-all duration-500 overflow-hidden"
                         >
                             <div className="relative z-10 flex flex-col h-full justify-between">
                                 <div>
-                                    <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${category.bg} ${category.color} mb-8 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
-                                        <category.icon size={28} strokeWidth={2.5} />
+                                    <div className={`inline-flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl ${category.bg} ${category.color} mb-4 md:mb-8 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                                        <category.icon className="w-5 h-5 md:w-7 md:h-7" strokeWidth={2.5} />
                                     </div>
                                     <h3 className="font-extrabold text-[#1e293b] text-lg mb-2 group-hover:text-primary transition-colors leading-tight">
                                         {category.name}

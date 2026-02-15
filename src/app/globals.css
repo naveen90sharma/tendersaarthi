@@ -7,3 +7,21 @@
     @apply antialiased text-text-main bg-[#f8fafc];
   }
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.glass-morphism {
+  @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl shadow-black/5;
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, #1e293b 0%, #103e68 100%);
+}

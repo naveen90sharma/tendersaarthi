@@ -5,69 +5,58 @@ const linkGroups = [
         title: 'TENDER BY STATES',
         viewAllPath: '/states',
         links: [
-            'Uttar Pradesh Tenders', 'Maharashtra Tenders', 'Madhya Pradesh Tenders', 'Bihar Tenders',
-            'Rajasthan Tenders', 'Gujarat Tenders', 'Rajasthan Tenders', 'West Bengal Tenders',
-            'Karnataka Tenders', 'Andhra Pradesh Tenders', 'Assam Tenders', 'Tamil Nadu Tenders',
-            'Haryana Tenders', 'Jharkhand Tenders', 'Odisha Tenders', 'Delhi Tenders',
-            'Jammu And Kashmir Tenders', 'Telangana Tenders', 'Chhattisgarh Tenders',
-            'Himachal Pradesh Tenders', 'Uttarakhand Tenders'
-        ]
+            { name: 'Uttar Pradesh', slug: 'uttar-pradesh' },
+            { name: 'Maharashtra', slug: 'maharashtra' },
+            { name: 'Madhya Pradesh', slug: 'madhya-pradesh' },
+            { name: 'Bihar', slug: 'bihar' },
+            { name: 'Rajasthan', slug: 'rajasthan' },
+            { name: 'Gujarat', slug: 'gujarat' },
+            { name: 'West Bengal', slug: 'west-bengal' },
+            { name: 'Karnataka', slug: 'karnataka' },
+            { name: 'Andhra Pradesh', slug: 'andhra-pradesh' },
+            { name: 'Assam', slug: 'assam' },
+            { name: 'Tamil Nadu', slug: 'tamil-nadu' },
+            { name: 'Haryana', slug: 'haryana' },
+            { name: 'Jharkhand', slug: 'jharkhand' },
+            { name: 'Odisha', slug: 'odisha' },
+            { name: 'Delhi', slug: 'delhi' },
+            { name: 'Jammu And Kashmir', slug: 'jammu-and-kashmir' },
+            { name: 'Telangana', slug: 'telangana' },
+            { name: 'Chhattisgarh', slug: 'chhattisgarh' },
+            { name: 'Himachal Pradesh', slug: 'himachal-pradesh' },
+            { name: 'Uttarakhand', slug: 'uttarakhand' }
+        ],
+        baseUrl: '/tenders/state'
     },
     {
         title: 'TENDER BY CATEGORIES',
-        // Assuming generic search or a future Category directory. For now pointing to generic search or top level
-        viewAllPath: '/search?q=Categories',
+        viewAllPath: '/tenders/category/construction',
         links: [
-            'Road Construction Tenders', 'Building Construction Tenders', 'Civil Works Tenders',
-            'Other Chemicals Tenders', 'Pipeline Projects Tenders', 'Personal paper products Tenders',
-            'Computers Tenders', 'Development Software Tenders', 'Furniture Tenders',
-            'Road transportation Tenders', 'Electrical components Tenders'
-        ]
+            { name: 'Road Construction', slug: 'road-construction' },
+            { name: 'Building Construction', slug: 'building-construction' },
+            { name: 'Civil Works', slug: 'civil-works' },
+            { name: 'Other Chemicals', slug: 'other-chemicals' },
+            { name: 'Pipeline Projects', slug: 'pipeline-projects' },
+            { name: 'Software Development', slug: 'development-software' },
+            { name: 'Furniture', slug: 'furniture' },
+            { name: 'Road Transportation', slug: 'road-transportation' },
+            { name: 'Electrical Components', slug: 'electrical-components' }
+        ],
+        baseUrl: '/tenders/category'
     },
     {
         title: 'TENDER BY AUTHORITIES',
         viewAllPath: '/authorities',
         links: [
-            'National Highway Authority of India Tenders', 'Central Public works Department Tenders',
-            'Road And Building Department Tenders', 'Public Works Department Tenders',
-            'Oil and natural Gas corporation Limited Tenders', 'Bharat Petroleum Corporation Limited Tenders',
-            'Ministry of Road transport and highways Tenders', 'Bharat Heavy Electricals Limited Tenders',
-            'Gas Authority of India Limited Tenders', 'Ministry Of Defence Tenders',
-            'Public Health Engineering Department Tenders', 'National Board Of Examination Tenders'
-        ]
-    },
-    {
-        title: 'TENDER BY COUNTRIES',
-        viewAllPath: '/countries',
-        links: [
-            'United States Tenders', 'Philippines Tenders', 'France Tenders', 'Russia Tenders',
-            'Germany Tenders', 'Bangladesh Tenders', 'Canada Tenders', 'Bosnia and Herzegovina Tenders',
-            'Poland Tenders', 'Spain Tenders', 'Brazil Tenders', 'South Africa Tenders',
-            'Vietnam Tenders', 'Chile Tenders', 'Morocco Tenders', 'Belarus Tenders',
-            'Morocco Tenders', 'China Tenders', 'Japan Tenders', 'United Kingdom Tenders',
-            'Ukraine Tenders', 'Egypt Tenders'
-        ]
-    },
-    {
-        title: 'TENDER BY REGIONS',
-        viewAllPath: '/regions',
-        links: [
-            'Africa Tenders', 'Asia Tenders', 'Australia Tenders', 'Europe Tenders',
-            'Latin America Tenders', 'Middle East Tenders', 'MENA Tenders', 'North America Tenders',
-            'SAARC Tenders'
-        ]
-    },
-    {
-        title: 'TENDER BY WEBSITE',
-        viewAllPath: '/websites',
-        links: [
-            'ireps.gov.in Tenders', 'wbtenders.gov.in Tenders', 'mahatenders.gov.in Tenders',
-            'bidplus.gem.gov.in Tenders', 'etenders.gov.in Tenders', 'tender.nprocure.com Tenders',
-            'eproc.rajasthan.gov.in Tenders', 'eprocurentpc.nic.in Tenders', 'nbcc.enivida.com Tenders',
-            'jktenders.gov.in Tenders', 'kppp.karnataka.gov.in Tenders', 'defproc.gov.in Tenders',
-            'tntenders.gov.in Tenders', 'eproc.punjab.gov.in Tenders', 'tender.telangana.gov.in Tenders',
-            'eprocure.gov.in Tenders', 'eproc.cgstate.gov.in Tenders', 'etender.cpwd.gov.in Tenders'
-        ]
+            { name: 'NHAI', slug: 'national-highway-authority-of-india' },
+            { name: 'CPWD', slug: 'central-public-works-department' },
+            { name: 'PWD', slug: 'public-works-department' },
+            { name: 'ONGC', slug: 'oil-and-natural-gas-corporation-limited' },
+            { name: 'BPCL', slug: 'bharat-petroleum-corporation-limited' },
+            { name: 'BHEL', slug: 'bharat-heavy-electricals-limited' },
+            { name: 'Ministry of Defence', slug: 'ministry-of-defence' }
+        ],
+        baseUrl: '/tenders/authority'
     }
 ];
 
@@ -82,13 +71,13 @@ export default function QuickLinks() {
                                 {group.title}
                             </h3>
                             <div className="flex flex-wrap gap-2 text-[13px] leading-relaxed text-gray-600">
-                                {group.links.map((link, idx) => (
+                                {group.links.map((link: any, idx) => (
                                     <span key={idx} className="inline-block">
                                         <Link
-                                            href={`/search?q=${encodeURIComponent(link)}`}
-                                            className="hover:text-primary hover:underline transition-colors"
+                                            href={`${group.baseUrl}/${link.slug}`}
+                                            className="hover:text-primary hover:underline transition-colors font-medium"
                                         >
-                                            {link}
+                                            {link.name} Tenders
                                         </Link>
                                         <span className="text-gray-400 mx-1.5 font-light">|</span>
                                     </span>

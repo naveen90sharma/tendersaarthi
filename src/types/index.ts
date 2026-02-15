@@ -1,5 +1,6 @@
 export interface Tender {
     id: number;
+    slug: string;
     title: string;
     authority?: string;
     location?: string;

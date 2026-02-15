@@ -23,7 +23,7 @@ const navItems: NavItem[] = [
             { label: 'Latest Tenders', path: '/active-tenders/latest' },
             { label: 'Closing Soon', path: '/active-tenders/closing-soon' },
             { label: 'High Value', path: '/active-tenders/high-value' },
-            { label: 'State-wise', path: '/active-tenders/state' },
+            { label: 'State-wise Tenders', path: '/active-tenders' },
         ]
     },
     {
@@ -51,11 +51,11 @@ const navItems: NavItem[] = [
         path: '/categories',
         icon: <LayoutDashboard size={20} />,
         dropdown: [
-            { label: 'Construction', path: '/category/construction' },
-            { label: 'IT & Software', path: '/category/it' },
-            { label: 'Electrical', path: '/category/electrical' },
-            { label: 'Transport', path: '/category/transport' },
-            { label: 'View All', path: '/categories' },
+            { label: 'Construction', path: '/tenders/category/construction' },
+            { label: 'IT & Software', path: '/tenders/category/it-software' },
+            { label: 'Electrical', path: '/tenders/category/electrical' },
+            { label: 'Transport', path: '/tenders/category/transport' },
+            { label: 'View All', path: '/active-tenders' },
         ]
 
     },
@@ -145,35 +145,11 @@ export default function Header() {
 
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0 cursor-pointer hover:opacity-90 transition">
-                        <div className="text-2xl font-bold text-slate-800 flex items-center gap-1 tracking-tight">
-                            Tender<span className="text-primary font-black">Saarthi</span>
+                        <div className="text-2xl font-black flex items-center tracking-tighter">
+                            <span className="text-tj-yellow">Tender</span>
+                            <span className="text-slate-800">Saarthi</span>
                         </div>
                     </Link>
-
-                    {/* Search Bar - Wide and Grey */}
-                    <div className="hidden md:flex flex-1 max-w-2xl px-4">
-                        <div className="w-full relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
-                                <Search size={18} strokeWidth={2.5} />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Search tenders by keyword, department, or ID..."
-                                className="w-full bg-[#f1f5f9] border border-transparent rounded-lg py-2.5 pl-12 pr-4 text-sm focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium text-slate-700 placeholder:text-slate-400"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                            />
-                            {searchQuery && (
-                                <button
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-white text-[10px] font-black px-4 py-1.5 rounded-md uppercase tracking-widest hover:brightness-110 transition-all shadow-sm"
-                                    onClick={handleSearch}
-                                >
-                                    Search
-                                </button>
-                            )}
-                        </div>
-                    </div>
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-4">
@@ -337,7 +313,7 @@ export default function Header() {
 
             {/* Mobile Menu Overlay - Persistent for Animations */}
             <div
-                className={`fixed inset-0 z-50 transition-visibility duration-300 ${isMobileMenuOpen ? 'visible' : 'invisible'}`}
+                className={`fixed inset-0 z-[100] transition-visibility duration-300 ${isMobileMenuOpen ? 'visible' : 'invisible'}`}
             >
                 {/* Backdrop with Blur */}
                 <div
@@ -350,57 +326,65 @@ export default function Header() {
                     className={`absolute left-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-300 ease-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}
                 >
                     {/* Header */}
-                    <div className="bg-primary p-6 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 pointer-events-none blur-2xl"></div>
+                    <div className="bg-[#103e68] p-8 relative overflow-hidden">
+                        {/* Decorative background patterns */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 pointer-events-none blur-2xl"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-tj-yellow/10 rounded-full -ml-12 -mb-12 pointer-events-none blur-xl"></div>
 
-                        <div className="flex justify-between items-start relative z-10 mb-6">
-                            <div className="text-white">
-                                <h2 className="text-xl font-black tracking-tight flex items-center gap-1">
+                        <div className="flex justify-between items-start relative z-10 mb-8">
+                            <div>
+                                <h2 className="text-2xl font-black tracking-tighter text-white flex items-center gap-1">
                                     Tender<span className="text-tj-yellow">Saarthi</span>
                                 </h2>
-                                <p className="text-blue-100 text-xs mt-1 font-medium">India's #1 Tender Portal</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <div className="h-[2px] w-6 bg-tj-yellow rounded-full"></div>
+                                    <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.2em]">India's #1 Portal</p>
+                                </div>
                             </div>
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="text-white/80 hover:text-white bg-white/10 p-1.5 rounded-full backdrop-blur-sm"
+                                className="text-white/60 hover:text-white bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 transition-all"
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
                         {/* User Info Block */}
-                        <div className="relative z-10">
+                        <div className="relative z-10 mt-4">
                             {currentUser ? (
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-xl bg-white text-primary flex items-center justify-center text-xl font-bold shadow-lg">
+                                <div className="flex items-center gap-4 bg-white/5 backdrop-blur-md p-4 rounded-[1.5rem] border border-white/10">
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-tj-yellow to-yellow-300 text-tj-blue flex items-center justify-center text-xl font-black shadow-lg">
                                         {currentUser.email?.[0] || 'U'}
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-white text-sm truncate max-w-[150px]">
-                                            {currentUser.user_metadata?.full_name || 'User'}
+                                    <div className="min-w-0">
+                                        <p className="font-black text-white text-base truncate uppercase tracking-tight leading-none mb-1.5">
+                                            {currentUser.user_metadata?.full_name?.split(' ')[0] || 'Hello User'}
                                         </p>
-                                        <p className="text-xs text-blue-200 truncate max-w-[150px]">
+                                        <p className="text-[10px] text-blue-200 font-bold truncate opacity-80">
                                             {currentUser.email}
                                         </p>
                                     </div>
                                 </div>
                             ) : (
-                                <div>
-                                    <h3 className="text-white font-bold text-lg mb-3">Welcome Guest!</h3>
+                                <div className="space-y-5">
+                                    <div>
+                                        <p className="text-blue-200 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Welcome Experience</p>
+                                        <h3 className="text-white font-black text-2xl tracking-tight">Unlock Opportunities</h3>
+                                    </div>
                                     <div className="flex gap-3">
                                         <Link
                                             href="/login"
-                                            className="flex-1 bg-white text-primary text-xs font-black py-2.5 px-4 rounded-lg text-center uppercase tracking-wider shadow-md hover:bg-gray-50 transition-colors"
+                                            className="flex-1 bg-white text-[#103e68] text-[11px] font-black py-3 px-4 rounded-xl text-center uppercase tracking-wider shadow-xl hover:translate-y-[-2px] transition-all"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             Sign In
                                         </Link>
                                         <Link
                                             href="/register"
-                                            className="flex-1 bg-tj-yellow text-primary text-xs font-black py-2.5 px-4 rounded-lg text-center uppercase tracking-wider shadow-md hover:brightness-110 transition-colors"
+                                            className="flex-1 bg-tj-yellow text-[#103e68] text-[11px] font-black py-3 px-4 rounded-xl text-center uppercase tracking-wider shadow-xl shadow-tj-yellow/20 hover:translate-y-[-2px] transition-all"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            Register
+                                            Join Now
                                         </Link>
                                     </div>
                                 </div>
@@ -409,65 +393,58 @@ export default function Header() {
                     </div>
 
                     {/* Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto bg-gray-50/50">
-                        {/* Search in Menu */}
-                        <div className="p-4 sticky top-0 bg-gray-50/95 backdrop-blur-sm z-10 border-b border-gray-100">
-                            <div className="relative group">
-                                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" />
-                                <input
-                                    type="text"
-                                    placeholder="Search Tenders..."
-                                    className="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all shadow-sm"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyDown={handleKeyDown}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="p-4 space-y-1">
-                            {navItems.map((item) => (
-                                <div key={item.label} className="bg-white rounded-xl border border-gray-100 overflow-hidden mb-2 shadow-sm">
-                                    <div
-                                        className={`flex items-center justify-between p-3.5 cursor-pointer hover:bg-gray-50 transition-colors ${activeMobileDropdown === item.label ? 'bg-gray-50' : ''}`}
-                                        onClick={() => item.dropdown ? toggleMobileDropdown(item.label) : (router.push(item.path), setIsMobileMenuOpen(false))}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-lg ${activeMobileDropdown === item.label ? 'bg-primary/10 text-primary' : 'bg-gray-50 text-gray-500'}`}>
-                                                {item.icon || <FileText size={18} />}
+                    <div className="flex-1 overflow-y-auto bg-white">
+                        <div className="py-4 px-2">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-6 mb-4">Main Exploration</h4>
+                            <div className="space-y-0.5">
+                                {navItems.map((item) => (
+                                    <div key={item.label} className="overflow-hidden">
+                                        <div
+                                            className={`flex items-center justify-between px-6 py-4 cursor-pointer transition-all ${activeMobileDropdown === item.label ? 'bg-slate-50 relative' : 'hover:bg-slate-50'}`}
+                                            onClick={() => item.dropdown ? toggleMobileDropdown(item.label) : (router.push(item.path), setIsMobileMenuOpen(false))}
+                                        >
+                                            {activeMobileDropdown === item.label && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>}
+                                            <div className="flex items-center gap-4">
+                                                <div className={`transition-colors ${activeMobileDropdown === item.label ? 'text-primary' : 'text-slate-400'}`}>
+                                                    {item.icon || <FileText size={20} />}
+                                                </div>
+                                                <span className={`text-[15px] font-black tracking-tight ${activeMobileDropdown === item.label ? 'text-primary' : 'text-slate-700'}`}>
+                                                    {item.label}
+                                                </span>
                                             </div>
-                                            <span className="text-sm font-bold text-gray-700">{item.label}</span>
+                                            {item.dropdown && (
+                                                <ChevronDown
+                                                    size={16}
+                                                    className={`text-slate-300 transition-transform duration-300 ${activeMobileDropdown === item.label ? 'rotate-180 text-primary' : ''}`}
+                                                />
+                                            )}
                                         </div>
+
+                                        {/* Submenu */}
                                         {item.dropdown && (
-                                            <ChevronDown
-                                                size={16}
-                                                className={`text-gray-400 transition-transform duration-300 ${activeMobileDropdown === item.label ? 'rotate-180 text-primary' : ''}`}
-                                            />
+                                            <div
+                                                className={`bg-slate-50/50 overflow-hidden transition-all duration-300 ease-in-out ${activeMobileDropdown === item.label ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+                                            >
+                                                <div className="py-2 pl-12 pr-6 space-y-1">
+                                                    {item.dropdown.map((subItem) => (
+                                                        <Link
+                                                            key={subItem.label}
+                                                            href={subItem.path}
+                                                            className="flex items-center justify-between py-3 text-sm font-bold text-slate-500 hover:text-primary transition-all group"
+                                                            onClick={() => setIsMobileMenuOpen(false)}
+                                                        >
+                                                            {subItem.label}
+                                                            <div className="w-6 h-6 rounded-full bg-white border border-slate-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                                                                <ArrowRight size={12} className="text-primary" />
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
-
-                                    {/* Submenu with Animation State */}
-                                    {item.dropdown && (
-                                        <div
-                                            className={`bg-gray-50 border-t border-gray-100 overflow-hidden transition-all duration-300 ease-in-out ${activeMobileDropdown === item.label ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-                                        >
-                                            <div className="p-2 space-y-1">
-                                                {item.dropdown.map((subItem) => (
-                                                    <Link
-                                                        key={subItem.label}
-                                                        href={subItem.path}
-                                                        className="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-primary hover:bg-white rounded-lg transition-all pl-12 flex items-center justify-between group"
-                                                        onClick={() => setIsMobileMenuOpen(false)}
-                                                    >
-                                                        {subItem.label}
-                                                        <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-primary" />
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
 
                         {/* Extra Links */}
@@ -493,7 +470,7 @@ export default function Header() {
                     </div>
 
                     {/* Bottom Sticky Action Bar */}
-                    <div className="p-4 bg-white border-t border-gray-100 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+                    <div className="p-4 pb-12 bg-white border-t border-gray-100 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
                         <div className="grid grid-cols-2 gap-3">
                             <Link
                                 href="/bid-support"

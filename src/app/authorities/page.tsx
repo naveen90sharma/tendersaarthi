@@ -1,48 +1,28 @@
-'use client';
 
-import { useState } from 'react';
+import { Suspense } from 'react';
 import Link from 'next/link';
-import { Search, Building2, ChevronRight, BarChart3 } from 'lucide-react';
+import { Building2, ChevronRight, BarChart3, Search } from 'lucide-react';
 import Breadcrumb from '@/components/Breadcrumb';
+import { supabase } from '@/services/supabase';
 
-const authoritiesData = [
-    { name: 'Airport Authority of India', count: 124 },
-    { name: 'Bharat Heavy Electricals Limited', count: 89 },
-    { name: 'Central Public Works Department', count: 1432 },
-    { name: 'Defense Research and Development Organization', count: 56 },
-    { name: 'Employees State Insurance Corporation', count: 78 },
-    { name: 'Food Corporation of India', count: 210 },
-    { name: 'Gas Authority of India Limited', count: 45 },
-    { name: 'Hindustan Aeronautics Limited', count: 34 },
-    { name: 'Indian Oil Corporation Limited', count: 321 },
-    { name: 'Jammu and Kashmir Bank', count: 12 },
-    { name: 'Kendriya Vidyalaya Sangathan', count: 67 },
-    { name: 'Life Insurance Corporation', count: 156 },
-    { name: 'Ministry of Road Transport and Highways', count: 890 },
-    { name: 'National Highways Authority of India', count: 2341 },
-    { name: 'Oil and Natural Gas Corporation', count: 432 },
-    { name: 'Public Works Department (PWD)', count: 5678 },
-    { name: 'Reserve Bank of India', count: 23 },
-    { name: 'State Bank of India', count: 198 },
-    { name: 'Telecommunications Consultants India', count: 45 },
-    { name: 'Union Public Service Commission', count: 5 },
-    { name: 'Visakhapatnam Port Trust', count: 67 },
-    { name: 'West Bengal State Electricity Distribution', count: 453 },
-    { name: 'Yamuna Expressway Authority', count: 89 },
-    { name: 'Zilla Parishad', count: 1200 }
-];
+async function getAuthorities() {
+    const { data } = await supabase
+        .from('authorities')
+        .select('*')
+        .eq('status', true)
+        .order('name');
+    return data || [];
+}
 
-export default function AuthorityDirectory() {
-    const [searchTerm, setSearchTerm] = useState('');
+export default async function AuthorityDirectory() {
+    const authoritiesData = await getAuthorities();
 
-    const groupedAuthorities = authoritiesData
-        .filter(auth => auth.name.toLowerCase().includes(searchTerm.toLowerCase()))
-        .reduce((acc, auth) => {
-            const letter = auth.name.charAt(0).toUpperCase();
-            if (!acc[letter]) acc[letter] = [];
-            acc[letter].push(auth);
-            return acc;
-        }, {} as Record<string, typeof authoritiesData>);
+    const groupedAuthorities = authoritiesData.reduce((acc, auth) => {
+        const letter = auth.name.charAt(0).toUpperCase();
+        if (!acc[letter]) acc[letter] = [];
+        acc[letter].push(auth);
+        return acc;
+    }, {} as Record<string, any[]>);
 
     const sortedLetters = Object.keys(groupedAuthorities).sort();
 
@@ -57,73 +37,72 @@ export default function AuthorityDirectory() {
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 mb-2">Tender Authorities Directory</h1>
-                        <p className="text-gray-600">Explore active tenders from over 500+ government departments and PSUs.</p>
-                    </div>
-
-                    <div className="relative w-full md:w-96">
-                        <input
-                            type="text"
-                            placeholder="Search Authority..."
-                            className="w-full bg-white border border-gray-200 rounded-lg py-3 pl-11 pr-4 shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <h1 className="text-4xl font-black text-slate-800 mb-2 tracking-tight uppercase">Tender Authorities</h1>
+                        <p className="text-gray-500 font-medium">Browse active tenders from over 500+ government departments, PSUs, and organizations.</p>
                     </div>
                 </div>
 
-                {sortedLetters.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                        <Building2 size={48} className="mx-auto text-gray-300 mb-4" />
-                        <h3 className="text-lg font-bold text-gray-800 mb-1">No Authorities Found</h3>
-                        <p className="text-gray-500">Try adjusting your search terms</p>
-                    </div>
-                ) : (
-                    <div className="space-y-6">
-                        {sortedLetters.map(letter => (
-                            <div key={letter} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                <div className="bg-gray-50/50 border-b border-gray-100 px-6 py-3 flex items-center gap-3">
-                                    <span className="flex items-center justify-center w-8 h-8 rounded bg-primary text-white text-sm font-bold shadow-sm">
-                                        {letter}
-                                    </span>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                                        {groupedAuthorities[letter].length} Authorities Listed
-                                    </span>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 relative">
-                                    {groupedAuthorities[letter].map((auth) => (
-                                        <Link
-                                            key={auth.name}
-                                            href={`/authority/${auth.name.toLowerCase().replace(/\s+/g, '-')}`}
-                                            className="group relative p-5 hover:bg-blue-50/30 transition-all duration-200 border-b md:border-b-0 md:border-r border-gray-100 last:border-0 hover:z-10"
-                                        >
-                                            <div className="flex items-start justify-between gap-3 mb-2">
-                                                <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-white group-hover:shadow-md transition-all duration-200">
-                                                    <Building2 size={20} className="text-gray-500 group-hover:text-primary transition-colors" />
-                                                </div>
-                                                <span className="flex items-center gap-1 text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full border border-green-200">
-                                                    <BarChart3 size={10} />
-                                                    {auth.count} Tenders
-                                                </span>
-                                            </div>
-
-                                            <h3 className="text-sm font-bold text-gray-800 leading-snug group-hover:text-primary transition-colors mb-1">
-                                                {auth.name}
-                                            </h3>
-
-                                            <div className="flex items-center text-xs text-primary font-medium opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                                                View Active Tenders <ChevronRight size={12} />
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
+                <div className="space-y-8">
+                    {sortedLetters.map(letter => (
+                        <div key={letter} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div className="bg-slate-50 border-b border-gray-100 px-8 py-4 flex items-center gap-4">
+                                <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-orange-500 text-white text-lg font-black shadow-lg shadow-orange-500/20">
+                                    {letter}
+                                </span>
+                                <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
+                                    {groupedAuthorities[letter].length} Departments Found
+                                </span>
                             </div>
-                        ))}
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-4 gap-2">
+                                {groupedAuthorities[letter].map((auth) => (
+                                    <Link
+                                        key={auth.slug}
+                                        href={`/tenders/authority/${auth.slug}`}
+                                        className="group flex flex-col p-5 rounded-2xl hover:bg-slate-50 transition-all duration-300 border border-transparent hover:border-slate-100"
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-white group-hover:shadow-md transition-all duration-300">
+                                                <Building2 size={18} className="text-blue-500" />
+                                            </div>
+                                            <div className="flex items-center gap-1 text-[10px] font-black bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg border border-emerald-100">
+                                                <BarChart3 size={10} />
+                                                LATEST
+                                            </div>
+                                        </div>
+
+                                        <h3 className="text-[14px] font-black text-slate-700 group-hover:text-primary transition-colors leading-tight mb-2">
+                                            {auth.name}
+                                        </h3>
+
+                                        <div className="flex items-center text-[11px] text-primary font-bold opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                                            EXPLORE CONTRACTS <ChevronRight size={12} className="ml-1" />
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* SEO Text Block for Authorities */}
+                <div className="mt-16 bg-white rounded-3xl p-10 border border-gray-100 shadow-sm max-w-4xl mx-auto">
+                    <h2 className="text-2xl font-black text-slate-800 mb-6 uppercase tracking-tight">Consolidated Tenders from Major Departments</h2>
+                    <div className="prose prose-slate max-w-none text-gray-500 font-medium leading-relaxed">
+                        <p>
+                            Finding tenders across different government bodies like <b>NHAI, CPWD, Railway Board, and BHEL</b> can be challenging.
+                            TenderSaarthi aggregates all active notices from these authorities into a single, searchable database.
+                        </p>
+                        <p className="mt-4">
+                            Whether you are looking for <b>National Highways Construction, Railway Track Maintenance, or PSU Supply Contracts</b>,
+                            our authority directory helps you narrow down your search to specific departments. We cover central ministries,
+                            state-level bodies, and municipal corporations across India.
+                        </p>
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );
 }
+
+export const revalidate = 3600;

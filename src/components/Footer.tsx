@@ -44,7 +44,10 @@ export default function Footer() {
                         <Link href="/" className="inline-block">
                             <div className="flex items-center gap-2">
                                 <div className="w-10 h-10 bg-tj-yellow rounded-lg flex items-center justify-center text-primary font-black text-xl">TS</div>
-                                <span className="text-2xl font-black text-white tracking-tighter">TenderSaarthi</span>
+                                <div className="text-2xl font-black tracking-tighter">
+                                    <span className="text-tj-yellow">Tender</span>
+                                    <span className="text-white">Saarthi</span>
+                                </div>
                             </div>
                         </Link>
                         <p className="text-blue-100/70 text-sm leading-relaxed font-medium max-w-sm">
@@ -151,6 +154,8 @@ export default function Footer() {
                     </div>
                 </div>
             </div>
+            {/* Bottom Safe Area for Mobile Nav */}
+            <div className="h-20 md:hidden" />
         </footer>
     );
 }

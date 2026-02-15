@@ -56,23 +56,23 @@ export default function StatsSection() {
     }
 
     return (
-        <section className="py-16 bg-white border-b border-gray-50 relative overflow-hidden">
+        <section className="py-10 md:py-16 bg-white border-b border-gray-50 relative overflow-hidden">
             <div className="container mx-auto px-4 relative z-10">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12">
                     {stats.map((stat, index) => (
                         <div key={index} className="flex flex-col items-center text-center group cursor-default">
-                            <div className="relative mb-6">
-                                <div className="p-5 rounded-3xl bg-[#f8fafc] text-primary border border-gray-100 group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl shadow-gray-100 group-hover:shadow-primary/20">
-                                    <stat.icon size={32} strokeWidth={2.5} />
+                            <div className="relative mb-4 md:mb-6">
+                                <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl bg-[#f8fafc] text-primary border border-gray-100 group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl shadow-gray-100 group-hover:shadow-primary/20">
+                                    <stat.icon size={28} className="md:w-8 md:h-8" strokeWidth={2.5} />
                                 </div>
-                                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#FFC212] rounded-full border-4 border-white flex items-center justify-center">
+                                <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 w-6 h-6 md:w-8 md:h-8 bg-[#FFC212] rounded-full border-2 md:border-4 border-white flex items-center justify-center">
                                     <div className="w-1 h-1 bg-primary rounded-full animate-ping" />
                                 </div>
                             </div>
-                            <div className="space-y-1">
-                                <div className="text-3xl md:text-4xl font-black text-primary tracking-tighter tabular-nums">{stat.value}</div>
-                                <div className="text-[13px] font-black text-[#1e293b] uppercase tracking-wider">{stat.label}</div>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{stat.sub}</p>
+                            <div className="space-y-0.5 md:space-y-1">
+                                <div className="text-2xl md:text-4xl font-black text-primary tracking-tighter tabular-nums">{stat.value}</div>
+                                <div className="text-[11px] md:text-[13px] font-black text-[#1e293b] uppercase tracking-wider">{stat.label}</div>
+                                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-tight">{stat.sub}</p>
                             </div>
                         </div>
                     ))}
