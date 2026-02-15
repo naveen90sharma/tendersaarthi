@@ -7,6 +7,7 @@ import FilterSidebar from '@/components/FilterSidebar';
 import TenderCard from '@/components/TenderCard';
 import Breadcrumb from '@/components/Breadcrumb';
 import { supabase } from '@/services/supabase';
+import Image from 'next/image';
 import { RefreshCw, ChevronLeft, ChevronRight, AlertCircle, Filter } from 'lucide-react';
 import type { Tender } from '@/types';
 
@@ -56,6 +57,7 @@ export default function TenderListing({
 
     const effectiveQuery = urlQuery || initialQuery;
     const isArchive = type === 'archive';
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
     // Filter Params
     const categoryParam = searchParams.get('category');
@@ -304,7 +306,9 @@ export default function TenderListing({
         submissionDateFrom,
         submissionDateTo,
         sortBy,
-        initialFilters
+        initialFilters,
+        minPrice,
+        maxPrice
     ]);
 
     const handlePageChange = (newPage: number) => {
@@ -318,8 +322,8 @@ export default function TenderListing({
 
     return (
         <div className="bg-gray-50 min-h-screen pb-16">
-            <div className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90">
-                <div className="container mx-auto px-4 py-4">
+            <div className="bg-white border-b border-gray-100">
+                <div className="container mx-auto px-4 pt-4">
                     <Breadcrumb />
                 </div>
             </div>
@@ -361,17 +365,8 @@ export default function TenderListing({
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     <div className="lg:w-1/4 space-y-8">
-                        {/* Mobile Filter Toggle */}
-                        <button
-                            onClick={() => document.getElementById('mobile-filter-drawer')?.classList.toggle('hidden')}
-                            className="lg:hidden w-full bg-white border border-gray-200 text-gray-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-sm mb-4"
-                        >
-                            <Filter size={18} />
-                            Filters
-                        </button>
-
-                        <div id="mobile-filter-drawer" className="hidden lg:block">
-                            <FilterSidebar />
+                        <div className="w-full">
+                            <FilterSidebar open={mobileFiltersOpen} onClose={() => setMobileFiltersOpen(false)} />
                         </div>
 
                         {/* Category Breakdown */}
@@ -433,7 +428,41 @@ export default function TenderListing({
                     </div>
 
                     <div className="w-full lg:w-3/4">
-                        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+                        {/* Mobile Filter & Sort Bar */}
+                        <div className="lg:hidden flex items-center gap-3 mb-6 sticky top-[62px] z-30 bg-gray-50/95 backdrop-blur py-2">
+                            <div className="flex-1 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4 mask-fade-right">
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleSortChange('newest')}
+                                        className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap border transition-all ${sortBy === 'newest' ? 'bg-[#103e68] text-white border-[#103e68] shadow-md shadow-[#103e68]/20' : 'bg-white text-gray-500 border-gray-200'}`}
+                                    >
+                                        All
+                                    </button>
+                                    <button
+                                        onClick={() => handleSortChange('closing')}
+                                        className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap border transition-all ${sortBy === 'closing' ? 'bg-[#103e68] text-white border-[#103e68] shadow-md shadow-[#103e68]/20' : 'bg-white text-gray-500 border-gray-200'}`}
+                                    >
+                                        Closing Soon
+                                    </button>
+                                    <button
+                                        onClick={() => handleSortChange('value_high')}
+                                        className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap border transition-all ${sortBy === 'value_high' ? 'bg-[#103e68] text-white border-[#103e68] shadow-md shadow-[#103e68]/20' : 'bg-white text-gray-500 border-gray-200'}`}
+                                    >
+                                        High Value
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setMobileFiltersOpen(true)}
+                                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-[#103e68] shrink-0 shadow-sm active:scale-95 transition-transform"
+                            >
+                                <Filter size={18} strokeWidth={2.5} />
+                            </button>
+                        </div>
+
+                        {/* Desktop Sort Header */}
+                        <div className="hidden lg:flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
                             <div className="text-sm font-medium text-gray-600">
                                 Sorted by: <span className="font-bold text-gray-800 capitalize">{sortBy.replace('_', ' ')}</span>
                             </div>
@@ -464,8 +493,14 @@ export default function TenderListing({
                                     ))
                                 ) : (
                                     <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-sm">
-                                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <AlertCircle size={32} className="text-gray-300" />
+                                        <div className="flex justify-center mb-6">
+                                            <Image
+                                                src="/empty.svg"
+                                                alt="No tenders found"
+                                                width={200}
+                                                height={200}
+                                                className="opacity-90"
+                                            />
                                         </div>
                                         <h3 className="text-xl font-bold text-gray-800 mb-2">No Tenders Found</h3>
                                         <p className="text-gray-500 max-w-sm mx-auto mb-8 font-medium">We couldn't find any tenders matching your current filters. Try resetting or adjusting your search.</p>
