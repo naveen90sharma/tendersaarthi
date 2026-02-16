@@ -1,0 +1,10 @@
+Fetching tenders within the problematic range...
+Checking count of tenders with tender_value_numeric >= 34340000000
+Total matching tenders: 1
+
+Checking specific IDs/Values mentioned by user...
+Found 2 problematic tenders mentioned by user.
+39ff319c-296b-43df-a97d-d168bc613bc1: Strengthening & Major Maintena... | Val: 1,87,30,00,000 | Num: 1873000000
+Confirmed: tender_value_numeric < minPrice. Filtering logic appears sound at DB level.
+e6473089-d472-431b-abac-3937bb573ce9: Providing Solar Highway Lighti... | Val: 2,51,00,000 | Num: 25100000
+Confirmed: tender_value_numeric < minPrice. Filtering logic appears sound at DB level.

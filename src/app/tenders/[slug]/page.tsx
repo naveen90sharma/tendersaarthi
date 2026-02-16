@@ -4,6 +4,8 @@ import { supabase } from '@/services/supabase';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import SaveTenderButton from '@/components/SaveTenderButton';
+import PrintButton from '@/components/PrintButton';
+import TenderIntelligence from '@/components/TenderIntelligence';
 import { headers } from 'next/headers';
 
 interface TenderDetailProps {
@@ -98,8 +100,24 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                         <Link href="/" className="hover:text-tj-yellow transition-colors whitespace-nowrap">Home</Link>
                         <ChevronRight size={10} className="opacity-40" />
                         <Link href="/active-tenders" className="hover:text-tj-yellow transition-colors whitespace-nowrap">Tenders</Link>
+                        {tender.state && (
+                            <>
+                                <ChevronRight size={10} className="opacity-40" />
+                                <Link href={`/tenders/state/${tender.state.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-tj-yellow transition-colors whitespace-nowrap">
+                                    {tender.state}
+                                </Link>
+                            </>
+                        )}
+                        {tender.tender_category && (
+                            <>
+                                <ChevronRight size={10} className="opacity-40" />
+                                <Link href={`/tenders/category/${tender.tender_category.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-tj-yellow transition-colors whitespace-nowrap">
+                                    {tender.tender_category}
+                                </Link>
+                            </>
+                        )}
                         <ChevronRight size={10} className="opacity-40" />
-                        <span className="text-tj-yellow truncate">#{tender.tender_id || 'Detail'}</span>
+                        <span className="text-tj-yellow truncate max-w-[200px]">{tender.tender_id || 'Detail'}</span>
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-6">
@@ -113,7 +131,7 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                         )}
                     </div>
 
-                    <h1 className="text-2xl md:text-5xl font-black leading-[1.2] md:leading-tight tracking-tight mb-8">
+                    <h1 className="text-2xl md:text-3xl font-black leading-[1.2] md:leading-tight tracking-tight mb-8">
                         {tender.title}
                     </h1>
 
@@ -134,95 +152,123 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
                     <div className="space-y-8">
                         {/* Highlights Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
                             {[
-                                { label: 'Tender Value', value: tender.tender_value, icon: <IndianRupee size={20} />, color: 'bg-white' },
-                                { label: 'EMD Amount', value: tender.emd_amount, icon: <Wallet size={20} />, color: 'bg-white' },
-                                { label: 'Tender Fee', value: tender.tender_fee, icon: <FileCheck size={20} />, color: 'bg-white' },
-                                { label: 'Bid Deadline', value: tender.bid_submission_end, icon: <Clock size={20} />, color: isUrgent ? 'bg-red-50' : 'bg-white', text: isUrgent ? 'text-red-600' : 'text-primary' },
+                                { label: 'Tender Value', value: tender.tender_value, icon: <IndianRupee size={18} />, color: 'bg-white' },
+                                { label: 'EMD Amount', value: tender.emd_amount, icon: <Wallet size={18} />, color: 'bg-white' },
+                                { label: 'Tender Fee', value: tender.tender_fee, icon: <FileCheck size={18} />, color: 'bg-white' },
+                                { label: 'Bid Deadline', value: tender.bid_submission_end, icon: <Clock size={18} />, color: isUrgent ? 'bg-red-50' : 'bg-white', text: isUrgent ? 'text-red-600' : 'text-primary' },
                             ].map((item, i) => (
-                                <div key={i} className={`${item.color} p-5 md:p-6 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between group transition-all`}>
-                                    <div className={`mb-4 ${item.text || 'text-slate-400 group-hover:text-primary'}`}>
+                                <div key={i} className={`${item.color} p-3 md:p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between group transition-all`}>
+                                    <div className={`mb-2 ${item.text || 'text-slate-400 group-hover:text-primary'}`}>
                                         {item.icon}
                                     </div>
                                     <div>
                                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
-                                        <p className={`text-base font-black truncate ${item.text || 'text-slate-800'}`}>{item.value || 'N/A'}</p>
+                                        <p className={`text-sm md:text-[15px] font-black leading-tight break-words ${item.text || 'text-slate-800'}`}>
+                                            {item.value || 'N/A'}
+                                        </p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* AI Powered Analysis Section */}
-                        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/50 border border-slate-50 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32 transition-transform group-hover:scale-110" />
-
-                            <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
-                                <div className="space-y-1">
-                                    <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                                        <Sparkles className="text-tj-yellow animate-pulse" />
-                                        AI Tender Intelligence
-                                    </h2>
-                                    <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Automated opportunity assessment v3.4</p>
-                                </div>
-                                <div className="flex-shrink-0">
-                                    <div className="bg-primary/5 text-primary text-[9px] font-black px-4 py-2 rounded-full border border-primary/10 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
-                                        LIVE ANALYSIS
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
-                                {[
-                                    { label: 'Complexity', value: 'High Accuracy Extract', icon: <FileText size={16} /> },
-                                    { label: 'Work Type', value: tender.tender_category, icon: <Briefcase size={16} /> },
-                                    { label: 'Authority', value: tender.authority, icon: <Building2 size={16} /> },
-                                    { label: 'Deadline Status', value: isExpired ? 'Expired' : 'Active Opportunity', icon: <Clock size={16} /> },
-                                ].map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-primary/20 hover:bg-white transition-all">
-                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary group-hover:rotate-12 transition-transform">
-                                            {item.icon}
+                        {/* Important Downloads Section */}
+                        <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm space-y-6">
+                            <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                                <Download className="text-primary" size={20} />
+                                Official Documents
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="group relative overflow-hidden bg-slate-50 hover:bg-white border border-slate-200 hover:border-primary/30 rounded-2xl p-4 transition-all duration-300">
+                                    <div className="flex items-start gap-4">
+                                        <div className="bg-red-50 text-red-500 p-3 rounded-xl group-hover:scale-110 transition-transform">
+                                            <FileText size={24} />
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{item.label}</p>
-                                            <p className="text-sm text-slate-700 font-bold truncate max-w-[200px]">{item.value || 'N/A'}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {tender.eligibility_requirements && (
-                                <div className="space-y-6">
-                                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.25em] flex items-center gap-3">
-                                        <div className="w-8 h-[2px] bg-tj-yellow" />
-                                        Eligibility & Key Requirements
-                                    </h3>
-                                    <div className="bg-slate-50 rounded-[2rem] p-6 md:p-10 border border-slate-100 shadow-inner">
-                                        <div className="prose prose-slate prose-sm max-w-none text-slate-600 font-medium leading-loose">
-                                            <div dangerouslySetInnerHTML={{
-                                                __html: tender.eligibility_requirements.includes('<')
-                                                    ? tender.eligibility_requirements
-                                                    : `<ul class="space-y-4">${tender.eligibility_requirements.split('\n').map((l: string) => l.trim() ? `<li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-tj-yellow mt-2 shrink-0"></span> <span class="flex-1">${l}</span></li>` : '').join('')}</ul>`
-                                            }} />
+                                            <p className="font-bold text-slate-800 text-sm mb-1 group-hover:text-primary transition-colors">Notice Inviting Tender (NIT)</p>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">PDF • 2.4 MB • Official</p>
+                                            <a
+                                                href={tender.official_link || '#'}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary hover:underline decoration-2 underline-offset-4"
+                                            >
+                                                Download File <ArrowRight size={10} />
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
-                            )}
+
+                                <div className="group relative overflow-hidden bg-slate-50 hover:bg-white border border-slate-200 hover:border-emerald-500/30 rounded-2xl p-4 transition-all duration-300">
+                                    <div className="flex items-start gap-4">
+                                        <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl group-hover:scale-110 transition-transform">
+                                            <FileCheck size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-800 text-sm mb-1 group-hover:text-emerald-700 transition-colors">Bill of Quantities (BoQ)</p>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">XLS • 850 KB • Financial</p>
+                                            <a
+                                                href={tender.official_link || '#'}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:underline decoration-2 underline-offset-4"
+                                            >
+                                                Download XLS <ArrowRight size={10} />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
+                        {/* Market Intelligence Logic - Simulated for now */}
+                        <TenderIntelligence tender={tender} />
+
+                        {/* Eligibility & Requirements Section - Separate */}
+                        {tender.eligibility_requirements && (
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1 h-8 bg-gradient-to-b from-primary to-blue-400 rounded-full" />
+                                        <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight">
+                                            Eligibility & Requirements
+                                        </h3>
+                                    </div>
+                                    <div className="flex-1 h-[1px] bg-gradient-to-r from-slate-200 to-transparent" />
+                                </div>
+
+                                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
+                                    <div
+                                        className="eligibility-html-content prose prose-slate max-w-none"
+                                        dangerouslySetInnerHTML={{ __html: tender.eligibility_requirements }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         {/* Detailed Description */}
-                        <div className="space-y-6">
-                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.25em] px-2 flex items-center gap-3">
-                                <FileCheck className="text-primary" size={18} />
-                                Full Project Specification
-                            </h3>
-                            <div className="bg-white rounded-[2rem] p-8 md:p-12 border border-slate-100 shadow-sm prose prose-slate max-w-none text-slate-600 font-medium leading-[1.8]">
-                                <div dangerouslySetInnerHTML={{
-                                    __html: tender.description?.includes('<')
-                                        ? tender.description
-                                        : tender.description?.replace(/\n/g, '<br/>') || 'No detailed description provided by authority.'
-                                }} />
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1 h-8 bg-gradient-to-b from-primary to-blue-400 rounded-full" />
+                                    <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight">
+                                        Full Project Specification
+                                    </h3>
+                                </div>
+                                <div className="flex-1 h-[1px] bg-gradient-to-r from-slate-200 to-transparent" />
+                            </div>
+
+                            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
+                                {/* Render HTML description with improved styling */}
+                                <div
+                                    className="project-specification-content prose prose-slate max-w-none"
+                                    dangerouslySetInnerHTML={{
+                                        __html: tender.description?.includes('<')
+                                            ? tender.description
+                                            : tender.description?.replace(/\n/g, '<br/>') || 'No detailed description provided by authority.'
+                                    }}
+                                />
                             </div>
                         </div>
 
@@ -263,7 +309,7 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                                     {similar.map((t: any) => (
                                         <Link key={t.slug} href={`/tenders/${t.slug}`} className="group p-6 bg-slate-50/50 rounded-3xl border border-transparent hover:border-orange-100 hover:bg-white hover:shadow-xl transition-all duration-500">
                                             <div className="flex justify-between items-center mb-4">
-                                                <span className="text-[9px] font-black text-orange-600 bg-orange-50 px-2 by-1 rounded-lg uppercase tracking-wider">AI MATCH</span>
+                                                <span className="text-[9px] font-black text-orange-600 bg-orange-50 px-2 py-1 rounded-lg uppercase tracking-wider">AI MATCH</span>
                                                 <span className="text-[10px] font-bold text-slate-400">{t.state || 'National'}</span>
                                             </div>
                                             <h4 className="text-sm font-black text-slate-700 group-hover:text-primary transition-colors line-clamp-2 mb-4 leading-normal">{t.title}</h4>
@@ -309,6 +355,7 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                                         <MessageSquare size={18} className="text-[#25D366]" />
                                         Share on WhatsApp
                                     </a>
+                                    <PrintButton />
                                 </div>
                             </div>
 

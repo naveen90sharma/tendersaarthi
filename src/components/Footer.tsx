@@ -2,8 +2,13 @@
 
 import Link from 'next/link';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Send, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
+    const pathname = usePathname();
+
+    if (pathname?.startsWith('/dashboard')) return null;
+
     return (
         <footer className="relative bg-[#0B2C4A] text-white overflow-hidden">
             {/* Background Decorative Elements */}

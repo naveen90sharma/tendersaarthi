@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, User, ChevronDown, Globe, Menu, X, LogOut, FileText, Settings, Star, MessageSquare, Briefcase, Bell, Phone, MapPin, ArrowRight, LayoutDashboard, PlusCircle, Headphones, Newspaper } from 'lucide-react';
+import { Search, User, ChevronDown, Globe, Menu, X, LogOut, FileText, Settings, Star, MessageSquare, Briefcase, Bell, Phone, MapPin, ArrowRight, LayoutDashboard, PlusCircle, Headphones, Newspaper, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { getCurrentUser, signOut } from '@/services/auth';
@@ -71,6 +71,12 @@ const navItems: NavItem[] = [
             { label: '2024 Tenders', path: '/archive/2024' },
             { label: '2023 Tenders', path: '/archive/2023' },
         ]
+    },
+    {
+        label: 'Results',
+        path: '/tender-results',
+        icon: <Trophy size={20} />,
+        badge: 'NEW'
     },
     {
         label: 'Post Tender',
@@ -152,6 +158,8 @@ export default function Header() {
         setActiveMobileDropdown(activeMobileDropdown === label ? null : label);
     };
 
+    if (pathname?.startsWith('/dashboard')) return null;
+
     return (
         <>
             <header className="bg-white shadow-sm sticky top-0 z-40 font-sans">
@@ -207,13 +215,12 @@ export default function Header() {
                             currentUser ? (
                                 /* User Profile Dropdown */
                                 <div className="relative group hidden md:block">
-                                    <div className="flex items-center gap-3 bg-white border border-slate-100 rounded-full px-4 py-1.5 cursor-pointer hover:shadow-md hover:border-primary/20 transition-all duration-300">
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-blue-400 text-white flex items-center justify-center text-xs font-black shadow-inner uppercase">
+                                    <div className="flex items-center gap-2.5 bg-white border border-slate-200 rounded-full pl-1.5 pr-4 py-1.5 cursor-pointer hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] hover:border-primary/30 transition-all duration-300">
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-blue-500 text-white flex items-center justify-center text-[13px] font-black shadow-sm uppercase ring-2 ring-white">
                                             {currentUser.email?.[0] || 'U'}
                                         </div>
-                                        <div className="hidden lg:block">
-                                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Account</p>
-                                            <p className="text-sm font-black text-slate-800 leading-none truncate max-w-[100px]">
+                                        <div className="flex flex-col">
+                                            <p className="text-[13px] font-black text-slate-800 leading-none tracking-tight">
                                                 {currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.email?.split('@')[0]}
                                             </p>
                                         </div>
@@ -221,52 +228,50 @@ export default function Header() {
                                     </div>
 
                                     {/* Dropdown Menu */}
-                                    <div className="absolute right-0 top-full mt-3 pt-0 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50 min-w-[280px]">
-                                        <div className="bg-white border border-gray-100 shadow-[0_15px_50px_-12px_rgba(0,0,0,0.15)] rounded-2xl overflow-hidden">
+                                    <div className="absolute right-0 top-full mt-3 pt-0 opacity-0 invisible translate-y-3 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50 min-w-[260px]">
+                                        <div className="bg-white border border-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] rounded-[20px] overflow-hidden">
                                             {/* User Header */}
-                                            <div className="px-6 py-6 bg-gradient-to-br from-gray-50 to-white border-b border-gray-50 flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-tj-blue to-blue-400 text-white flex items-center justify-center text-xl font-black shadow-lg shadow-blue-100 uppercase">
+                                            <div className="px-5 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
+                                                <div className="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center text-lg font-black shadow-lg shadow-primary/20 uppercase">
                                                     {currentUser.email?.[0]}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="font-black text-gray-900 truncate uppercase tracking-tight text-base">
-                                                        {currentUser.user_metadata?.full_name || 'User'}
+                                                    <p className="font-black text-slate-900 truncate tracking-tight text-sm">
+                                                        {currentUser.user_metadata?.full_name || 'My Account'}
                                                     </p>
-                                                    <p className="text-[10px] text-gray-400 font-bold truncate mt-1">
+                                                    <p className="text-[10px] text-slate-400 font-bold truncate">
                                                         {currentUser.email}
                                                     </p>
                                                 </div>
                                             </div>
 
-                                            {/* Actions */}
-                                            <div className="p-2 space-y-1">
+                                            <div className="p-2">
                                                 {[
-                                                    { href: '/my-tenders', icon: <FileText size={18} />, label: 'My Tenders', color: 'text-tj-blue', bg: 'bg-blue-50' },
-                                                    { href: '/my-drafts', icon: <FileText size={18} />, label: 'My Drafts', color: 'text-gray-400', bg: 'bg-gray-50' },
-                                                    { href: '/my-saved', icon: <Star size={18} />, label: 'Saved Tenders', color: 'text-tj-yellow', bg: 'bg-yellow-50' },
-                                                    { href: '/alerts', icon: <MessageSquare size={18} />, label: 'WhatsApp Alerts', color: 'text-[#25D366]', bg: 'bg-green-50' },
-                                                    { href: '/profile', icon: <Settings size={18} />, label: 'Profile Settings', color: 'text-gray-600', bg: 'bg-gray-50' },
+                                                    { href: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard', color: 'text-primary' },
+                                                    { href: '/dashboard', icon: <Star size={18} />, label: 'Saved Tenders', color: 'text-tj-yellow' },
+                                                    { href: '/post-tender', icon: <PlusCircle size={18} />, label: 'Post Tender', color: 'text-emerald-500' },
+                                                    { href: '/dashboard', icon: <Settings size={18} />, label: 'Account Settings', color: 'text-slate-500' },
                                                 ].map((item, i) => (
                                                     <Link
                                                         key={i}
                                                         href={item.href}
-                                                        className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-gray-50 transition-all group/item"
+                                                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all group/item"
                                                     >
-                                                        <div className={`${item.color} ${item.bg} p-2 rounded-xl transition-transform group-hover/item:scale-110`}>
+                                                        <div className={`${item.color} transition-transform group-hover/item:scale-110`}>
                                                             {item.icon}
                                                         </div>
-                                                        <span className="text-sm font-black text-gray-700 uppercase tracking-tight">{item.label}</span>
+                                                        <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{item.label}</span>
                                                     </Link>
                                                 ))}
                                             </div>
 
-                                            <div className="p-2 border-t border-gray-50 bg-gray-50/50">
+                                            <div className="p-2 border-t border-slate-50 bg-slate-50/30">
                                                 <button
                                                     onClick={handleSignOut}
-                                                    className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-500 transition-all font-black uppercase text-[10px] tracking-widest border border-transparent hover:border-red-100 shadow-sm"
+                                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl hover:bg-red-50 text-red-500 transition-all font-black uppercase text-[10px] tracking-widest"
                                                 >
                                                     <LogOut size={16} />
-                                                    Log Out Securely
+                                                    Sign Out
                                                 </button>
                                             </div>
                                         </div>
@@ -501,9 +506,9 @@ export default function Header() {
                                 <>
                                     <div className="border-t border-gray-200 my-4"></div>
                                     <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest px-2 mb-2">Account</h4>
-                                    <Link href="/profile" className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 shadow-sm" onClick={() => setIsMobileMenuOpen(false)}>
-                                        <Settings size={18} className="text-gray-500" />
-                                        <span className="text-sm font-bold text-gray-700">Settings</span>
+                                    <Link href="/dashboard" className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 shadow-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <LayoutDashboard size={18} className="text-gray-500" />
+                                        <span className="text-sm font-bold text-gray-700">My Dashboard</span>
                                     </Link>
                                     <button
                                         onClick={handleSignOut}

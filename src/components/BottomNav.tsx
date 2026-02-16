@@ -11,6 +11,8 @@ export default function BottomNav() {
 
     const isActive = (path: string) => pathname === path;
 
+    if (pathname?.startsWith('/dashboard')) return null;
+
     return (
         <>
             <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] z-50 md:hidden pb-safe">
