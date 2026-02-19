@@ -73,6 +73,7 @@ export default function TenderListing({
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const sortBy = searchParams.get('sortBy') || 'newest';
+    const yearParam = searchParams.get('year');
 
     const handleSortChange = (newSort: string) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -146,7 +147,13 @@ export default function TenderListing({
                 const now = new Date().toISOString();
 
                 if (type === 'archive') {
-                    supabaseQuery = supabaseQuery.lt('bid_end_ts', now);
+                    if (yearParam) {
+                        const startOfYear = `${yearParam}-01-01T00:00:00Z`;
+                        const endOfYear = `${yearParam}-12-31T23:59:59Z`;
+                        supabaseQuery = supabaseQuery.gte('bid_end_ts', startOfYear).lte('bid_end_ts', endOfYear);
+                    } else {
+                        supabaseQuery = supabaseQuery.lt('bid_end_ts', now);
+                    }
                 } else if (type === 'latest') {
                     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
                     supabaseQuery = supabaseQuery.gt('created_at', yesterday).gt('bid_end_ts', now);
@@ -163,7 +170,12 @@ export default function TenderListing({
                 }
 
                 // 1.5 Global Filters
-                supabaseQuery = supabaseQuery.eq('status', 'published');
+                // Allow 'published' and 'Active' for all, but for archive also allow 'archived' and 'closed'
+                if (isArchive) {
+                    supabaseQuery = supabaseQuery.in('status', ['published', 'archived', 'closed', 'Active']);
+                } else {
+                    supabaseQuery = supabaseQuery.in('status', ['published', 'Active']);
+                }
 
                 // 2. Powerful Full-Text Search (FTS) with Exact Match Fallback
                 if (effectiveQuery) {
@@ -308,7 +320,8 @@ export default function TenderListing({
         sortBy,
         initialFilters,
         minPrice,
-        maxPrice
+        maxPrice,
+        yearParam
     ]);
 
     const handlePageChange = (newPage: number) => {

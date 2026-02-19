@@ -4,7 +4,7 @@ import { TrendingUp, Building2, MapPin, Bell, RefreshCw, BarChart3, Globe } from
 import { useState, useEffect } from 'react';
 import { supabase } from '@/services/supabase';
 
-export default function StatsSection() {
+export default function StatsSection({ isDark = false }: { isDark?: boolean }) {
     const [counts, setCounts] = useState({
         tenders: '0',
         authorities: '0',
@@ -40,39 +40,37 @@ export default function StatsSection() {
     }, []);
 
     const stats = [
-        { icon: BarChart3, value: counts.tenders, label: 'Live Tenders', sub: 'Opportunities available today' },
-        { icon: Building2, value: counts.authorities, label: 'Verified Org', sub: 'PSUs, Govt & Private' },
-        { icon: Globe, value: counts.states, label: 'States Coverage', sub: 'All 28 States & UTs' },
-        { icon: RefreshCw, value: '60 Min', label: 'Refresh Cycle', sub: 'Guaranteed data accuracy' },
+        { icon: BarChart3, value: counts.tenders, label: 'Live Tenders', sub: 'Today' },
+        { icon: Building2, value: counts.authorities, label: 'Authorities', sub: 'Verified' },
+        { icon: Globe, value: counts.states, label: 'States', sub: 'Coverage' },
+        { icon: RefreshCw, value: '60 Min', label: 'Updates', sub: 'Every Hour' },
     ];
 
-    if (loading) {
-        return (
-            <div className="py-20 bg-white flex flex-col items-center justify-center border-b border-gray-50">
-                <RefreshCw className="animate-spin text-primary/20 mb-4" size={40} />
-                <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Loading Live Stats</p>
-            </div>
-        );
-    }
+    if (loading) return null;
 
     return (
-        <section className="py-10 md:py-16 bg-white border-b border-gray-50 relative overflow-hidden">
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12">
+        <section className={`${isDark ? 'py-1 mt-1 bg-transparent border-none' : 'py-10 md:py-16 bg-white border-b border-gray-50'} relative overflow-hidden`}>
+            <div className="container mx-auto px-2 md:px-4 relative z-10">
+                <div className={`grid grid-cols-4 ${isDark ? 'gap-1' : 'gap-2'} md:gap-12`}>
                     {stats.map((stat, index) => (
                         <div key={index} className="flex flex-col items-center text-center group cursor-default">
-                            <div className="relative mb-4 md:mb-6">
-                                <div className="p-4 md:p-5 rounded-2xl md:rounded-3xl bg-[#f8fafc] text-primary border border-gray-100 group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl shadow-gray-100 group-hover:shadow-primary/20">
-                                    <stat.icon size={28} className="md:w-8 md:h-8" strokeWidth={2.5} />
+                            <div className={`relative ${isDark ? 'mb-1.5' : 'mb-2'} md:mb-6`}>
+                                <div className={`${isDark ? 'p-2' : 'p-2.5'} md:p-5 rounded-xl md:rounded-3xl transition-all duration-500 ${isDark
+                                        ? 'bg-white/5 text-tj-yellow border border-white/10'
+                                        : 'bg-[#f8fafc] text-primary border border-gray-100 shadow-xl shadow-gray-100'
+                                    } group-hover:bg-tj-yellow group-hover:text-primary group-hover:scale-110 transition-all`}>
+                                    <stat.icon size={isDark ? 16 : 20} className="md:w-8 md:h-8" strokeWidth={2.5} />
                                 </div>
-                                <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 w-6 h-6 md:w-8 md:h-8 bg-[#FFC212] rounded-full border-2 md:border-4 border-white flex items-center justify-center">
-                                    <div className="w-1 h-1 bg-primary rounded-full animate-ping" />
-                                </div>
+                                {!isDark && (
+                                    <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 w-6 h-6 md:w-8 md:h-8 bg-[#FFC212] rounded-full border-2 md:border-4 border-white flex items-center justify-center">
+                                        <div className="w-1 h-1 bg-primary rounded-full animate-ping" />
+                                    </div>
+                                )}
                             </div>
                             <div className="space-y-0.5 md:space-y-1">
-                                <div className="text-2xl md:text-4xl font-black text-primary tracking-tighter tabular-nums">{stat.value}</div>
-                                <div className="text-[11px] md:text-[13px] font-black text-[#1e293b] uppercase tracking-wider">{stat.label}</div>
-                                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-tight">{stat.sub}</p>
+                                <div className={`text-xs md:text-4xl font-black tabular-nums tracking-tight ${isDark ? 'text-white' : 'text-primary uppercase'}`}>{stat.value}</div>
+                                <div className={`text-[8px] md:text-[13px] font-black uppercase tracking-wider ${isDark ? 'text-tj-yellow/80' : 'text-[#1e293b]'}`}>{stat.label}</div>
+                                <p className={`hidden md:block text-[9px] font-bold uppercase tracking-tight ${isDark ? 'text-blue-100/30' : 'text-gray-400'}`}>{stat.sub}</p>
                             </div>
                         </div>
                     ))}

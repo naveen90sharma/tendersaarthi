@@ -118,8 +118,8 @@ export default function Footer() {
                                 <div>
                                     <span className="block text-xs font-black text-white/50 uppercase tracking-widest mb-1">Headquarters</span>
                                     <p className="text-sm font-bold text-white leading-relaxed">
-                                        Unit 405, City Centre Mall, <br />
-                                        Sector 12, Dwarka, New Delhi - 110075
+                                        96th, 3rd Floor, Tower-5 Apna Ghar Shalimar, <br />
+                                        Alwar, Rajasthan - 301001
                                     </p>
                                 </div>
                             </li>
@@ -130,7 +130,7 @@ export default function Footer() {
                                 <div>
                                     <span className="block text-xs font-black text-white/50 uppercase tracking-widest mb-1">Helpline (24/7)</span>
                                     <p className="text-lg font-black text-white">
-                                        +91 9770-974-974
+                                        +91 9289751333
                                     </p>
                                 </div>
                             </li>
@@ -150,12 +150,15 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4 text-xs font-bold text-blue-100/40 uppercase tracking-widest">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4 text-[10px] font-black text-blue-100/40 uppercase tracking-[0.2em]">
                     <p>&copy; {new Date().getFullYear()} TenderSaarthi. All rights reserved.</p>
-                    <div className="flex gap-8">
-                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-                        <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-                        <Link href="/sitemap" className="hover:text-white transition-colors">Sitemap</Link>
+                    <div className="flex flex-wrap justify-center gap-x-8 gap-y-4">
+                        <Link href="/privacy-policy" className="hover:text-tj-yellow transition-colors">Privacy Policy</Link>
+                        <Link href="/terms-of-service" className="hover:text-tj-yellow transition-colors">Terms of Service</Link>
+                        <Link href="/refund-policy" className="hover:text-tj-yellow transition-colors">Refund Policy</Link>
+                        <Link href="/disclaimer" className="hover:text-tj-yellow transition-colors">Disclaimer</Link>
+                        <Link href="/cookie-policy" className="hover:text-tj-yellow transition-colors text-blue-100/20">Cookies</Link>
+                        <Link href="/contact" className="hover:text-tj-yellow transition-colors">Contact Us</Link>
                     </div>
                 </div>
             </div>

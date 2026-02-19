@@ -67,9 +67,10 @@ const navItems: NavItem[] = [
         path: '/archive-tenders',
         icon: <FileText size={20} />,
         dropdown: [
-            { label: '2025 Tenders', path: '/archive/2025' },
-            { label: '2024 Tenders', path: '/archive/2024' },
-            { label: '2023 Tenders', path: '/archive/2023' },
+            { label: '2026 Tenders', path: '/archive-tenders?year=2026' },
+            { label: '2025 Tenders', path: '/archive-tenders?year=2025' },
+            { label: '2024 Tenders', path: '/archive-tenders?year=2024' },
+            { label: '2023 Tenders', path: '/archive-tenders?year=2023' },
         ]
     },
     {
@@ -96,6 +97,7 @@ const navItems: NavItem[] = [
             { label: 'Consultancy', path: '/support/consultancy' },
             { label: 'Financing', path: '/support/financing' },
             { label: 'Joint Ventures', path: '/support/jv' },
+            { label: 'Contact Us', path: '/contact' },
         ]
     },
     { label: 'News & Updates', path: '/news', icon: <Newspaper size={20} /> },
@@ -158,16 +160,31 @@ export default function Header() {
         setActiveMobileDropdown(activeMobileDropdown === label ? null : label);
     };
 
+    const isHomePage = pathname === '/';
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     if (pathname?.startsWith('/dashboard')) return null;
 
     return (
         <>
-            <header className="bg-white shadow-sm sticky top-0 z-40 font-sans">
+            <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 font-sans ${isHomePage
+                ? scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
+                : 'bg-white shadow-sm sticky py-3'
+                }`}>
                 {/* Top Main Row */}
-                <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+                <div className="container mx-auto px-4 flex items-center justify-between gap-4">
                     {/* Mobile Menu Toggle */}
                     <button
-                        className="md:hidden text-gray-700 hover:text-primary p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors"
+                        className={`md:hidden p-2 -ml-2 rounded-xl transition-colors ${isHomePage && !scrolled ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:text-primary hover:bg-gray-100'
+                            }`}
                         onClick={() => setIsMobileMenuOpen(true)}
                         aria-label="Open Menu"
                     >
@@ -176,9 +193,9 @@ export default function Header() {
 
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0 cursor-pointer hover:opacity-90 transition">
-                        <div className="text-2xl font-black flex items-center tracking-tighter">
+                        <div className="text-xl md:text-2xl font-black flex items-center tracking-tighter">
                             <span className="text-tj-yellow">Tender</span>
-                            <span className="text-slate-800">Saarthi</span>
+                            <span className={`${isHomePage && !scrolled ? 'text-white' : 'text-slate-800'}`}>Saarthi</span>
                         </div>
                     </Link>
 
@@ -190,25 +207,68 @@ export default function Header() {
                             GET SUPPORT
                         </Link>
 
-                        {/* Language */}
-                        <div className="relative group hidden md:flex items-center gap-1 text-sm text-slate-600 cursor-pointer hover:text-primary font-bold h-full py-2">
-                            <Globe size={16} />
-                            <span className="hidden xl:inline">English</span>
-                            <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-200" />
+                        {/* Notifications / Alerts */}
+                        <div className="relative group hidden md:block">
+                            <button className="p-2.5 text-slate-500 hover:text-primary hover:bg-slate-50 rounded-xl transition-all relative border border-transparent hover:border-slate-100 shadow-sm hover:shadow-none active:scale-95">
+                                <Bell size={20} strokeWidth={2.5} />
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                            </button>
 
-                            {/* Language Dropdown */}
-                            <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[120px]">
-                                <div className="bg-white border text-gray-700 shadow-md rounded overflow-hidden">
-                                    <div className="px-4 py-2 hover:bg-gray-50 hover:text-primary transition font-normal text-xs">English</div>
-                                    <div className="px-4 py-2 hover:bg-gray-50 hover:text-primary transition font-normal text-xs">Hindi</div>
+                            {/* Notification Dropdown */}
+                            <div className="absolute right-0 top-full mt-3 pt-0 opacity-0 invisible translate-y-3 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50 min-w-[320px]">
+                                <div className="bg-white border border-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] rounded-[20px] overflow-hidden">
+                                    <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                                            <span className="font-black text-[11px] uppercase tracking-widest text-slate-800">Alert Center</span>
+                                        </div>
+                                        <button className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-tj-blue transition-colors">
+                                            Mark all as read
+                                        </button>
+                                    </div>
+
+                                    <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
+                                        {/* Notification Items */}
+                                        <div className="p-1">
+                                            {[
+                                                { title: 'New Tender Alert', desc: 'NHAI just posted a new construction tender in Uttar Pradesh.', time: '2 mins ago', type: 'new' },
+                                                { title: 'Bid Closing Soon', desc: 'The tender for Smart City Project Jaipur closes in 24 hours.', time: '1 hour ago', type: 'urgent' },
+                                                { title: 'Price Update', desc: 'Tender value updated for Delhi Metro Expansion Phase 4.', time: '5 hours ago', type: 'info' }
+                                            ].map((item, i) => (
+                                                <div key={i} className="p-4 hover:bg-slate-50 rounded-xl cursor-pointer transition-all border border-transparent hover:border-slate-100 relative group/item">
+                                                    <div className="flex gap-4">
+                                                        <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${item.type === 'new' ? 'bg-emerald-50 text-emerald-500' :
+                                                            item.type === 'urgent' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'
+                                                            }`}>
+                                                            {item.type === 'new' ? <PlusCircle size={18} /> :
+                                                                item.type === 'urgent' ? <Headphones size={18} /> : <FileText size={18} />}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="text-[13px] font-black text-slate-800 leading-tight mb-0.5">{item.title}</p>
+                                                            <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">{item.desc}</p>
+                                                            <p className="text-[9px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">{item.time}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Empty State (Hidden if items exist) */}
+                                        {/* <div className="p-10 text-center">
+                                            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                                                <Bell size={24} className="text-slate-300" />
+                                            </div>
+                                            <p className="text-sm font-black text-slate-700">All Quiet Here</p>
+                                            <p className="text-xs text-slate-400 mt-1 px-4">We'll let you know when new tenders match your profile.</p>
+                                        </div> */}
+                                    </div>
+
+                                    <Link href="/dashboard" className="block py-4 text-center text-[10px] font-black uppercase tracking-widest text-[#103e68] bg-slate-50/50 hover:bg-primary hover:text-white border-t border-slate-100 transition-all">
+                                        View All Alerts & Notifications
+                                    </Link>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Post Tender Button */}
-                        <Link href="/post-tender" className="hidden md:block bg-primary text-white px-6 py-2 rounded-lg text-sm font-black hover:bg-[#0d345b] transition-all shadow-sm shadow-primary/20 tracking-tight uppercase border-b-2 border-[#0a2742] active:border-b-0 active:translate-y-0.5">
-                            POST TENDER
-                        </Link>
 
                         {/* Sign In / User Profile */}
                         {!isLoadingUser && (
@@ -287,9 +347,12 @@ export default function Header() {
                         )}
 
                         {/* Mobile User Icon/Search is distinct, handled in mobile nav below */}
-                        <button className="md:hidden text-gray-700" onClick={() => setIsMobileMenuOpen(true)}>
+                        <button
+                            className={`md:hidden ${isHomePage && !scrolled ? 'text-white' : 'text-gray-700'}`}
+                            onClick={() => setIsMobileMenuOpen(true)}
+                        >
                             {currentUser ? (
-                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                                <div className="w-8 h-8 rounded-full bg-tj-yellow text-tj-blue flex items-center justify-center text-xs font-black ring-2 ring-white/20">
                                     {currentUser.email?.[0] || 'U'}
                                 </div>
                             ) : (
@@ -299,19 +362,22 @@ export default function Header() {
                     </div>
                 </div>
 
-                {/* Navigation Menu - Second Row */}
-                <nav className="border-t border-gray-100 hidden md:block">
+                {/* Navigation Menu - Second Row (Desktop Only) */}
+                <nav className={`border-t hidden md:block transition-colors ${isHomePage && !scrolled ? 'border-white/10' : 'border-gray-100'
+                    }`}>
                     <div className="container mx-auto px-4">
-                        <ul className="flex items-center gap-8 text-[13px] font-bold text-gray-700 py-3 uppercase tracking-tight">
+                        <ul className={`flex items-center gap-8 text-[13px] font-bold py-3 uppercase tracking-tight ${isHomePage && !scrolled ? 'text-white/90' : 'text-gray-700'
+                            }`}>
                             {navItems.map((item) => (
                                 <li key={item.label} className="relative group">
                                     <Link
                                         href={item.path}
-                                        className="flex items-center gap-1 cursor-pointer hover:text-primary py-2 transition-colors duration-200"
+                                        className={`flex items-center gap-1 cursor-pointer py-2 transition-colors duration-200 ${isHomePage && !scrolled ? 'hover:text-tj-yellow' : 'hover:text-primary'
+                                            }`}
                                     >
                                         {item.label}
                                         {item.badge && (
-                                            <span className="bg-primary text-white text-[9px] px-1 rounded-sm ml-1 animate-pulse">{item.badge}</span>
+                                            <span className="bg-tj-yellow text-tj-blue text-[9px] px-1 rounded-sm ml-1 animate-pulse">{item.badge}</span>
                                         )}
                                         {item.dropdown && <ChevronDown size={12} className="group-hover:rotate-180 transition-transform duration-200" />}
                                     </Link>
