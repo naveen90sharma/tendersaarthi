@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { Tender } from '../types';
-import { MapPin, Clock, Share2, Building2, CalendarDays, Wallet, ChevronRight, Gavel, FileCheck } from 'lucide-react';
+import { MapPin, Share2, Building2, Wallet, ChevronRight, Clock } from 'lucide-react';
 import SaveTenderButton from './SaveTenderButton';
 
 interface TenderCardProps {
@@ -11,7 +11,6 @@ interface TenderCardProps {
 }
 
 export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
-    // Robust date parsing for "Time Left"
     const calculateDaysLeft = (dateStr?: string) => {
         if (!dateStr || dateStr === 'N/A') return null;
         try {
@@ -22,15 +21,14 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
             const diff = targetDate.getTime() - now.getTime();
             if (diff <= 0) return 'Expired';
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            if (days < 0) return 'Expired';
-            return days > 0 ? `${days} Days` : 'Closing Today';
+            return days > 0 ? `${days}d left` : 'Closing Today';
         } catch (e) {
             return null;
         }
     };
 
     const formatDisplayAmount = (amount?: string) => {
-        if (!amount || amount === 'N/A' || amount === '0') return 'N/A';
+        if (!amount || amount === 'N/A' || amount === '0') return null;
         const clean = amount.toString().trim();
         if (clean.startsWith('₹') || clean.toLowerCase().includes('crore') || clean.toLowerCase().includes('lakh')) {
             return clean.replace(/Rs\.?/i, '₹').trim();
@@ -39,105 +37,107 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
     };
 
     const daysLeft = calculateDaysLeft(tender.bid_submission_end);
-    const isClosingSoon = daysLeft && (daysLeft === 'Closing Today' || (typeof daysLeft === 'string' && parseInt(daysLeft) <= 5));
+    const isClosingSoon = daysLeft && daysLeft !== 'Expired' && (daysLeft === 'Closing Today' || (typeof daysLeft === 'string' && parseInt(daysLeft) <= 5));
     const isExpired = daysLeft === 'Expired';
+    const displayValue = formatDisplayAmount(tender.tender_value || tender.value);
 
     return (
-        <div className="group relative bg-white border border-gray-300 rounded-[2rem] p-0 mb-4 transition-all duration-300 hover:shadow-[0_20px_60px_-15px_rgba(16,62,104,0.12)] flex flex-col lg:flex-row overflow-hidden w-full mx-auto lg:min-h-[200px]">
-            {/* Index Badge */}
-            <div className="absolute top-0 left-0 z-20">
-                <div className="bg-[#103e68] text-white px-4 py-2 rounded-br-2xl rounded-tl-[1.8rem] flex items-center justify-center border-b-2 border-r-2 border-white/10 shadow-sm">
-                    <span className="text-[12px] font-black tracking-tighter">#{index}</span>
-                </div>
+        <div className="group relative bg-white border border-gray-200 rounded-xl mb-3 transition-all duration-200 hover:border-[#103e68]/30 hover:shadow-md flex flex-col lg:flex-row overflow-hidden w-full">
+
+            {/* Serial Number - Left accent */}
+            <div className="hidden lg:flex items-center justify-center w-10 shrink-0 bg-gray-50 border-r border-gray-100 text-gray-300 text-xs font-bold">
+                {index}
             </div>
 
-            {/* Left Block: Identification (Shaded) */}
-            <div className="bg-[#f8fafc]/50 lg:w-[260px] p-6 pt-12 lg:pt-6 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-[#e2e8f0]/40 shrink-0">
-                <div className="bg-white rounded-xl p-3 border border-[#e2e8f0]/50 shadow-sm mb-4">
-                    <span className="block text-[8px] font-black text-[#94a3b8] uppercase tracking-[0.2em] mb-1 leading-none">ID / REF</span>
-                    <span className="block text-[13px] font-black text-[#103e68] truncate leading-none">
-                        {tender.reference_no || `TS-${tender.id.toString().slice(0, 8).toUpperCase()}`}
-                    </span>
-                </div>
-
-                <div className="flex items-center gap-2 px-1">
-                    <div className="text-[#94a3b8] shrink-0">
-                        <Building2 size={16} strokeWidth={2.5} />
+            {/* Main Content */}
+            <div className="flex-1 p-4 min-w-0">
+                {/* Top Row: Badges + Days Left */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                        {tender.tender_type && (
+                            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-semibold rounded border border-blue-100 uppercase tracking-wide">
+                                {tender.tender_type}
+                            </span>
+                        )}
+                        {tender.tender_category && (
+                            <span className="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-semibold rounded border border-gray-200 uppercase tracking-wide">
+                                {tender.tender_category}
+                            </span>
+                        )}
                     </div>
-                    <span className="text-[12px] font-black text-[#64748b] truncate uppercase tracking-tight">
-                        {tender.authority || 'Contracting Authority'}
-                    </span>
-                </div>
-            </div>
-
-            {/* Middle Block: Content */}
-            <div className="flex-1 p-6 flex flex-col justify-center min-w-0">
-                <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="px-2.5 py-1 bg-[#f8fafc] text-[#103e68] text-[9px] font-black rounded-lg border border-[#e2e8f0] uppercase tracking-wider leading-none">
-                        {tender.tender_type || 'EPC'}
-                    </span>
-                    <span className="px-2.5 py-1 bg-white text-[#64748b] text-[9px] font-black rounded-lg border border-[#e2e8f0] uppercase tracking-wider leading-none">
-                        {tender.tender_category || 'PROJECT'}
-                    </span>
+                    {daysLeft && (
+                        <span className={`hidden lg:flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded shrink-0 ${isExpired ? 'bg-red-50 text-red-500 border border-red-100' :
+                                isClosingSoon ? 'bg-amber-50 text-amber-600 border border-amber-100' :
+                                    'bg-green-50 text-green-600 border border-green-100'
+                            }`}>
+                            <Clock size={10} strokeWidth={2.5} />
+                            {daysLeft}
+                        </span>
+                    )}
                 </div>
 
-                <Link href={`/tenders/${tender.slug || tender.id}`} className="block group/title mb-2">
-                    <h3 className="text-[18px] font-black text-[#103e68] group-hover/title:text-primary transition-colors leading-[1.3] line-clamp-2 tracking-tight">
+                {/* Title */}
+                <Link href={`/tenders/${tender.slug || tender.id}`} className="block mb-2">
+                    <h3 className="text-sm font-semibold text-[#103e68] group-hover:text-blue-700 transition-colors leading-snug line-clamp-2">
                         {tender.title}
                     </h3>
                 </Link>
 
-                <p className="hidden lg:block text-[13px] text-[#94a3b8] font-medium line-clamp-2 leading-relaxed mb-6">
-                    {tender.summary || `Strategic project requiring expert solutions. Targeted completion within timelines.`}
-                </p>
-
-                {/* Value & Location - Moved Here */}
-                <div className="grid grid-cols-2 gap-8 pt-4 border-t border-[#f1f5f9] mt-auto">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-[#94a3b8]">
-                            <Wallet size={12} strokeWidth={3} />
-                            <span className="text-[8px] font-black uppercase tracking-[0.2em]">Value</span>
-                        </div>
-                        <p className="text-[15px] font-black text-[#1e293b] leading-none">
-                            {formatDisplayAmount(tender.tender_value || tender.value)}
-                        </p>
-                    </div>
-
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-[#94a3b8]">
-                            <MapPin size={12} strokeWidth={3} />
-                            <span className="text-[8px] font-black uppercase tracking-[0.2em]">Location</span>
-                        </div>
-                        <p className="text-[15px] font-black text-[#1e293b] leading-none truncate">
-                            {tender.state || 'India'}
-                        </p>
-                    </div>
+                {/* Meta Row */}
+                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
+                    {tender.authority && (
+                        <span className="flex items-center gap-1">
+                            <Building2 size={11} strokeWidth={2} />
+                            <span className="truncate max-w-[200px] font-medium text-gray-500">{tender.authority}</span>
+                        </span>
+                    )}
+                    {tender.state && (
+                        <span className="flex items-center gap-1">
+                            <MapPin size={11} strokeWidth={2} />
+                            <span className="font-medium text-gray-500">{tender.state}</span>
+                        </span>
+                    )}
+                    {tender.reference_no && (
+                        <span className="hidden md:inline font-mono text-[10px] text-gray-300 ml-auto">
+                            {tender.reference_no}
+                        </span>
+                    )}
                 </div>
             </div>
 
-            {/* Right Block: Actions Only */}
-            <div className="lg:w-[200px] p-6 pt-2 lg:pt-6 flex flex-col justify-center bg-white border-t lg:border-t-0 lg:border-l border-[#f1f5f9] shrink-0">
-                <div className="flex flex-col gap-3 h-full justify-center">
+            {/* Right: Value + Actions */}
+            <div className="flex items-center gap-0 border-t lg:border-t-0 lg:border-l border-gray-100 shrink-0">
+                {/* Value Block */}
+                {displayValue && (
+                    <div className="px-4 py-3 flex flex-col justify-center min-w-[120px]">
+                        <span className="flex items-center gap-1 text-[9px] font-semibold text-gray-300 uppercase tracking-widest mb-0.5">
+                            <Wallet size={9} strokeWidth={2.5} />
+                            Value
+                        </span>
+                        <span className="text-sm font-bold text-slate-700 leading-none">
+                            {displayValue}
+                        </span>
+                    </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex items-center border-l border-gray-100 h-full">
+                    <button className="h-full px-3 text-gray-300 hover:text-[#103e68] hover:bg-gray-50 transition-all flex items-center justify-center">
+                        <Share2 size={14} strokeWidth={2} />
+                    </button>
+                    <div className="h-full flex items-center border-l border-gray-100">
+                        <SaveTenderButton
+                            tenderId={tender.id.toString()}
+                            variant="icon"
+                            className="!bg-transparent !border-0 !rounded-none !h-full !px-3 !w-auto text-gray-300 hover:!text-[#103e68] hover:!bg-gray-50 shadow-none"
+                        />
+                    </div>
                     <Link
                         href={`/tenders/${tender.slug || tender.id}`}
-                        className="w-full h-[46px] bg-[#103e68] text-white flex items-center justify-center rounded-xl hover:bg-[#0a2742] active:scale-[0.98] transition-all shadow-lg shadow-[#103e68]/20 group/btn"
+                        className="h-full px-4 bg-[#103e68] text-white hover:bg-[#0a2742] transition-all flex items-center justify-center group/btn"
                     >
-                        <ChevronRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
+                        <ChevronRight size={16} className="group-hover/btn:translate-x-0.5 transition-transform" />
                     </Link>
-
-                    <div className="flex gap-2">
-                        <button className="flex-1 h-[46px] bg-white text-[#94a3b8] border-2 border-[#f1f5f9] flex items-center justify-center rounded-xl hover:text-[#103e68] hover:border-primary/20 transition-all">
-                            <Share2 size={18} strokeWidth={2.5} />
-                        </button>
-
-                        <div className="flex-1">
-                            <SaveTenderButton
-                                tenderId={tender.id.toString()}
-                                variant="icon"
-                                className="!bg-white !border-2 !border-[#f1f5f9] !p-0 !h-[46px] !w-full !rounded-xl text-[#94a3b8] hover:!text-[#103e68] hover:!border-primary/20 flex items-center justify-center shadow-none"
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

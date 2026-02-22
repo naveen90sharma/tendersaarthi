@@ -8,7 +8,7 @@ import TenderCard from '@/components/TenderCard';
 import Breadcrumb from '@/components/Breadcrumb';
 import { supabase } from '@/services/supabase';
 import Image from 'next/image';
-import { RefreshCw, ChevronLeft, ChevronRight, AlertCircle, Filter } from 'lucide-react';
+import { RefreshCw, ChevronLeft, ChevronRight, AlertCircle, Filter, X, Search } from 'lucide-react';
 import type { Tender } from '@/types';
 
 interface TenderListingProps {
@@ -324,6 +324,16 @@ export default function TenderListing({
         yearParam
     ]);
 
+    const removeFilterParam = (key: string, value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        const current = params.get(key)?.split(',').filter(Boolean) || [];
+        const next = current.filter(v => v !== value);
+        if (next.length > 0) params.set(key, next.join(','));
+        else params.delete(key);
+        params.set('page', '1');
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
     const handlePageChange = (newPage: number) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('page', newPage.toString());
@@ -341,35 +351,133 @@ export default function TenderListing({
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-8">
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">{pageTitle}</h1>
+            {/* Active Filters Bar */}
+            <div className="bg-white border-b border-gray-50 py-3">
+                <div className="container mx-auto px-4 flex flex-wrap items-center gap-3">
+                    {/* Clear All Button */}
+                    {((effectiveQuery && !initialQuery) || categoryParam || stateParam || locationParam || authorityParam || tenderTypeParam || minPrice || maxPrice || yearParam) && (
+                        <button
+                            onClick={() => router.push(pathname)}
+                            className="bg-white border border-blue-200 text-blue-600 px-4 py-2 rounded-xl text-sm font-black transition-all hover:bg-blue-50 active:scale-95 shadow-sm"
+                        >
+                            Reset All
+                        </button>
+                    )}
+
+                    {/* Filter Chips */}
+                    <div className="flex flex-wrap items-center gap-2">
+                        {/* Search Query Chip */}
+                        {effectiveQuery && !initialQuery && (
+                            <FilterChip
+                                label={effectiveQuery}
+                                type="Keyword"
+                                onRemove={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    params.delete('q');
+                                    router.push(`${pathname}?${params.toString()}`);
+                                }}
+                            />
+                        )}
+
+                        {/* Category Chips */}
+                        {categoryParam?.split(',').filter(Boolean).map(cat => (
+                            <FilterChip
+                                key={`cat-${cat}`}
+                                label={cat}
+                                type="Category"
+                                onRemove={() => removeFilterParam('category', cat)}
+                            />
+                        ))}
+
+                        {/* State Chips */}
+                        {stateParam?.split(',').filter(Boolean).map(st => (
+                            <FilterChip
+                                key={`st-${st}`}
+                                label={st}
+                                type="State"
+                                onRemove={() => removeFilterParam('state', st)}
+                            />
+                        ))}
+
+                        {/* Authority Chips */}
+                        {authorityParam?.split(',').filter(Boolean).map(auth => (
+                            <FilterChip
+                                key={`auth-${auth}`}
+                                label={auth}
+                                type="Authority"
+                                onRemove={() => removeFilterParam('authority', auth)}
+                            />
+                        ))}
+
+                        {/* Location Chips */}
+                        {locationParam?.split(',').filter(Boolean).map(loc => (
+                            <FilterChip
+                                key={`loc-${loc}`}
+                                label={loc}
+                                type="Location"
+                                onRemove={() => removeFilterParam('location', loc)}
+                            />
+                        ))}
+
+                        {/* Price Chip */}
+                        {(minPrice || maxPrice) && (
+                            <FilterChip
+                                label={`${minPrice ? formatPrice(parseInt(minPrice)) : '0'} - ${maxPrice ? formatPrice(parseInt(maxPrice)) : 'Max'}`}
+                                type="Value"
+                                onRemove={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    params.delete('minPrice');
+                                    params.delete('maxPrice');
+                                    router.push(`${pathname}?${params.toString()}`);
+                                }}
+                            />
+                        )}
+
+                        {/* Year Chip (Archive) */}
+                        {yearParam && (
+                            <FilterChip
+                                label={yearParam}
+                                type="Year"
+                                onRemove={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    params.delete('year');
+                                    router.push(`${pathname}?${params.toString()}`);
+                                }}
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <div className="container mx-auto px-4 py-5">
+                <div className="mb-4">
+                    <h1 className="text-xl font-bold text-gray-800 mb-1">{pageTitle}</h1>
                     <div className="flex justify-between items-center">
-                        <p className="text-gray-600">Showing {tenders.length} results (Total: {totalCount}) for "{displayTitle}"</p>
-                        <div className="hidden md:flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1 rounded-full border border-green-100 animate-pulse">
-                            <div className="w-2 h-2 bg-green-500 rounded-full" />
-                            <span className="text-[11px] font-bold uppercase tracking-wider">Live Updates: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <p className="text-xs text-gray-400 font-medium">{totalCount.toLocaleString()} tenders found for <span className="text-gray-600">"{displayTitle}"</span></p>
+                        <div className="hidden md:flex items-center gap-1.5 bg-green-50 text-green-600 px-2.5 py-1 rounded-full border border-green-100">
+                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                            <span className="text-[10px] font-semibold uppercase tracking-wider">Live</span>
                         </div>
                     </div>
 
                     {errorMsg && (
-                        <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded flex items-center gap-2">
-                            <AlertCircle size={18} />
+                        <div className="mt-3 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm flex items-center gap-2">
+                            <AlertCircle size={15} />
                             <span>Failed to load tenders: {errorMsg}</span>
                         </div>
                     )}
                 </div>
 
                 {sideStats && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                         {sideStats.map((stat, i) => (
-                            <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 group hover:border-[#103e68]/30 transition-all">
-                                <div className={`${stat.color} p-3 rounded-xl bg-opacity-10 text-xl group-hover:scale-110 transition-transform`}>
+                            <div key={i} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3 group hover:border-[#103e68]/20 transition-all">
+                                <div className={`${stat.color} p-2 rounded-lg bg-opacity-10 group-hover:scale-105 transition-transform shrink-0`}>
                                     {stat.icon}
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
-                                    <p className="text-xl font-black text-slate-800">{stat.value}</p>
+                                    <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wider">{stat.label}</p>
+                                    <p className="text-sm font-semibold text-slate-700">{stat.value}</p>
                                 </div>
                             </div>
                         ))}
@@ -562,8 +670,8 @@ export default function TenderListing({
                         )}
 
                         {/* FAQ Section */}
-                        <div className="mt-16 bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-                            <h3 className="text-2xl font-black text-gray-800 mb-6 uppercase tracking-tight border-b-4 border-primary inline-block pb-1">Frequently Asked Questions</h3>
+                        <div className="mt-10 bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                            <h3 className="text-base font-semibold text-gray-700 mb-5 pb-3 border-b border-gray-100">Frequently Asked Questions</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {faqs && faqs.length > 0 ? (
                                     faqs.map((faq, i) => (
@@ -618,6 +726,38 @@ export default function TenderListing({
                     </div>
                 </div>
             </div>
+        </div >
+    );
+}
+
+/**
+ * Utility function to format price for chips
+ */
+function formatPrice(num: number) {
+    if (num === 0) return '0';
+    if (num >= 10000000) {
+        const cr = num / 10000000;
+        return cr >= 100 ? `${Math.round(cr)} Cr` : `${cr.toFixed(1)} Cr`;
+    }
+    if (num >= 100000) return `${(num / 100000).toFixed(1)} L`;
+    return num.toLocaleString('en-IN');
+}
+
+/**
+ * Filter Chip Component
+ */
+function FilterChip({ label, type, onRemove }: { label: string, type: string, onRemove: () => void }) {
+    return (
+        <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-full pl-3 pr-1.5 py-1">
+            <span className="text-[10px] text-blue-500 font-medium uppercase tracking-wide">{type}:</span>
+            <span className="text-xs font-semibold text-slate-700">{label}</span>
+            <button
+                onClick={onRemove}
+                className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-100 text-blue-400 hover:bg-red-100 hover:text-red-500 transition-colors ml-0.5"
+                aria-label={`Remove ${label} filter`}
+            >
+                <X size={9} strokeWidth={3} />
+            </button>
         </div>
     );
 }

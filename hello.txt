@@ -1,0 +1,173 @@
+STATE AUTO-GENERATION LOGIC
+On Create State:
+
+If:
+
+seo_content IS NULL
+
+
+Then generate:
+
+1️⃣ Slug
+
+Convert state name to lowercase
+
+Replace spaces with hyphens
+
+Remove special characters
+
+Ensure uniqueness
+
+2️⃣ Meta Title
+
+Format:
+
+Latest Government Tenders in {State Name} – 2026 Updates | Tendersaarthi
+
+3️⃣ Meta Description
+
+Format:
+
+Find latest government tenders in {State Name}. Explore live projects, EMD details, bid deadlines and opportunities across departments.
+
+4️⃣ SEO Content (600–800 words)
+
+Use structured template:
+
+Sections must include:
+
+Introduction about tenders in {State}
+
+Major Departments publishing tenders
+
+Key sectors (Infrastructure, Roads, Electrical, etc.)
+
+Application process overview
+
+EMD & eligibility explanation
+
+MSME benefits
+
+Closing advice for bidders
+
+Content must:
+
+Include {State Name} multiple times naturally
+
+Include internal linking placeholders like:
+/tenders/category/{top-category}
+/tenders/authority/{top-authority}
+
+Be structured with headings (H2/H3)
+
+5️⃣ FAQ JSON (Store in faq_json as jsonb)
+
+Generate 4 FAQs dynamically:
+
+Example structure:
+
+[
+{
+"question": "How to apply for tenders in {State}?",
+"answer": "Contractors can apply through official eProcurement portals by submitting required documents before deadline."
+},
+{
+"question": "What is EMD in {State} tenders?",
+"answer": "EMD is a refundable security deposit required while submitting a bid."
+},
+{
+"question": "Which departments publish tenders in {State}?",
+"answer": "Major departments like PWD, Irrigation, Transport and Urban Development regularly publish tenders."
+},
+{
+"question": "Are MSMEs eligible for government tenders in {State}?",
+"answer": "Yes, MSMEs receive procurement benefits under government policies."
+}
+]
+
+🏷 CATEGORY AUTO-GENERATION LOGIC
+
+On Create Category:
+
+If seo_content IS NULL:
+
+Generate:
+
+Meta Title
+Latest {Category Name} Tenders in India – Govt eTender Updates 2026 | Tendersaarthi
+
+Meta Description
+Explore latest {Category Name} tenders in India. Find EMD details, deadlines, and live government projects across states.
+
+SEO Content (500–700 words)
+
+Must include:
+
+What is {Category Name} tender
+
+Types of projects under this category
+
+Eligibility norms
+
+EMD & tender fee overview
+
+Major authorities publishing this category
+
+Tips for bidders
+
+FAQ JSON (4 questions)
+⚙ IMPLEMENTATION REQUIREMENTS
+
+Run generation inside backend API (server-side).
+
+Save generated content permanently in DB.
+
+Do NOT generate on every page load.
+
+Use reusable template utility function.
+
+Make function usable for both state and category creation.
+
+Ensure slugs are unique and indexed.
+
+Keep generation async but wait before final DB insert.
+
+🔒 SAFETY RULES
+
+Do not overwrite existing seo_content.
+
+If admin edits manually, system must respect manual content.
+
+Regenerate button should require confirmation.
+
+OPTIONAL (If Using OpenAI API)
+
+If using AI API:
+
+Pass structured prompt with:
+
+State Name
+
+Top 5 categories
+
+Top 5 authorities
+
+Total tenders count
+
+Ensure content uniqueness.
+
+Keep temperature moderate (0.7).
+
+Limit output to 700–900 words max.
+
+EXPECTED RESULT
+
+After implementation:
+
+Adding new State automatically creates full SEO page.
+
+Adding new Category automatically creates full SEO page.
+
+No manual writing needed.
+
+Fully scalable to 10,000+ pages.

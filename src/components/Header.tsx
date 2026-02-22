@@ -363,8 +363,7 @@ export default function Header() {
                 </div>
 
                 {/* Navigation Menu - Second Row (Desktop Only) */}
-                <nav className={`border-t hidden md:block transition-colors ${isHomePage && !scrolled ? 'border-white/10' : 'border-gray-100'
-                    }`}>
+                <nav className="hidden md:block">
                     <div className="container mx-auto px-4">
                         <ul className={`flex items-center gap-8 text-[13px] font-bold py-3 uppercase tracking-tight ${isHomePage && !scrolled ? 'text-white/90' : 'text-gray-700'
                             }`}>

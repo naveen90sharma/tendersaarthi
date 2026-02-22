@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Calendar, ArrowRight, BookOpen } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 
 const news = [
     {
@@ -43,63 +43,72 @@ const news = [
 
 export default function NewsSection() {
     return (
-        <section className="py-24 md:py-32 bg-white relative overflow-hidden">
+        <section className="py-14 md:py-20 bg-white relative overflow-hidden">
             <div className="container mx-auto px-4 relative z-10">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
-                    <div className="max-w-2xl">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="h-1 w-12 bg-primary rounded-full" />
-                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Market Intelligence</span>
+
+                {/* Section Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <div className="h-0.5 w-8 bg-primary rounded-full" />
+                            <span className="text-[9px] font-semibold text-primary uppercase tracking-[0.25em]">Market Intelligence</span>
                         </div>
-                        <h2 className="text-3xl md:text-5xl font-black text-[#0f172a] tracking-tight mb-2">Tender Insights</h2>
-                        <p className="text-slate-400 text-[10px] md:text-sm font-bold uppercase tracking-wider">LATEST POLICY CHANGES AND INDUSTRY MOVEMENTS</p>
+                        <h2 className="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">Tender Insights</h2>
+                        <p className="text-slate-400 text-[10px] font-medium uppercase tracking-wider mt-0.5">
+                            Latest policy changes and industry movements
+                        </p>
                     </div>
 
-                    <Link href="/news" className="group flex items-center gap-3 bg-white hover:bg-primary text-primary hover:text-white px-8 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all duration-500 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-primary/20 w-fit">
+                    <Link
+                        href="/news"
+                        className="group flex items-center gap-2 text-primary hover:text-white hover:bg-primary border border-slate-200 hover:border-primary px-4 py-2 rounded-lg font-medium text-xs transition-all w-fit"
+                    >
                         View All Stories
-                        <ArrowRight size={18} className="group-hover:translate-x-1" />
+                        <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {/* News Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {news.map((item) => (
                         <Link
                             href={`/news/${item.id}`}
                             key={item.id}
-                            className="group flex flex-col bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-[0_40px_80px_-20px_rgba(15,23,42,0.1)] transition-all duration-500 h-full"
+                            className="group flex flex-col bg-white rounded-xl overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-md transition-all duration-300 h-full"
                         >
-                            <div className="relative h-64 overflow-hidden bg-slate-100">
+                            {/* Image */}
+                            <div className="relative h-40 overflow-hidden bg-slate-100 shrink-0">
                                 <img
                                     src={item.image}
                                     alt={item.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     onError={(e) => {
                                         e.currentTarget.src = 'https://images.unsplash.com/photo-1454165833762-02617a92b219?q=80&w=2070&auto=format&fit=crop';
                                     }}
                                 />
-                                <div className="absolute top-6 left-6">
-                                    <span className="px-4 py-2 bg-white ring-1 ring-slate-200 rounded-xl text-[10px] font-black text-primary uppercase tracking-widest shadow-xl">
+                                {/* Category badge */}
+                                <div className="absolute top-3 left-3">
+                                    <span className="px-2 py-0.5 bg-white/95 backdrop-blur-sm rounded-md text-[9px] font-semibold text-primary uppercase tracking-wider shadow-sm">
                                         {item.category}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="p-8 md:p-10 flex flex-col flex-1">
-                                <div className="flex items-center gap-2 text-slate-400 mb-6">
-                                    <Calendar size={14} strokeWidth={2.5} />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{item.date}</span>
+                            {/* Content */}
+                            <div className="p-4 flex flex-col flex-1">
+                                <div className="flex items-center gap-1.5 text-slate-400 mb-2">
+                                    <Calendar size={11} strokeWidth={2} />
+                                    <span className="text-[9px] font-medium uppercase tracking-wider">{item.date}</span>
                                 </div>
 
-                                <h3 className="text-xl md:text-2xl font-black text-[#0f172a] leading-tight mb-8 group-hover:text-primary transition-colors flex-1 line-clamp-3">
+                                <h3 className="text-sm font-semibold text-slate-700 leading-snug mb-3 group-hover:text-primary transition-colors flex-1 line-clamp-3">
                                     {item.title}
                                 </h3>
 
-                                <div className="pt-8 border-t border-slate-50 flex items-center justify-between">
-                                    <span className="text-[11px] font-black text-primary uppercase tracking-[0.2em]">
-                                        Read Full Article
-                                    </span>
-                                    <div className="w-11 h-11 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all duration-300 shadow-sm group-hover:shadow-lg">
-                                        <ArrowRight size={20} strokeWidth={3} />
+                                <div className="pt-3 border-t border-slate-50 flex items-center justify-between">
+                                    <span className="text-[9px] font-semibold text-primary uppercase tracking-wider">Read Article</span>
+                                    <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                                        <ArrowRight size={11} strokeWidth={2} />
                                     </div>
                                 </div>
                             </div>

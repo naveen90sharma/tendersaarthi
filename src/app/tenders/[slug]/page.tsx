@@ -96,7 +96,7 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
 
                 <div className="container mx-auto px-4 relative z-10">
                     {/* Modern Breadcrumb */}
-                    <div className="flex items-center gap-2 text-[10px] md:text-xs font-black text-blue-200/60 uppercase tracking-[0.2em] mb-6 md:mb-8 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-1.5 text-[10px] text-blue-200/50 mb-6 overflow-x-auto no-scrollbar flex-wrap">
                         <Link href="/" className="hover:text-tj-yellow transition-colors whitespace-nowrap">Home</Link>
                         <ChevronRight size={10} className="opacity-40" />
                         <Link href="/active-tenders" className="hover:text-tj-yellow transition-colors whitespace-nowrap">Tenders</Link>
@@ -117,32 +117,32 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                             </>
                         )}
                         <ChevronRight size={10} className="opacity-40" />
-                        <span className="text-tj-yellow truncate max-w-[200px]">{tender.tender_id || 'Detail'}</span>
+                        <span className="text-tj-yellow truncate max-w-[180px]">{tender.tender_id || 'Detail'}</span>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        <div className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest text-[#FFC212]">
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                        <div className="px-2.5 py-0.5 bg-white/10 rounded-full border border-white/10 text-[9px] font-medium uppercase tracking-wide text-[#FFC212]">
                             {tender.tender_category}
                         </div>
                         {tender.state && (
-                            <div className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest text-blue-200">
+                            <div className="px-2.5 py-0.5 bg-white/10 rounded-full border border-white/10 text-[9px] font-medium uppercase tracking-wide text-blue-200">
                                 {tender.state}
                             </div>
                         )}
                     </div>
 
-                    <h1 className="text-2xl md:text-3xl font-black leading-[1.2] md:leading-tight tracking-tight mb-8">
+                    <h1 className="text-xl md:text-2xl font-semibold leading-snug tracking-tight mb-5">
                         {tender.title}
                     </h1>
 
-                    <div className="flex flex-wrap items-center gap-6 md:gap-10 text-[10px] md:text-sm font-black uppercase tracking-widest text-blue-100/60">
-                        <div className="flex items-center gap-2">
-                            <Calendar size={14} className="text-tj-yellow" />
-                            <span>Published: <span className="text-white">{tender.published_date || 'N/A'}</span></span>
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-blue-100/50">
+                        <div className="flex items-center gap-1.5">
+                            <Calendar size={12} className="text-tj-yellow" />
+                            <span>Published: <span className="text-white/80">{tender.published_date || 'N/A'}</span></span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Building2 size={14} className="text-tj-yellow" />
-                            <span className="truncate max-w-[200px]">{tender.authority}</span>
+                        <div className="flex items-center gap-1.5">
+                            <Building2 size={12} className="text-tj-yellow" />
+                            <span className="truncate max-w-[200px] text-white/80">{tender.authority}</span>
                         </div>
                     </div>
                 </div>
@@ -152,20 +152,20 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
                     <div className="space-y-8">
                         {/* Highlights Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {[
-                                { label: 'Tender Value', value: tender.tender_value, icon: <IndianRupee size={18} />, color: 'bg-white' },
-                                { label: 'EMD Amount', value: tender.emd_amount, icon: <Wallet size={18} />, color: 'bg-white' },
-                                { label: 'Tender Fee', value: tender.tender_fee, icon: <FileCheck size={18} />, color: 'bg-white' },
-                                { label: 'Bid Deadline', value: tender.bid_submission_end, icon: <Clock size={18} />, color: isUrgent ? 'bg-red-50' : 'bg-white', text: isUrgent ? 'text-red-600' : 'text-primary' },
+                                { label: 'Tender Value', value: tender.tender_value, icon: <IndianRupee size={15} />, color: 'bg-white' },
+                                { label: 'EMD Amount', value: tender.emd_amount, icon: <Wallet size={15} />, color: 'bg-white' },
+                                { label: 'Tender Fee', value: tender.tender_fee, icon: <FileCheck size={15} />, color: 'bg-white' },
+                                { label: 'Bid Deadline', value: tender.bid_submission_end, icon: <Clock size={15} />, color: isUrgent ? 'bg-red-50' : 'bg-white', text: isUrgent ? 'text-red-600' : 'text-primary' },
                             ].map((item, i) => (
-                                <div key={i} className={`${item.color} p-3 md:p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between group transition-all`}>
-                                    <div className={`mb-2 ${item.text || 'text-slate-400 group-hover:text-primary'}`}>
+                                <div key={i} className={`${item.color} p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-2`}>
+                                    <div className={`${item.text || 'text-slate-300'}`}>
                                         {item.icon}
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
-                                        <p className={`text-sm md:text-[15px] font-black leading-tight break-words ${item.text || 'text-slate-800'}`}>
+                                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">{item.label}</p>
+                                        <p className={`text-sm font-semibold leading-tight break-words ${item.text || 'text-slate-700'}`}>
                                             {item.value || 'N/A'}
                                         </p>
                                     </div>
@@ -174,47 +174,38 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                         </div>
 
                         {/* Important Downloads Section */}
-                        <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm space-y-6">
-                            <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                                <Download className="text-primary" size={20} />
+                        <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm space-y-4">
+                            <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                <Download className="text-primary" size={15} />
                                 Official Documents
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="group relative overflow-hidden bg-slate-50 hover:bg-white border border-slate-200 hover:border-primary/30 rounded-2xl p-4 transition-all duration-300">
-                                    <div className="flex items-start gap-4">
-                                        <div className="bg-red-50 text-red-500 p-3 rounded-xl group-hover:scale-110 transition-transform">
-                                            <FileText size={24} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div className="group bg-slate-50 hover:bg-white border border-slate-100 hover:border-primary/20 rounded-lg p-3 transition-all">
+                                    <div className="flex items-start gap-3">
+                                        <div className="bg-red-50 text-red-400 p-2 rounded-lg shrink-0">
+                                            <FileText size={16} />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-slate-800 text-sm mb-1 group-hover:text-primary transition-colors">Notice Inviting Tender (NIT)</p>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">PDF • 2.4 MB • Official</p>
-                                            <a
-                                                href={tender.official_link || '#'}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary hover:underline decoration-2 underline-offset-4"
-                                            >
-                                                Download File <ArrowRight size={10} />
+                                            <p className="font-medium text-slate-700 text-xs mb-0.5">Notice Inviting Tender (NIT)</p>
+                                            <p className="text-[9px] text-slate-400 uppercase tracking-wide mb-2">PDF • Official</p>
+                                            <a href={tender.official_link || '#'} target="_blank" rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 text-[10px] font-medium text-primary hover:underline">
+                                                Download <ArrowRight size={9} />
                                             </a>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="group relative overflow-hidden bg-slate-50 hover:bg-white border border-slate-200 hover:border-emerald-500/30 rounded-2xl p-4 transition-all duration-300">
-                                    <div className="flex items-start gap-4">
-                                        <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl group-hover:scale-110 transition-transform">
-                                            <FileCheck size={24} />
+                                <div className="group bg-slate-50 hover:bg-white border border-slate-100 hover:border-emerald-300/30 rounded-lg p-3 transition-all">
+                                    <div className="flex items-start gap-3">
+                                        <div className="bg-emerald-50 text-emerald-500 p-2 rounded-lg shrink-0">
+                                            <FileCheck size={16} />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-slate-800 text-sm mb-1 group-hover:text-emerald-700 transition-colors">Bill of Quantities (BoQ)</p>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">XLS • 850 KB • Financial</p>
-                                            <a
-                                                href={tender.official_link || '#'}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:underline decoration-2 underline-offset-4"
-                                            >
-                                                Download XLS <ArrowRight size={10} />
+                                            <p className="font-medium text-slate-700 text-xs mb-0.5">Bill of Quantities (BoQ)</p>
+                                            <p className="text-[9px] text-slate-400 uppercase tracking-wide mb-2">XLS • Financial</p>
+                                            <a href={tender.official_link || '#'} target="_blank" rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 hover:underline">
+                                                Download <ArrowRight size={9} />
                                             </a>
                                         </div>
                                     </div>
@@ -273,24 +264,23 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                         </div>
 
                         {/* Procurement Context & Regional Intelligence */}
-                        <div className="bg-slate-50/50 rounded-[2.5rem] p-8 md:p-12 border border-slate-100 relative overflow-hidden">
-                            <div className="flex flex-col md:flex-row gap-8 items-start">
-                                <div className="flex-shrink-0 w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-primary">
-                                    <MapPin size={24} />
+                        <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <div className="flex gap-4 items-start">
+                                <div className="w-9 h-9 bg-white rounded-lg shadow-sm border border-slate-100 flex items-center justify-center text-primary shrink-0">
+                                    <MapPin size={16} />
                                 </div>
-                                <div className="space-y-4">
-                                    <h3 className="text-xl font-black text-slate-800 tracking-tight">
+                                <div>
+                                    <h3 className="text-sm font-semibold text-slate-700 mb-2">
                                         Understanding <span className="text-primary">{tender.tender_category}</span> in {tender.location}
                                     </h3>
-                                    <div className="prose prose-slate prose-sm max-w-none text-slate-600 font-medium leading-[1.8]">
+                                    <div className="text-xs text-slate-500 leading-relaxed space-y-2">
                                         <p>
-                                            This opportunity by <span className="font-bold text-slate-900">{tender.authority}</span> represents a significant procurement action in the <span className="font-bold text-slate-900">{tender.tender_category}</span> sector.
-                                            Located in <span className="font-bold text-slate-900">{tender.location} {tender.state ? `(${tender.state})` : ''}</span>, this project is part of the regional development framework.
+                                            This opportunity by <span className="font-semibold text-slate-700">{tender.authority}</span> represents a significant procurement action in the <span className="font-semibold text-slate-700">{tender.tender_category}</span> sector.
+                                            Located in <span className="font-semibold text-slate-700">{tender.location} {tender.state ? `(${tender.state})` : ''}</span>, this project is part of the regional development framework.
                                         </p>
                                         <p>
-                                            As a <span className="text-primary font-bold uppercase tracking-wider text-[10px] bg-primary/5 px-2 py-1 rounded">{tender.tender_type}</span>, businesses
-                                            specializing in this domain are encouraged to review the eligibility requirements carefully. TenderSaarthi provides full bid-preparedness support to help you navigate the
-                                            complex submission process of {tender.authority} with confidence.
+                                            As a <span className="text-primary font-medium text-[10px] bg-primary/5 px-1.5 py-0.5 rounded">{tender.tender_type}</span>, businesses
+                                            specializing in this domain are encouraged to review the eligibility requirements carefully.
                                         </p>
                                     </div>
                                 </div>
@@ -299,25 +289,22 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
 
                         {/* Same similar tenders section but with updated styling */}
                         {similar.length > 0 && (
-                            <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-sm relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50/50 rounded-full blur-3xl -mr-16 -mt-16" />
-                                <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-3 mb-10">
-                                    <div className="w-2 h-10 bg-orange-500 rounded-full" />
+                            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm">
+                                <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-4">
+                                    <div className="w-1 h-4 bg-orange-400 rounded-full" />
                                     Related Opportunities
                                 </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {similar.map((t: any) => (
-                                        <Link key={t.slug} href={`/tenders/${t.slug}`} className="group p-6 bg-slate-50/50 rounded-3xl border border-transparent hover:border-orange-100 hover:bg-white hover:shadow-xl transition-all duration-500">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <span className="text-[9px] font-black text-orange-600 bg-orange-50 px-2 py-1 rounded-lg uppercase tracking-wider">AI MATCH</span>
-                                                <span className="text-[10px] font-bold text-slate-400">{t.state || 'National'}</span>
+                                        <Link key={t.slug} href={`/tenders/${t.slug}`} className="group p-3 bg-slate-50 rounded-lg border border-transparent hover:border-orange-100 hover:bg-white hover:shadow-md transition-all">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-[9px] font-medium text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wide">Similar</span>
+                                                <span className="text-[10px] text-slate-400">{t.state || 'National'}</span>
                                             </div>
-                                            <h4 className="text-sm font-black text-slate-700 group-hover:text-primary transition-colors line-clamp-2 mb-4 leading-normal">{t.title}</h4>
-                                            <div className="flex items-center justify-between text-xs pt-4 border-t border-slate-100/50">
-                                                <span className="font-black text-slate-500">₹ {t.tender_value || 'N/A'}</span>
-                                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all">
-                                                    <ArrowRight size={14} />
-                                                </div>
+                                            <h4 className="text-xs font-medium text-slate-600 group-hover:text-primary transition-colors line-clamp-2 mb-2 leading-relaxed">{t.title}</h4>
+                                            <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+                                                <span className="font-semibold text-slate-500 text-[11px]">₹ {t.tender_value || 'N/A'}</span>
+                                                <ArrowRight size={12} className="text-slate-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                                             </div>
                                         </Link>
                                     ))}
@@ -328,43 +315,42 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
 
                     {/* Sidebar: Hidden on Mobile, Sticky on Desktop */}
                     <aside className="hidden lg:block">
-                        <div className="sticky top-24 space-y-6">
-                            <div className="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200 border border-slate-50">
-                                <div className="text-center mb-8 pb-8 border-b border-slate-50">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Time to Decision</p>
-                                    <p className={`text-4xl font-black tracking-tighter ${isExpired ? 'text-slate-300' : isUrgent ? 'text-red-500' : 'text-primary'}`}>
-                                        {isExpired ? 'EXPIRED' : daysLeft ? `${daysLeft} DAYS` : 'TBD'}
+                        <div className="sticky top-24 space-y-4">
+                            <div className="bg-white rounded-xl p-5 shadow-md border border-slate-100">
+                                <div className="text-center mb-5 pb-5 border-b border-slate-50">
+                                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-wider mb-1">Time to Decision</p>
+                                    <p className={`text-2xl font-bold tracking-tight ${isExpired ? 'text-slate-300' : isUrgent ? 'text-red-500' : 'text-primary'}`}>
+                                        {isExpired ? 'EXPIRED' : daysLeft ? `${daysLeft} Days` : 'TBD'}
                                     </p>
                                 </div>
-                                <div className="space-y-4">
+                                <div className="space-y-2.5">
                                     <SaveTenderButton tenderId={tender.id.toString()} />
                                     <a
                                         href={tender.official_link || '#'}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full flex items-center justify-center gap-3 bg-slate-900 hover:bg-black text-white py-4 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all shadow-xl active:scale-95"
+                                        className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-2.5 rounded-lg font-semibold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95"
                                     >
-                                        <ExternalLink size={18} />
-                                        Official portal
+                                        <ExternalLink size={14} />
+                                        Official Portal
                                     </a>
                                     <a
                                         href={`https://wa.me/?text=${encodeURIComponent(`Checkout this Tender: ${tender.title}\nValue: ${tender.tender_value}\nLink: ${currentUrl}`)}`}
                                         target="_blank" rel="noopener noreferrer"
-                                        className="w-full flex items-center justify-center gap-3 border-2 border-slate-100 hover:bg-slate-50 text-slate-600 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all"
+                                        className="w-full flex items-center justify-center gap-2 border border-slate-100 hover:bg-slate-50 text-slate-500 py-2.5 rounded-lg font-semibold text-xs uppercase tracking-wider transition-all"
                                     >
-                                        <MessageSquare size={18} className="text-[#25D366]" />
+                                        <MessageSquare size={14} className="text-[#25D366]" />
                                         Share on WhatsApp
                                     </a>
                                     <PrintButton />
                                 </div>
                             </div>
 
-                            <div className="bg-gradient-to-br from-primary to-[#0d345b] rounded-[2rem] p-8 text-white relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                                <h3 className="text-lg font-black tracking-tight mb-2 relative z-10">Need Bid Support?</h3>
-                                <p className="text-blue-100/60 text-xs font-bold mb-6 relative z-10">Our experts help you prepare flawless submissions for maximum success.</p>
-                                <Link href="/bid-support" className="inline-flex items-center gap-2 text-tj-yellow font-black text-[10px] uppercase tracking-[0.2em] hover:gap-4 transition-all relative z-10">
-                                    Expert Counseling <ArrowRight size={14} />
+                            <div className="bg-gradient-to-br from-primary to-[#0d345b] rounded-xl p-5 text-white">
+                                <h3 className="text-sm font-semibold tracking-tight mb-1.5">Need Bid Support?</h3>
+                                <p className="text-blue-100/60 text-xs mb-4">Our experts help you prepare flawless submissions for maximum success.</p>
+                                <Link href="/bid-support" className="inline-flex items-center gap-1.5 text-tj-yellow font-semibold text-xs hover:gap-3 transition-all">
+                                    Expert Counseling <ArrowRight size={12} />
                                 </Link>
                             </div>
                         </div>
@@ -373,14 +359,14 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
             </div>
 
             {/* Premium Mobile Sticky Bottom Action Bar */}
-            <div className="fixed bottom-16 left-0 right-0 z-50 lg:hidden px-4 pb-6 pt-4 bg-white/80 backdrop-blur-xl border-t border-slate-100 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-                <div className="max-w-md mx-auto flex items-center gap-3 px-2">
+            <div className="fixed bottom-16 left-0 right-0 z-50 lg:hidden px-4 pb-4 pt-3 bg-white/90 backdrop-blur-xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                <div className="max-w-md mx-auto flex items-center gap-2">
                     <div className="flex-1">
                         <a
                             href={tender.official_link || '#'}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full flex items-center justify-center gap-3 bg-primary text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-primary/20 active:scale-95 transition-all"
+                            className="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-xl font-semibold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all"
                         >
                             Apply Now
                         </a>
@@ -389,14 +375,14 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                         <SaveTenderButton
                             tenderId={tender.id.toString()}
                             variant="icon"
-                            className="w-[52px] h-[52px] bg-slate-50 text-slate-400 rounded-2xl border border-slate-200/50 active:scale-95 transition-all"
+                            className="w-[46px] h-[46px] bg-slate-50 text-slate-400 rounded-xl border border-slate-200 active:scale-95 transition-all"
                         />
                         <a
                             href={`https://wa.me/?text=${encodeURIComponent(`Check out this Tender: ${tender.title}\nValue: ${tender.tender_value}\nLink: ${currentUrl}`)}`}
                             target="_blank" rel="noopener noreferrer"
-                            className="w-[52px] h-[52px] flex items-center justify-center bg-[#25D366]/10 text-[#25D366] rounded-2xl border border-[#25D366]/20 active:scale-95 transition-all"
+                            className="w-[46px] h-[46px] flex items-center justify-center bg-[#25D366]/10 text-[#25D366] rounded-xl border border-[#25D366]/20 active:scale-95 transition-all"
                         >
-                            <MessageSquare size={22} fill="currentColor" strokeWidth={1} />
+                            <MessageSquare size={18} fill="currentColor" strokeWidth={1} />
                         </a>
                     </div>
                 </div>
