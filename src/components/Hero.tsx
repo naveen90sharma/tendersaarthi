@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, ArrowRight, ChevronDown, MapPin, Tag, ShieldCheck, Zap, RefreshCw, Globe } from 'lucide-react';
+import { Search, ArrowRight, ChevronDown, MapPin, Tag, ShieldCheck, Zap, RefreshCw, Globe, Loader2 } from 'lucide-react';
 import LocationDetector from './LocationDetector';
 import StatsSection from './StatsSection';
+import { supabase } from '@/services/supabase';
 
 export default function Hero() {
     const router = useRouter();
@@ -26,7 +27,69 @@ export default function Hero() {
         'Defense', 'Railway', 'Smart City', 'Healthcare', 'Education'
     ];
 
-    const suggestions = ["Highways & Roads", "Civil Infrastructure", "Defense Projects", "Smart Cities"];
+    const trendingTags = ["Highways & Roads", "Civil Infrastructure", "Defense Projects", "Smart Cities"];
+
+    const [suggestions, setSuggestions] = useState<Array<{ text: string, type: string, slug?: string }>>([]);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+    const wrapperRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+                setSuggestions([]);
+                setIsDropdownOpen(false);
+                return;
+            }
+
+            setIsLoadingSuggestions(true);
+            try {
+                const kw = `%${searchQuery.trim()}%`;
+
+                const [authRes, catRes] = await Promise.all([
+                    supabase.from('authorities').select('authority_name, slug').ilike('authority_name', kw).limit(4),
+                    supabase.from('tender_categories').select('name, slug').ilike('name', kw).limit(3)
+                ]);
+
+                const newSuggestions: Array<{ text: string, type: string, slug?: string }> = [];
+
+                if (authRes.data) {
+                    authRes.data.forEach(auth => {
+                        newSuggestions.push({ text: auth.authority_name, type: 'Authority', slug: auth.slug });
+                    });
+                }
+
+                if (catRes.data) {
+                    catRes.data.forEach(cat => {
+                        newSuggestions.push({ text: cat.name, type: 'Category', slug: cat.slug });
+                    });
+                }
+
+                setSuggestions(newSuggestions);
+                setIsDropdownOpen(true);
+            } catch (err) {
+                console.error("Error fetching suggestions:", err);
+            } finally {
+                setIsLoadingSuggestions(false);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            fetchSuggestions();
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const handleSearch = () => {
         const params = new URLSearchParams();
@@ -107,9 +170,9 @@ export default function Hero() {
                 </div>
 
                 {/* ── Step 2: Search Bar with State + Category Dropdowns ────── */}
-                <div className="relative max-w-3xl mx-auto mb-3 md:mb-8 px-2">
+                <div className="relative max-w-3xl mx-auto mb-3 md:mb-8 px-2" ref={wrapperRef}>
                     <div className="bg-white/8 backdrop-blur-xl p-1 rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
-                        <div className="bg-white rounded-xl flex flex-col md:flex-row items-stretch md:items-center">
+                        <div className="bg-white rounded-xl flex flex-col md:flex-row items-stretch md:items-center relative">
 
                             {/* Keyword Search */}
                             <div className="flex-1 flex items-center gap-2.5 px-4 py-3 md:py-0 md:min-h-[52px]">
@@ -121,8 +184,46 @@ export default function Hero() {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleKeyDown}
+                                    onFocus={() => { if (searchQuery.trim().length >= 2) setIsDropdownOpen(true); }}
                                 />
                             </div>
+
+                            {/* Autocomplete Dropdown */}
+                            {isDropdownOpen && (searchQuery.trim().length >= 2) && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden z-50 text-left">
+                                    {isLoadingSuggestions ? (
+                                        <div className="p-4 flex items-center justify-center text-slate-400 gap-2">
+                                            <Loader2 size={16} className="animate-spin" />
+                                            <span className="text-sm font-medium">Searching...</span>
+                                        </div>
+                                    ) : suggestions.length > 0 ? (
+                                        <div className="max-h-[300px] overflow-y-auto w-full no-scrollbar">
+                                            {suggestions.map((item, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 flex items-start gap-3 transition-colors"
+                                                    onClick={() => {
+                                                        setSearchQuery(item.text);
+                                                        setIsDropdownOpen(false);
+                                                        // Option to auto-search upon selection
+                                                        // router.push(`/active-tenders?q=${encodeURIComponent(item.text)}`);
+                                                    }}
+                                                >
+                                                    <Search size={15} className="text-slate-300 shrink-0 mt-0.5" />
+                                                    <div className="flex flex-col flex-1">
+                                                        <span className="text-sm font-semibold text-slate-800 line-clamp-1">{item.text}</span>
+                                                        <span className="text-[11px] font-medium text-blue-600/80 uppercase tracking-wider mt-0.5">in {item.type}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="p-4 text-center text-slate-500 text-sm">
+                                            No matches found for "{searchQuery}"
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {/* State Dropdown */}
                             <div className="relative flex items-center border-t md:border-t-0 md:border-l border-slate-100 px-3 py-2.5 md:py-0 md:min-w-[130px]">
@@ -167,7 +268,7 @@ export default function Hero() {
                 {/* ── Step 3: Trending Tags — Mobile + Desktop ─────────────── */}
                 <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar px-2 pb-1 mb-2 md:mb-0">
                     <span className="text-[9px] text-white/20 uppercase tracking-widest shrink-0 hidden md:inline">Trending:</span>
-                    {suggestions.map((tag) => (
+                    {trendingTags.map((tag) => (
                         <button
                             key={tag}
                             onClick={() => {
