@@ -10,7 +10,7 @@ async function getAuthorities() {
         .from('authorities')
         .select('*')
         .eq('status', true)
-        .order('name');
+        .order('authority_name');
     return data || [];
 }
 
@@ -18,7 +18,7 @@ export default async function AuthorityDirectory() {
     const authoritiesData = await getAuthorities();
 
     const groupedAuthorities = authoritiesData.reduce((acc, auth) => {
-        const letter = auth.name.charAt(0).toUpperCase();
+        const letter = (auth.authority_name || auth.name || '').charAt(0).toUpperCase();
         if (!acc[letter]) acc[letter] = [];
         acc[letter].push(auth);
         return acc;
@@ -72,7 +72,7 @@ export default async function AuthorityDirectory() {
                                         </div>
 
                                         <h3 className="text-[14px] font-black text-slate-700 group-hover:text-primary transition-colors leading-tight mb-2">
-                                            {auth.name}
+                                            {auth.authority_name || auth.name}
                                         </h3>
 
                                         <div className="flex items-center text-[11px] text-primary font-bold opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">

@@ -67,8 +67,8 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
                     </div>
                     {daysLeft && (
                         <span className={`hidden lg:flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded shrink-0 ${isExpired ? 'bg-red-50 text-red-500 border border-red-100' :
-                                isClosingSoon ? 'bg-amber-50 text-amber-600 border border-amber-100' :
-                                    'bg-green-50 text-green-600 border border-green-100'
+                            isClosingSoon ? 'bg-amber-50 text-amber-600 border border-amber-100' :
+                                'bg-green-50 text-green-600 border border-green-100'
                             }`}>
                             <Clock size={10} strokeWidth={2.5} />
                             {daysLeft}
@@ -106,10 +106,10 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
             </div>
 
             {/* Right: Value + Actions */}
-            <div className="flex items-center gap-0 border-t lg:border-t-0 lg:border-l border-gray-100 shrink-0">
+            <div className="flex items-center border-t lg:border-t-0 lg:border-l border-gray-100 shrink-0 min-h-[52px] lg:min-h-0">
                 {/* Value Block */}
                 {displayValue && (
-                    <div className="px-4 py-3 flex flex-col justify-center min-w-[120px]">
+                    <div className="px-4 py-2 lg:py-3 flex flex-col justify-center min-w-[120px] flex-1 lg:flex-none">
                         <span className="flex items-center gap-1 text-[9px] font-semibold text-gray-300 uppercase tracking-widest mb-0.5">
                             <Wallet size={9} strokeWidth={2.5} />
                             Value
@@ -121,8 +121,8 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex items-center border-l border-gray-100 h-full">
-                    <button className="h-full px-3 text-gray-300 hover:text-[#103e68] hover:bg-gray-50 transition-all flex items-center justify-center">
+                <div className="flex items-center border-l border-gray-100 self-stretch">
+                    <button className="px-3 h-full text-gray-300 hover:text-[#103e68] hover:bg-gray-50 transition-all flex items-center justify-center">
                         <Share2 size={14} strokeWidth={2} />
                     </button>
                     <div className="h-full flex items-center border-l border-gray-100">
@@ -134,7 +134,7 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
                     </div>
                     <Link
                         href={`/tenders/${tender.slug || tender.id}`}
-                        className="h-full px-4 bg-[#103e68] text-white hover:bg-[#0a2742] transition-all flex items-center justify-center group/btn"
+                        className="h-full px-5 bg-[#103e68] text-white hover:bg-[#0a2742] transition-all flex items-center justify-center group/btn"
                     >
                         <ChevronRight size={16} className="group-hover/btn:translate-x-0.5 transition-transform" />
                     </Link>

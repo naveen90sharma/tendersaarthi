@@ -183,12 +183,16 @@ export default function Header() {
                 <div className="container mx-auto px-4 flex items-center justify-between gap-4">
                     {/* Mobile Menu Toggle */}
                     <button
-                        className={`md:hidden p-2 -ml-2 rounded-xl transition-colors ${isHomePage && !scrolled ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:text-primary hover:bg-gray-100'
+                        className={`md:hidden p-2.5 -ml-2 rounded-xl transition-colors group ${isHomePage && !scrolled ? 'text-white hover:bg-white/10' : 'text-slate-700 hover:text-primary hover:bg-slate-100'
                             }`}
                         onClick={() => setIsMobileMenuOpen(true)}
                         aria-label="Open Menu"
                     >
-                        <Menu size={24} />
+                        <div className="flex flex-col justify-center items-start gap-[5px] w-[22px]">
+                            <span className="block h-[2px] w-full bg-current rounded-full transition-all duration-300 group-hover:w-[70%]"></span>
+                            <span className="block h-[2px] w-[70%] bg-current rounded-full transition-all duration-300 group-hover:w-full"></span>
+                            <span className="block h-[2px] w-[85%] bg-current rounded-full transition-all duration-300 group-hover:w-[85%] group-hover:translate-x-[15%]"></span>
+                        </div>
                     </button>
 
                     {/* Logo */}
@@ -440,66 +444,61 @@ export default function Header() {
                 />
 
                 {/* Sidebar Drawer */}
-                <div
-                    className={`absolute left-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl transition-transform duration-300 ease-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}
-                >
-                    {/* Header */}
-                    <div className="bg-[#103e68] p-8 relative overflow-hidden">
+                <div className={`absolute left-0 top-0 h-full w-[85%] max-w-[320px] bg-[#F8FAFC] shadow-[20px_0_50px_rgba(0,0,0,0.2)] transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}>
+                    {/* Header Profile Area (Gradient Dark) */}
+                    <div className="bg-gradient-to-br from-[#0a2742] via-[#103e68] to-[#144f85] p-6 relative overflow-hidden shrink-0">
                         {/* Decorative background patterns */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 pointer-events-none blur-2xl"></div>
-                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-tj-yellow/10 rounded-full -ml-12 -mb-12 pointer-events-none blur-xl"></div>
+                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-tj-yellow/10 rounded-full blur-xl pointer-events-none"></div>
 
-                        <div className="flex justify-between items-start relative z-10 mb-8">
-                            <div>
-                                <h2 className="text-2xl font-black tracking-tighter text-white flex items-center gap-1">
-                                    Tender<span className="text-tj-yellow">Saarthi</span>
-                                </h2>
-                                <div className="flex items-center gap-2 mt-1">
-                                    <div className="h-[2px] w-6 bg-tj-yellow rounded-full"></div>
-                                    <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.2em]">India's #1 Portal</p>
+                        <div className="flex justify-between items-start relative z-10 mb-6">
+                            <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                                <div className="text-xl font-black flex items-center tracking-tighter shadow-sm">
+                                    <span className="text-tj-yellow">Tender</span>
+                                    <span className="text-white">Saarthi</span>
                                 </div>
-                            </div>
+                            </Link>
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="text-white/60 hover:text-white bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 transition-all"
+                                className="text-white/70 hover:text-white bg-white/10 p-2 rounded-full backdrop-blur-md border border-white/10 transition-all active:scale-95"
                             >
-                                <X size={20} />
+                                <X size={18} />
                             </button>
                         </div>
 
                         {/* User Info Block */}
-                        <div className="relative z-10 mt-4">
+                        <div className="relative z-10">
                             {currentUser ? (
-                                <div className="flex items-center gap-4 bg-white/5 backdrop-blur-md p-4 rounded-[1.5rem] border border-white/10">
-                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-tj-yellow to-yellow-300 text-tj-blue flex items-center justify-center text-xl font-black shadow-lg">
+                                <div className="flex items-center gap-3.5 bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10 shadow-lg">
+                                    <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-tj-yellow to-yellow-400 text-[#0a2742] flex items-center justify-center text-lg font-black shadow-inner shadow-white/20">
                                         {currentUser.email?.[0] || 'U'}
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="font-black text-white text-base truncate uppercase tracking-tight leading-none mb-1.5">
+                                    <div className="min-w-0 flex-1">
+                                        <p className="font-bold text-white text-[15px] truncate leading-tight mb-0.5">
                                             {currentUser.user_metadata?.full_name?.split(' ')[0] || 'Hello User'}
                                         </p>
-                                        <p className="text-[10px] text-blue-200 font-bold truncate opacity-80">
+                                        <p className="text-[11px] text-blue-200/80 font-medium truncate">
                                             {currentUser.email}
                                         </p>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="space-y-5">
+                                <div className="space-y-4">
                                     <div>
-                                        <p className="text-blue-200 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Welcome Experience</p>
-                                        <h3 className="text-white font-black text-2xl tracking-tight">Unlock Opportunities</h3>
+                                        <p className="text-blue-200/80 text-[10px] font-black uppercase tracking-widest mb-1">Welcome to</p>
+                                        <h3 className="text-white font-black text-lg tracking-tight leading-tight">India's #1 Portal</h3>
                                     </div>
-                                    <div className="flex gap-3">
+                                    <div className="flex gap-2">
                                         <Link
                                             href="/login"
-                                            className="flex-1 bg-white text-[#103e68] text-[11px] font-black py-3 px-4 rounded-xl text-center uppercase tracking-wider shadow-xl hover:translate-y-[-2px] transition-all"
+                                            className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold py-2.5 px-3 rounded-xl text-center active:scale-95 transition-all outline-none"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             Sign In
                                         </Link>
                                         <Link
                                             href="/register"
-                                            className="flex-1 bg-tj-yellow text-[#103e68] text-[11px] font-black py-3 px-4 rounded-xl text-center uppercase tracking-wider shadow-xl shadow-tj-yellow/20 hover:translate-y-[-2px] transition-all"
+                                            className="flex-1 bg-tj-yellow text-[#0a2742] text-xs font-black py-2.5 px-3 rounded-xl text-center shadow-[0_5px_15px_rgba(255,183,0,0.3)] active:scale-95 transition-all outline-none"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             Join Now
@@ -511,101 +510,110 @@ export default function Header() {
                     </div>
 
                     {/* Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto bg-white">
-                        <div className="py-4 px-2">
-                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-6 mb-4">Main Exploration</h4>
-                            <div className="space-y-0.5">
-                                {navItems.map((item) => (
-                                    <div key={item.label} className="overflow-hidden">
-                                        <div
-                                            className={`flex items-center justify-between px-6 py-4 cursor-pointer transition-all ${activeMobileDropdown === item.label ? 'bg-slate-50 relative' : 'hover:bg-slate-50'}`}
-                                            onClick={() => item.dropdown ? toggleMobileDropdown(item.label) : (router.push(item.path), setIsMobileMenuOpen(false))}
-                                        >
-                                            {activeMobileDropdown === item.label && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>}
-                                            <div className="flex items-center gap-4">
-                                                <div className={`transition-colors ${activeMobileDropdown === item.label ? 'text-primary' : 'text-slate-400'}`}>
-                                                    {item.icon || <FileText size={20} />}
+                    <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#F8FAFC]">
+                        <div className="py-4">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-5 mb-3">Main Exploration</h4>
+                            <div className="space-y-1.5 px-3">
+                                {navItems.map((item) => {
+                                    const isActive = activeMobileDropdown === item.label;
+                                    return (
+                                        <div key={item.label} className="overflow-hidden bg-white rounded-2xl border border-slate-100/50 shadow-[0_2px_10px_rgba(0,0,0,0.015)]">
+                                            <div
+                                                className={`flex items-center justify-between px-4 py-3.5 cursor-pointer transition-all ${isActive ? 'bg-blue-50/20' : 'hover:bg-slate-50'}`}
+                                                onClick={() => item.dropdown ? toggleMobileDropdown(item.label) : (router.push(item.path), setIsMobileMenuOpen(false))}
+                                            >
+                                                <div className="flex items-center gap-3.5">
+                                                    <div className={`p-1.5 rounded-lg transition-colors ${isActive ? 'bg-[#103e68]/10 text-[#103e68]' : 'bg-slate-50 text-slate-400'}`}>
+                                                        {item.icon || <FileText size={18} strokeWidth={2.5} />}
+                                                    </div>
+                                                    <span className={`text-[14px] font-bold tracking-tight ${isActive ? 'text-[#103e68]' : 'text-slate-700'}`}>
+                                                        {item.label}
+                                                    </span>
                                                 </div>
-                                                <span className={`text-[15px] font-black tracking-tight ${activeMobileDropdown === item.label ? 'text-primary' : 'text-slate-700'}`}>
-                                                    {item.label}
-                                                </span>
+                                                {item.dropdown && (
+                                                    <ChevronDown
+                                                        size={16}
+                                                        strokeWidth={2.5}
+                                                        className={`text-slate-400 transition-transform duration-300 ${isActive ? 'rotate-180 text-[#103e68]' : ''}`}
+                                                    />
+                                                )}
                                             </div>
+
+                                            {/* Submenu */}
                                             {item.dropdown && (
-                                                <ChevronDown
-                                                    size={16}
-                                                    className={`text-slate-300 transition-transform duration-300 ${activeMobileDropdown === item.label ? 'rotate-180 text-primary' : ''}`}
-                                                />
+                                                <div
+                                                    className={`bg-slate-50/50 overflow-hidden transition-all duration-300 ease-in-out ${isActive ? 'max-h-[500px] opacity-100 border-t border-slate-100/50' : 'max-h-0 opacity-0'}`}
+                                                >
+                                                    <div className="py-2 pl-14 pr-4 space-y-0.5">
+                                                        {item.dropdown.map((subItem) => (
+                                                            <Link
+                                                                key={subItem.label}
+                                                                href={subItem.path}
+                                                                className="flex items-center justify-between py-2.5 text-[13px] font-medium text-slate-500 hover:text-[#103e68] transition-colors group outline-none"
+                                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                            >
+                                                                {subItem.label}
+                                                                <div className="w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
+                                                                    <ArrowRight size={14} className="text-[#103e68]" />
+                                                                </div>
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
-
-                                        {/* Submenu */}
-                                        {item.dropdown && (
-                                            <div
-                                                className={`bg-slate-50/50 overflow-hidden transition-all duration-300 ease-in-out ${activeMobileDropdown === item.label ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-                                            >
-                                                <div className="py-2 pl-12 pr-6 space-y-1">
-                                                    {item.dropdown.map((subItem) => (
-                                                        <Link
-                                                            key={subItem.label}
-                                                            href={subItem.path}
-                                                            className="flex items-center justify-between py-3 text-sm font-bold text-slate-500 hover:text-primary transition-all group"
-                                                            onClick={() => setIsMobileMenuOpen(false)}
-                                                        >
-                                                            {subItem.label}
-                                                            <div className="w-6 h-6 rounded-full bg-white border border-slate-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                                                                <ArrowRight size={12} className="text-primary" />
-                                                            </div>
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        {/* Extra Links */}
-                        <div className="px-4 pb-8 space-y-3">
-                            {currentUser && (
-                                <>
-                                    <div className="border-t border-gray-200 my-4"></div>
-                                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest px-2 mb-2">Account</h4>
-                                    <Link href="/dashboard" className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 shadow-sm" onClick={() => setIsMobileMenuOpen(false)}>
-                                        <LayoutDashboard size={18} className="text-gray-500" />
-                                        <span className="text-sm font-bold text-gray-700">My Dashboard</span>
+                        {/* Extra Links (Account) */}
+                        {currentUser && (
+                            <div className="px-3 pb-8 mt-2">
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 mb-3">Account</h4>
+                                <div className="space-y-1.5">
+                                    <Link href="/dashboard" className="flex items-center gap-3.5 p-3.5 bg-white rounded-2xl border border-slate-100/50 shadow-[0_2px_10px_rgba(0,0,0,0.015)] active:scale-[0.98] transition-transform outline-none" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+                                            <LayoutDashboard size={18} strokeWidth={2.5} />
+                                        </div>
+                                        <span className="text-[14px] font-bold text-slate-700">My Dashboard</span>
                                     </Link>
                                     <button
                                         onClick={handleSignOut}
-                                        className="w-full flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-100 text-red-600 shadow-sm"
+                                        className="w-full flex items-center justify-between p-3.5 bg-white rounded-2xl border border-slate-100/50 shadow-[0_2px_10px_rgba(0,0,0,0.015)] active:scale-[0.98] transition-all group outline-none"
                                     >
-                                        <LogOut size={18} />
-                                        <span className="text-sm font-bold">Sign Out</span>
+                                        <div className="flex items-center gap-3.5 text-red-500">
+                                            <div className="p-1.5 rounded-lg bg-red-50 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                                <LogOut size={18} strokeWidth={2.5} />
+                                            </div>
+                                            <span className="text-[14px] font-bold">Sign Out</span>
+                                        </div>
+                                        <ArrowRight size={16} className="text-red-300 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
                                     </button>
-                                </>
-                            )}
-                        </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Bottom Sticky Action Bar */}
-                    <div className="p-4 pb-12 bg-white border-t border-gray-100 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-                        <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-white border-t border-slate-200/60 shadow-[0_-5px_20px_rgba(0,0,0,0.03)] pb-[env(safe-area-inset-bottom)] relative z-10 shrink-0">
+                        <div className="grid grid-cols-2 gap-2.5">
                             <Link
                                 href="/bid-support"
-                                className="flex flex-col items-center justify-center bg-tj-yellow/10 text-tj-yellow px-4 py-3 rounded-xl border border-tj-yellow/20"
+                                className="flex items-center justify-center gap-2 bg-[#fffcf5] text-amber-600 border border-amber-200/50 py-3 rounded-[14px] active:scale-95 transition-transform shadow-sm outline-none"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
-                                <Headphones size={20} className="mb-1 text-[#d4a000]" />
-                                <span className="text-[10px] font-black uppercase tracking-wider text-[#d4a000]">Support</span>
+                                <Headphones size={18} strokeWidth={2.5} className="opacity-90" />
+                                <span className="text-[11px] font-black uppercase tracking-wider">Support</span>
                             </Link>
 
                             <Link
                                 href="/post-tender"
-                                className="flex flex-col items-center justify-center bg-primary text-white px-4 py-3 rounded-xl shadow-lg shadow-primary/20"
+                                className="flex items-center justify-center gap-2 bg-[#103e68] text-white py-3 rounded-[14px] shadow-[0_5px_15px_rgba(16,62,104,0.3)] active:scale-95 transition-transform outline-none"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
-                                <PlusCircle size={20} className="mb-1" />
-                                <span className="text-[10px] font-black uppercase tracking-wider">Post Tender</span>
+                                <PlusCircle size={18} strokeWidth={2.5} />
+                                <span className="text-[11px] font-black uppercase tracking-wider">Post Tender</span>
                             </Link>
                         </div>
                     </div>

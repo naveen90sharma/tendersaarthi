@@ -13,19 +13,21 @@ export default function Hero() {
     const [selectedState, setSelectedState] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
 
-    const states = [
-        'Andhra Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Delhi',
-        'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
-        'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Odisha', 'Punjab',
-        'Rajasthan', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Uttarakhand',
-        'West Bengal'
-    ];
+    const [states, setStates] = useState<string[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
 
-    const categories = [
-        'Civil Works', 'Electrical', 'Roads & Highways', 'Bridges',
-        'Water Supply', 'Drainage', 'Buildings', 'IT & Software',
-        'Defense', 'Railway', 'Smart City', 'Healthcare', 'Education'
-    ];
+    // Fetch states and categories from DB
+    useEffect(() => {
+        const fetchFilters = async () => {
+            const [stRes, catRes] = await Promise.all([
+                supabase.from('states').select('name').eq('is_active', true).order('name'),
+                supabase.from('tender_categories').select('name').eq('status', true).order('name'),
+            ]);
+            setStates((stRes.data || []).map((s: any) => s.name));
+            setCategories((catRes.data || []).map((c: any) => c.name));
+        };
+        fetchFilters();
+    }, []);
 
     const trendingTags = ["Highways & Roads", "Civil Infrastructure", "Defense Projects", "Smart Cities"];
 
@@ -47,7 +49,7 @@ export default function Hero() {
                 const kw = `%${searchQuery.trim()}%`;
 
                 const [authRes, catRes] = await Promise.all([
-                    supabase.from('authorities').select('authority_name, slug').ilike('authority_name', kw).limit(4),
+                    supabase.from('authorities').select('name, slug').ilike('name', kw).limit(4),
                     supabase.from('tender_categories').select('name, slug').ilike('name', kw).limit(3)
                 ]);
 
@@ -55,7 +57,7 @@ export default function Hero() {
 
                 if (authRes.data) {
                     authRes.data.forEach(auth => {
-                        newSuggestions.push({ text: auth.authority_name, type: 'Authority', slug: auth.slug });
+                        newSuggestions.push({ text: auth.name, type: 'Authority', slug: auth.slug });
                     });
                 }
 

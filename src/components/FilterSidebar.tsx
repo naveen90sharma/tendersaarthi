@@ -1,40 +1,33 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Search, Calendar, Filter, X, Check, ArrowRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getFilterMetadata } from '@/services/tenderService';
+import { X, SlidersHorizontal, ChevronDown, ChevronUp, Search, Calendar, Check } from 'lucide-react';
 import {
     Drawer,
     Fab,
     Slider,
     Box,
     Typography,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
     TextField,
-    Checkbox,
-    FormControlLabel,
     InputAdornment,
     Button,
     IconButton,
-    Paper,
-    Divider,
-    useMediaQuery
+    Chip,
+    useMediaQuery,
+    Collapse,
+    Badge,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 
-// --- Custom Styles & Theme Overrides for "Shaandaar" Look ---
-const primaryColor = '#103e68'; // Brand Primary
-const accentColor = '#e11d48'; // Brand Accent (Reddish)
+// ─── Theme ────────────────────────────────────────────────────────────────────
+const PRIMARY = '#103e68';
+const ACCENT = '#FFC212';
 
-// Custom scrollbar style
 const scrollbarStyle = {
-    '&::-webkit-scrollbar': { width: '6px' },
-    '&::-webkit-scrollbar-track': { background: '#f1f5f9' },
-    '&::-webkit-scrollbar-thumb': { background: '#cbd5e1', borderRadius: '10px' },
-    '&::-webkit-scrollbar-thumb:hover': { background: '#94a3b8' },
+    '&::-webkit-scrollbar': { width: '4px' },
+    '&::-webkit-scrollbar-track': { background: 'transparent' },
+    '&::-webkit-scrollbar-thumb': { background: '#e2e8f0', borderRadius: '10px' },
 };
 
 interface FilterSidebarProps {
@@ -42,98 +35,116 @@ interface FilterSidebarProps {
     onClose?: () => void;
 }
 
+// ─── FilterSection Sub-component ─────────────────────────────────────────────
+function FilterSection({
+    title,
+    icon,
+    selectedCount = 0,
+    children,
+    defaultOpen = true,
+}: {
+    title: string;
+    icon?: React.ReactNode;
+    selectedCount?: number;
+    children: React.ReactNode;
+    defaultOpen?: boolean;
+}) {
+    const [open, setOpen] = useState(defaultOpen);
+
+    return (
+        <div className="rounded-2xl border border-slate-100 overflow-hidden bg-white">
+            <button
+                onClick={() => setOpen(o => !o)}
+                className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-slate-50 transition-colors"
+            >
+                <div className="flex items-center gap-2">
+                    {icon && <span className="text-slate-400">{icon}</span>}
+                    <span className="text-sm font-bold text-slate-700 uppercase tracking-wide">{title}</span>
+                    {selectedCount > 0 && (
+                        <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black text-white"
+                            style={{ background: PRIMARY }}>
+                            {selectedCount}
+                        </span>
+                    )}
+                </div>
+                {open ? <ChevronUp size={15} className="text-slate-400" /> : <ChevronDown size={15} className="text-slate-400" />}
+            </button>
+
+            <Collapse in={open}>
+                <div className="px-4 pb-4">
+                    {children}
+                </div>
+            </Collapse>
+        </div>
+    );
+}
+
+// ─── CheckItem Sub-component ──────────────────────────────────────────────────
+function CheckItem({
+    label,
+    checked,
+    onChange,
+}: {
+    label: string;
+    checked: boolean;
+    onChange: () => void;
+}) {
+    return (
+        <button
+            onClick={onChange}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-all duration-150 group ${checked
+                ? 'bg-blue-50 border border-blue-100'
+                : 'hover:bg-slate-50 border border-transparent'
+                }`}
+        >
+            <span className={`flex items-center justify-center w-4.5 h-4.5 rounded-md border-2 shrink-0 transition-all ${checked
+                ? 'border-[#103e68] bg-[#103e68]'
+                : 'border-slate-300 group-hover:border-slate-400'
+                }`}
+                style={{ width: 18, height: 18, borderRadius: 5 }}>
+                {checked && <Check size={11} className="text-white" strokeWidth={3} />}
+            </span>
+            <span className={`text-sm transition-colors truncate leading-tight ${checked ? 'text-[#103e68] font-semibold' : 'text-slate-600 font-medium'
+                }`}>
+                {label}
+            </span>
+        </button>
+    );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function FilterSidebar({ open, onClose }: FilterSidebarProps = {}) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const theme = useTheme();
-    // Using MUI useMediaQuery for responsive checks (sm/md/lg)
-    // Note: Tailwind uses 'lg' as 1024px. MUI 'lg' default is 1200px.
-    // We'll align with Tailwind 'lg' breakpoint (1024px) approx for consistency
     const isDesktop = useMediaQuery('(min-width:1024px)');
 
-    // --- State ---
     const [internalOpen, setInternalOpen] = useState(false);
-
-    // Derived state: Use prop if available, otherwise internal
     const isMobileOpen = open !== undefined ? open : internalOpen;
-
-    const handleClose = () => {
-        if (onClose) onClose();
-        else setInternalOpen(false);
-    };
-
+    const handleClose = () => { if (onClose) onClose(); else setInternalOpen(false); };
 
     const [metadata, setMetadata] = useState<{
-        categories: string[];
-        states: string[];
-        authorities: string[];
-        types: string[];
-        minPrice: number;
-        maxPrice: number;
-    }>({
-        categories: [],
-        states: [],
-        authorities: [],
-        types: [],
-        minPrice: 0,
-        maxPrice: 10000000000 // 1000 Cr default
-    });
+        categories: string[]; states: string[]; authorities: string[]; types: string[]; minPrice: number; maxPrice: number;
+    }>({ categories: [], states: [], authorities: [], types: [], minPrice: 0, maxPrice: 10000000000 });
 
     const [searchQueries, setSearchQueries] = useState<Record<string, string>>({
-        category: '',
-        location: '',
-        authority: '',
-        state: '',
-        tender_type: ''
+        category: '', state: '', authority: '',
     });
-
-    // Default expanded sections
-    const [expanded, setExpanded] = useState<string[]>(['value', 'category', 'state', 'authority']);
-
-    const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-        setExpanded(isExpanded ? [...expanded, panel] : expanded.filter(p => p !== panel));
-    };
 
     const [filters, setFilters] = useState<{
-        category: string[];
-        state: string[];
-        location: string[];
-        authority: string[];
-        value: string[];
-        tender_type: string[];
-    }>({
-        category: [],
-        state: [],
-        location: [],
-        authority: [],
-        value: [],
-        tender_type: []
-    });
+        category: string[]; state: string[]; location: string[]; authority: string[]; value: string[]; tender_type: string[];
+    }>({ category: [], state: [], location: [], authority: [], value: [], tender_type: [] });
 
-    const [dateRanges, setDateRanges] = useState<{
-        publishDateFrom: string;
-        publishDateTo: string;
-        submissionDateFrom: string;
-        submissionDateTo: string;
-    }>({
-        publishDateFrom: '',
-        publishDateTo: '',
-        submissionDateFrom: '',
-        submissionDateTo: ''
+    const [dateRanges, setDateRanges] = useState({
+        publishDateFrom: '', publishDateTo: '', submissionDateFrom: '', submissionDateTo: '',
     });
 
     const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
-
-
-    // --- Effects ---
 
     // Fetch Metadata
     useEffect(() => {
         const fetchMeta = async () => {
             const res = await getFilterMetadata();
-            if (res.success && res.data) {
-                setMetadata(res.data);
-            }
+            if (res.success && res.data) setMetadata(res.data);
         };
         fetchMeta();
     }, []);
@@ -146,106 +157,77 @@ export default function FilterSidebar({ open, onClose }: FilterSidebarProps = {}
         const auth = searchParams.get('authority')?.split(',').filter(Boolean) || [];
         const val = searchParams.get('value')?.split(',').filter(Boolean) || [];
         const typ = searchParams.get('tender_type')?.split(',').filter(Boolean) || [];
-
         const pubFrom = searchParams.get('publishDateFrom') || '';
         const pubTo = searchParams.get('publishDateTo') || '';
         const subFrom = searchParams.get('submissionDateFrom') || '';
         const subTo = searchParams.get('submissionDateTo') || '';
 
-        // Only update if different
         setFilters(prev => {
-            const newFilters = { category: cat, state: st, location: loc, authority: auth, value: val, tender_type: typ };
-            return JSON.stringify(newFilters) !== JSON.stringify(prev) ? newFilters : prev;
+            const n = { category: cat, state: st, location: loc, authority: auth, value: val, tender_type: typ };
+            return JSON.stringify(n) !== JSON.stringify(prev) ? n : prev;
         });
-
         setDateRanges(prev => {
-            const newDates = { publishDateFrom: pubFrom, publishDateTo: pubTo, submissionDateFrom: subFrom, submissionDateTo: subTo };
-            return JSON.stringify(newDates) !== JSON.stringify(prev) ? newDates : prev;
+            const n = { publishDateFrom: pubFrom, publishDateTo: pubTo, submissionDateFrom: subFrom, submissionDateTo: subTo };
+            return JSON.stringify(n) !== JSON.stringify(prev) ? n : prev;
         });
-
-        // Price Sync
         if (metadata.maxPrice > 0) {
             const urlMin = Number(searchParams.get('minPrice')) || 0;
             const urlMax = Number(searchParams.get('maxPrice')) || metadata.maxPrice;
-            const sliderMin = Math.round((urlMin / metadata.maxPrice) * 1000);
-            const sliderMax = Math.round((urlMax / metadata.maxPrice) * 1000);
-            if (!isNaN(sliderMin) && !isNaN(sliderMax)) {
-                setPriceRange([sliderMin, sliderMax]);
-            }
+            setPriceRange([
+                Math.round((urlMin / metadata.maxPrice) * 1000),
+                Math.round((urlMax / metadata.maxPrice) * 1000),
+            ]);
         }
     }, [searchParams, metadata.maxPrice]);
 
-
-    // Auto-apply logic (debounced)
+    // Auto-apply debounced
     useEffect(() => {
-        const timer = setTimeout(() => {
-            applyFilters();
-        }, 800);
+        const timer = setTimeout(() => applyFilters(), 800);
         return () => clearTimeout(timer);
-    }, [filters, dateRanges]); // Price applied manually via button for better UX
+    }, [filters, dateRanges]);
 
-    // --- Helpers ---
-
-    const getActualValue = (sliderVal: number) => {
-        const maxValue = metadata.maxPrice || 10000000000;
-        // Simple linear mapping for now, can implement logarithmic if needed
-        return Math.round((sliderVal / 1000) * maxValue);
-    };
-
+    // Helpers
+    const getActualValue = (v: number) => Math.round((v / 1000) * (metadata.maxPrice || 10000000000));
     const formatPrice = (num: number) => {
-        if (num === 0) return '0';
-        if (num >= 10000000) {
-            const cr = num / 10000000;
-            return cr >= 100 ? `${Math.round(cr)}Cr` : `${cr.toFixed(1)}Cr`;
-        }
-        return `${Math.round(num / 100000)}L`;
-    };
-
-    const handlePriceSliderChange = (event: Event, newValue: number | number[]) => {
-        setPriceRange(newValue as number[]);
-    };
-
-    const applyPriceFilter = () => {
-        const params = new URLSearchParams(searchParams.toString());
-        const minVal = getActualValue(priceRange[0]);
-        const maxVal = getActualValue(priceRange[1]);
-        params.set('minPrice', minVal.toString());
-        params.set('maxPrice', maxVal.toString());
-        params.set('page', '1');
-        router.push(`?${params.toString()}`);
-        if (!isDesktop) handleClose();
+        if (num === 0) return '₹0';
+        if (num >= 10000000) { const cr = num / 10000000; return `₹${cr >= 100 ? Math.round(cr) : cr.toFixed(1)}Cr`; }
+        return `₹${Math.round(num / 100000)}L`;
     };
 
     const handleCheck = (section: keyof typeof filters, item: string) => {
         setFilters(prev => {
-            const current = prev[section];
-            const exists = current.includes(item);
-            const updated = exists ? current.filter(i => i !== item) : [...current, item];
-            return { ...prev, [section]: updated };
+            const cur = prev[section];
+            return { ...prev, [section]: cur.includes(item) ? cur.filter(i => i !== item) : [...cur, item] };
         });
     };
 
     const applyFilters = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('page', '1');
-
         Object.entries(filters).forEach(([key, val]) => {
-            if (val.length > 0) params.set(key, val.join(','));
-            else params.delete(key);
+            if (val.length > 0) params.set(key, val.join(',')); else params.delete(key);
         });
-
         if (dateRanges.publishDateFrom) params.set('publishDateFrom', dateRanges.publishDateFrom); else params.delete('publishDateFrom');
         if (dateRanges.publishDateTo) params.set('publishDateTo', dateRanges.publishDateTo); else params.delete('publishDateTo');
         if (dateRanges.submissionDateFrom) params.set('submissionDateFrom', dateRanges.submissionDateFrom); else params.delete('submissionDateFrom');
         if (dateRanges.submissionDateTo) params.set('submissionDateTo', dateRanges.submissionDateTo); else params.delete('submissionDateTo');
-
         router.push(`?${params.toString()}`);
+    };
+
+    const applyPriceFilter = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('minPrice', getActualValue(priceRange[0]).toString());
+        params.set('maxPrice', getActualValue(priceRange[1]).toString());
+        params.set('page', '1');
+        router.push(`?${params.toString()}`);
+        if (!isDesktop) handleClose();
     };
 
     const clearAll = () => {
         const params = new URLSearchParams(searchParams.toString());
-        ['category', 'state', 'location', 'authority', 'value', 'tender_type', 'publishDateFrom', 'publishDateTo', 'submissionDateFrom', 'submissionDateTo', 'minPrice', 'maxPrice']
-            .forEach(p => params.delete(p));
+        ['category', 'state', 'location', 'authority', 'value', 'tender_type',
+            'publishDateFrom', 'publishDateTo', 'submissionDateFrom', 'submissionDateTo',
+            'minPrice', 'maxPrice'].forEach(p => params.delete(p));
         params.set('page', '1');
         router.push(`?${params.toString()}`);
         setFilters({ category: [], state: [], location: [], authority: [], value: [], tender_type: [] });
@@ -254,377 +236,324 @@ export default function FilterSidebar({ open, onClose }: FilterSidebarProps = {}
         if (!isDesktop) handleClose();
     };
 
+    const totalActive = Object.values(filters).flat().length +
+        Object.values(dateRanges).filter(Boolean).length;
 
-    // --- Render Content ---
+    // ─── Active Filter Chips ──────────────────────────────────────────────────
+    const allSelectedChips: { label: string; section: keyof typeof filters }[] = [];
+    (['category', 'state', 'authority'] as const).forEach(sec => {
+        filters[sec].forEach(item => allSelectedChips.push({ label: item, section: sec }));
+    });
+
+    // ─── Filter List Render ───────────────────────────────────────────────────
+    const renderFilterList = (
+        items: string[],
+        section: keyof typeof filters,
+        searchKey: string,
+        placeholder: string
+    ) => {
+        const filtered = items
+            .filter(i => i.toLowerCase().includes((searchQueries[searchKey] || '').toLowerCase()));
+        const selected = filters[section];
+        const sorted = [...selected.filter(i => filtered.includes(i)), ...filtered.filter(i => !selected.includes(i))];
+
+        return (
+            <div>
+                {/* Search */}
+                <div className="relative mb-3">
+                    <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
+                    <input
+                        type="text"
+                        placeholder={placeholder}
+                        value={searchQueries[searchKey] || ''}
+                        onChange={e => setSearchQueries(p => ({ ...p, [searchKey]: e.target.value }))}
+                        className="w-full pl-8 pr-3 py-2 text-sm bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-blue-200 focus:bg-white transition-all placeholder:text-slate-300"
+                    />
+                </div>
+
+                {/* Items */}
+                <div className="space-y-1 max-h-[180px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
+                    {sorted.length > 0 ? sorted.slice(0, 12).map(item => (
+                        <CheckItem
+                            key={item}
+                            label={item}
+                            checked={selected.includes(item)}
+                            onChange={() => handleCheck(section, item)}
+                        />
+                    )) : (
+                        <p className="text-xs text-slate-400 py-3 text-center">No results found</p>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    // ─── Main Content ─────────────────────────────────────────────────────────
     const FilterContent = (
-        <Box sx={{
-            height: '100%',
-            overflowY: 'auto',
-            pb: 10,
-            ...scrollbarStyle
-        }}>
+        <div style={{ fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', height: '100%' }}>
+
             {/* Header */}
-            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9' }}>
-                <Typography variant="h6" sx={{ fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px', textTransform: 'uppercase', fontSize: '1.1rem' }}>
-                    Filters
-                </Typography>
-                <Button
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 shrink-0">
+                <div className="flex items-center gap-2">
+                    <SlidersHorizontal size={16} className="text-[#103e68]" />
+                    <span className="font-black text-slate-800 uppercase tracking-wide text-sm">Filters</span>
+                    {totalActive > 0 && (
+                        <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black text-white"
+                            style={{ background: PRIMARY }}>
+                            {totalActive}
+                        </span>
+                    )}
+                </div>
+                <button
                     onClick={clearAll}
-                    size="small"
-                    startIcon={<X size={14} />}
-                    sx={{
-                        color: '#ef4444',
-                        fontWeight: 700,
-                        fontSize: '0.75rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        '&:hover': { bgcolor: '#fee2e2' }
-                    }}
+                    className="text-xs font-bold text-red-400 hover:text-red-600 flex items-center gap-1 transition-colors"
                 >
+                    <X size={12} />
                     Clear All
-                </Button>
-            </Box>
+                </button>
+            </div>
 
-            <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-
-                {/* --- Price Range --- */}
-                <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid #e2e8f0' }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#103e68', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        VALUE (INR)
-                    </Typography>
-
-                    <Box sx={{ px: 1 }}>
-                        <Slider
-                            value={priceRange}
-                            onChange={handlePriceSliderChange}
-                            valueLabelDisplay="auto"
-                            valueLabelFormat={(x) => formatPrice(getActualValue(x))}
-                            min={0}
-                            max={1000}
-                            sx={{
-                                color: '#103e68',
-                                '& .MuiSlider-thumb': {
-                                    height: 20, width: 20, bgcolor: '#fff', border: '2px solid currentColor',
-                                    '&:hover': { boxShadow: '0 0 0 8px rgba(16, 62, 104, 0.16)' }
-                                },
-                                '& .MuiSlider-rail': { opacity: 0.3, bgcolor: '#cbd5e1' }
-                            }}
-                        />
-                    </Box>
-
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, alignItems: 'center' }}>
-                        <Box>
-                            <Typography variant="caption" display="block" sx={{ fontWeight: 700, color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Min</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: '#0f172a' }}>{formatPrice(getActualValue(priceRange[0]))}</Typography>
-                        </Box>
-                        <Button
-                            onClick={applyPriceFilter}
-                            variant="contained"
-                            size="small"
-                            sx={{
-                                bgcolor: '#0f172a',
-                                color: '#fff',
-                                borderRadius: 3,
-                                fontSize: '0.7rem',
-                                fontWeight: 800,
-                                px: 3,
-                                boxShadow: 'none',
-                                '&:hover': { bgcolor: '#000' }
-                            }}
+            {/* Active Chips */}
+            {allSelectedChips.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 px-4 py-3 border-b border-slate-50 shrink-0">
+                    {allSelectedChips.map(({ label, section }) => (
+                        <button
+                            key={`${section}-${label}`}
+                            onClick={() => handleCheck(section, label)}
+                            className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-100 text-[#103e68] rounded-full text-[11px] font-semibold hover:bg-red-50 hover:border-red-100 hover:text-red-600 transition-all group"
                         >
-                            Apply
-                        </Button>
-                        <Box sx={{ textAlign: 'right' }}>
-                            <Typography variant="caption" display="block" sx={{ fontWeight: 700, color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Max</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: '#0f172a' }}>{formatPrice(getActualValue(priceRange[1]))}</Typography>
+                            <span className="truncate max-w-[100px]">{label}</span>
+                            <X size={10} className="shrink-0 opacity-50 group-hover:opacity-100" />
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* Scrollable sections */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ scrollbarWidth: 'thin' }}>
+
+                {/* ── Price Range ─────────────────────────────────────────── */}
+                <FilterSection title="Tender Value" defaultOpen={true}>
+                    <div className="pt-2">
+                        {/* Value labels */}
+                        <div className="flex justify-between items-center mb-1">
+                            <div className="text-center">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Min</span>
+                                <span className="text-sm font-bold text-slate-700">{formatPrice(getActualValue(priceRange[0]))}</span>
+                            </div>
+                            <div className="text-center">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Max</span>
+                                <span className="text-sm font-bold text-slate-700">{formatPrice(getActualValue(priceRange[1]))}</span>
+                            </div>
+                        </div>
+
+                        {/* Slider */}
+                        <Box sx={{ px: 1, mt: 1 }}>
+                            <Slider
+                                value={priceRange}
+                                onChange={(_, v) => setPriceRange(v as number[])}
+                                valueLabelDisplay="auto"
+                                valueLabelFormat={x => formatPrice(getActualValue(x))}
+                                min={0}
+                                max={1000}
+                                sx={{
+                                    color: PRIMARY,
+                                    height: 4,
+                                    '& .MuiSlider-thumb': {
+                                        height: 18, width: 18,
+                                        bgcolor: '#fff',
+                                        border: `2px solid ${PRIMARY}`,
+                                        boxShadow: '0 2px 8px rgba(16,62,104,0.3)',
+                                        '&:hover': { boxShadow: '0 0 0 8px rgba(16,62,104,0.1)' }
+                                    },
+                                    '& .MuiSlider-track': { border: 'none' },
+                                    '& .MuiSlider-rail': { bgcolor: '#e2e8f0', opacity: 1 },
+                                    '& .MuiSlider-valueLabel': {
+                                        bgcolor: PRIMARY, borderRadius: '8px',
+                                        fontSize: '0.7rem', fontWeight: 800
+                                    }
+                                }}
+                            />
                         </Box>
-                    </Box>
-                </Paper>
 
-                {/* --- Categories --- */}
-                <FilterAccordion
-                    title="Industry"
-                    panel="category"
-                    expanded={expanded.includes('category')}
-                    onChange={handleAccordionChange('category')}
-                    icon={<Search size={16} />}
+                        {/* Quick preset chips */}
+                        <div className="flex flex-wrap gap-1.5 mt-3">
+                            {[
+                                { label: '< 10L', min: 0, max: 1000000 },
+                                { label: '10L–1Cr', min: 1000000, max: 10000000 },
+                                { label: '1Cr–50Cr', min: 10000000, max: 500000000 },
+                                { label: '50Cr+', min: 500000000, max: metadata.maxPrice },
+                            ].map(preset => {
+                                const max = metadata.maxPrice || 10000000000;
+                                const isActive = getActualValue(priceRange[0]) === preset.min && getActualValue(priceRange[1]) === preset.max;
+                                return (
+                                    <button
+                                        key={preset.label}
+                                        onClick={() => {
+                                            setPriceRange([
+                                                Math.round((preset.min / max) * 1000),
+                                                Math.round((preset.max / max) * 1000),
+                                            ]);
+                                        }}
+                                        className={`text-[11px] px-2.5 py-1 rounded-lg font-semibold border transition-all ${isActive
+                                            ? 'bg-[#103e68] text-white border-[#103e68]'
+                                            : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-blue-200 hover:text-[#103e68]'
+                                            }`}
+                                    >
+                                        {preset.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <button
+                            onClick={applyPriceFilter}
+                            className="mt-3 w-full py-2 bg-[#103e68] hover:bg-[#0a2742] text-white font-bold text-xs rounded-xl transition-colors uppercase tracking-wide"
+                        >
+                            Apply Range
+                        </button>
+                    </div>
+                </FilterSection>
+
+                {/* ── Category ────────────────────────────────────────────── */}
+                <FilterSection
+                    title="Category"
+                    selectedCount={filters.category.length}
+                    defaultOpen={true}
                 >
-                    <SearchInput
-                        value={searchQueries.category}
-                        onChange={(e) => setSearchQueries(prev => ({ ...prev, category: e.target.value }))}
-                        placeholder="Search Industry..."
-                    />
-                    <FilterList>
-                        {(metadata.categories.length > 0 ? metadata.categories : ['Construction', 'IT & Services', 'Healthcare', 'Power'])
-                            .filter(i => i.toLowerCase().includes(searchQueries.category.toLowerCase()))
-                            .slice(0, 10)
-                            .map(item => (
-                                <FormControlLabel
-                                    key={item}
-                                    control={
-                                        <Checkbox
-                                            checked={filters.category.includes(item)}
-                                            onChange={() => handleCheck('category', item)}
-                                            size="small"
-                                            sx={{ color: '#cbd5e1', '&.Mui-checked': { color: '#103e68' } }}
-                                        />
-                                    }
-                                    label={<Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: filters.category.includes(item) ? '#0f172a' : '#64748b' }}>{item}</Typography>}
-                                    sx={{ ml: 0, mr: 0, width: '100%' }}
-                                />
-                            ))}
-                    </FilterList>
-                </FilterAccordion>
+                    {renderFilterList(
+                        metadata.categories.length > 0 ? metadata.categories : [],
+                        'category', 'category', 'Search categories...'
+                    )}
+                </FilterSection>
 
-                {/* --- State --- */}
-                <FilterAccordion
+                {/* ── State ───────────────────────────────────────────────── */}
+                <FilterSection
                     title="State"
-                    panel="state"
-                    expanded={expanded.includes('state')}
-                    onChange={handleAccordionChange('state')}
-                    icon={<ArrowRight size={16} />} // Using generic icon
+                    selectedCount={filters.state.length}
+                    defaultOpen={true}
                 >
-                    <SearchInput
-                        value={searchQueries.state}
-                        onChange={(e) => setSearchQueries(prev => ({ ...prev, state: e.target.value }))}
-                        placeholder="Search State..."
-                    />
-                    <FilterList>
-                        {(metadata.states.length > 0 ? metadata.states : ['Delhi', 'Maharashtra', 'Karnataka'])
-                            .filter(i => i.toLowerCase().includes(searchQueries.state.toLowerCase()))
-                            .slice(0, 10)
-                            .map(item => (
-                                <FormControlLabel
-                                    key={item}
-                                    control={
-                                        <Checkbox
-                                            checked={filters.state.includes(item)}
-                                            onChange={() => handleCheck('state', item)}
-                                            size="small"
-                                            sx={{ color: '#cbd5e1', '&.Mui-checked': { color: '#103e68' } }}
-                                        />
-                                    }
-                                    label={<Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: filters.state.includes(item) ? '#0f172a' : '#64748b' }}>{item}</Typography>}
-                                    sx={{ ml: 0, mr: 0, width: '100%' }}
-                                />
-                            ))}
-                    </FilterList>
-                </FilterAccordion>
+                    {renderFilterList(
+                        metadata.states.length > 0 ? metadata.states : [],
+                        'state', 'state', 'Search states...'
+                    )}
+                </FilterSection>
 
-
-                {/* --- Authority --- */}
-                <FilterAccordion
-                    title="Authority"
-                    panel="authority"
-                    expanded={expanded.includes('authority')}
-                    onChange={handleAccordionChange('authority')}
-                    icon={<Check size={16} />} // Generic icon
+                {/* ── Authority ───────────────────────────────────────────── */}
+                <FilterSection
+                    title="Authority / Department"
+                    selectedCount={filters.authority.length}
+                    defaultOpen={false}
                 >
-                    <SearchInput
-                        value={searchQueries.authority}
-                        onChange={(e) => setSearchQueries(prev => ({ ...prev, authority: e.target.value }))}
-                        placeholder="Search Authority..."
-                    />
-                    <FilterList>
-                        {(metadata.authorities.length > 0 ? metadata.authorities : ['PWD', 'Railways', 'NHAI'])
-                            .filter(i => i.toLowerCase().includes(searchQueries.authority.toLowerCase()))
-                            .slice(0, 10)
-                            .map(item => (
-                                <FormControlLabel
-                                    key={item}
-                                    control={
-                                        <Checkbox
-                                            checked={filters.authority.includes(item)}
-                                            onChange={() => handleCheck('authority', item)}
-                                            size="small"
-                                            sx={{ color: '#cbd5e1', '&.Mui-checked': { color: '#103e68' } }}
-                                        />
-                                    }
-                                    label={<Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: filters.authority.includes(item) ? '#0f172a' : '#64748b' }}>{item}</Typography>}
-                                    sx={{ ml: 0, mr: 0, width: '100%' }}
-                                />
-                            ))}
-                    </FilterList>
-                </FilterAccordion>
+                    {renderFilterList(
+                        metadata.authorities.length > 0 ? metadata.authorities : [],
+                        'authority', 'authority', 'Search departments...'
+                    )}
+                </FilterSection>
 
+                {/* ── Deadline / Timeline ─────────────────────────────────── */}
+                <FilterSection title="Deadline" icon={<Calendar size={14} />} defaultOpen={false}>
+                    <div className="space-y-3 pt-1">
+                        <div>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">
+                                Submission Deadline Before
+                            </label>
+                            <input
+                                type="date"
+                                value={dateRanges.submissionDateTo}
+                                onChange={e => setDateRanges(p => ({ ...p, submissionDateTo: e.target.value }))}
+                                className="w-full text-sm bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 outline-none focus:border-blue-200 transition-all text-slate-600"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">
+                                Published After
+                            </label>
+                            <input
+                                type="date"
+                                value={dateRanges.publishDateFrom}
+                                onChange={e => setDateRanges(p => ({ ...p, publishDateFrom: e.target.value }))}
+                                className="w-full text-sm bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 outline-none focus:border-blue-200 transition-all text-slate-600"
+                            />
+                        </div>
+                    </div>
+                </FilterSection>
 
-                {/* --- Dates --- */}
-                <FilterAccordion
-                    title="Timeline"
-                    panel="dates"
-                    expanded={expanded.includes('dates')}
-                    onChange={handleAccordionChange('dates')}
-                    icon={<Calendar size={16} />}
+                {/* ── Promo card ──────────────────────────────────────────── */}
+                <div
+                    className="p-4 rounded-2xl text-white relative overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${PRIMARY} 0%, #071e33 100%)` }}
                 >
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <TextField
-                            label="Publish Date From"
-                            type="date"
-                            size="small"
-                            InputLabelProps={{ shrink: true, sx: { fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' } }}
-                            value={dateRanges.publishDateFrom}
-                            onChange={(e) => setDateRanges(prev => ({ ...prev, publishDateFrom: e.target.value }))}
-                            fullWidth
-                            sx={{
-                                '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: '#f8fafc', '& fieldset': { borderColor: '#e2e8f0' } }
-                            }}
-                        />
-                        <TextField
-                            label="Submission Deadline"
-                            type="date"
-                            size="small"
-                            InputLabelProps={{ shrink: true, sx: { fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' } }}
-                            value={dateRanges.submissionDateTo}
-                            onChange={(e) => setDateRanges(prev => ({ ...prev, submissionDateTo: e.target.value }))}
-                            fullWidth
-                            sx={{
-                                '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: '#f8fafc', '& fieldset': { borderColor: '#e2e8f0' } }
-                            }}
-                        />
-                    </Box>
-                </FilterAccordion>
+                    <div className="relative z-10">
+                        <div className="font-black text-sm mb-1 tracking-tight">🔔 SAVE THIS SEARCH</div>
+                        <p className="text-[11px] text-blue-200/70 leading-relaxed mb-3">
+                            Get email alerts when new tenders match your filters.
+                        </p>
+                        <button
+                            className="text-[11px] font-bold px-4 py-1.5 rounded-lg transition-all"
+                            style={{ background: ACCENT, color: PRIMARY }}
+                        >
+                            Set Alert
+                        </button>
+                    </div>
+                    <div className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full bg-white opacity-5" />
+                </div>
 
-                {/* Promo Card */}
-                <Box sx={{
-                    background: 'linear-gradient(135deg, #103e68 0%, #0f172a 100%)',
-                    borderRadius: 4,
-                    p: 3,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    mt: 2
-                }}>
-                    <Box sx={{ position: 'relative', zIndex: 2 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#fff', mb: 0.5, letterSpacing: '-0.5px' }}>
-                            UPGRADE TO PRO
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, display: 'block', mb: 2, lineHeight: 1.4 }}>
-                            Get unlimited access and AI recommendations.
-                        </Typography>
-                        <Button size="small" variant="contained" sx={{ bgcolor: '#fff', color: '#103e68', fontWeight: 800, borderRadius: 2, textTransform: 'uppercase', fontSize: '0.7rem', '&:hover': { bgcolor: '#f1f5f9' } }}>
-                            Try Free
-                        </Button>
-                    </Box>
-                    <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white opacity-5 rounded-full blur-2xl pointer-events-none" />
-                </Box>
-
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 
+    // ─── Return ───────────────────────────────────────────────────────────────
     return (
         <>
-            {/* Desktop View: Sticky Sidebar */}
-            <Box sx={{ display: { xs: 'none', lg: 'block' }, position: 'sticky', top: 96, maxHeight: 'calc(100vh - 120px)', width: '100%' }}>
-                <Paper elevation={0} sx={{ borderRadius: 4, bgcolor: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', overflow: 'hidden' }}>
-                    {FilterContent}
-                </Paper>
+            {/* Desktop Sticky */}
+            <Box sx={{
+                display: { xs: 'none', lg: 'flex' },
+                flexDirection: 'column',
+                position: 'sticky',
+                top: 88,
+                height: 'calc(100vh - 108px)',
+                width: '100%',
+                overflow: 'hidden',
+                borderRadius: 4,
+                border: '1px solid #f1f5f9',
+                bgcolor: '#fff',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.04)'
+            }}>
+                {FilterContent}
             </Box>
 
-            {/* Mobile View: Floating Action Button (Bottom Left) - ONLY if uncontrolled */}
+            {/* Mobile FAB */}
             {open === undefined && (
-                <Box sx={{ position: 'fixed', bottom: 24, left: 24, zIndex: 1200, display: { xs: 'block', lg: 'none' } }}>
-                    <Fab
+                <Box sx={{ position: 'fixed', bottom: 20, left: 20, zIndex: 1200, display: { xs: 'block', lg: 'none' } }}>
+                    <button
                         onClick={() => setInternalOpen(true)}
-                        variant="extended"
-                        sx={{
-                            bgcolor: '#103e68',
-                            color: '#fff',
-                            fontWeight: 800,
-                            px: 3,
-                            py: 3,
-                            borderRadius: '16px', // Rounded look like standard button
-                            boxShadow: '0 20px 25px -5px rgba(16, 62, 104, 0.3)',
-                            '&:hover': { bgcolor: '#0a2742' },
-                            gap: 1
-                        }}
+                        className="flex items-center gap-2 px-4 py-3 rounded-2xl text-white font-bold text-sm shadow-2xl"
+                        style={{ background: PRIMARY, boxShadow: '0 8px 25px rgba(16,62,104,0.4)' }}
                     >
-                        <Filter size={18} />
-                        <Typography sx={{ fontWeight: 800, fontSize: '0.875rem' }}>Filters</Typography>
-                    </Fab>
+                        <SlidersHorizontal size={17} />
+                        Filters
+                        {totalActive > 0 && (
+                            <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black" style={{ background: ACCENT, color: PRIMARY }}>
+                                {totalActive}
+                            </span>
+                        )}
+                    </button>
                 </Box>
             )}
 
-            {/* Mobile View: Drawer (Full Screen / Bottom Sheet) */}
+            {/* Mobile Drawer */}
             <Drawer
                 anchor="left"
                 open={isMobileOpen}
                 onClose={handleClose}
                 sx={{
                     display: { xs: 'block', lg: 'none' },
-                    '& .MuiDrawer-paper': { boxSizing: 'border-box', width: '100%', maxWidth: '380px' },
+                    '& .MuiDrawer-paper': { width: '100%', maxWidth: 360 },
                 }}
             >
                 {FilterContent}
             </Drawer>
         </>
-    );
-}
-
-// Custom Sub-components for cleaner code
-function FilterAccordion({ title, panel, expanded, onChange, children, icon }: any) {
-    return (
-        <Accordion
-            expanded={expanded}
-            onChange={onChange}
-            disableGutters
-            elevation={0}
-            sx={{
-                borderRadius: '16px !important',
-                border: '1px solid #f1f5f9',
-                mb: 2,
-                '&:before': { display: 'none' },
-                '&.Mui-expanded': { border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }
-            }}
-        >
-            <AccordionSummary
-                expandIcon={<ChevronDown size={18} className="text-gray-400" />}
-                sx={{
-                    px: 3,
-                    py: 1,
-                    minHeight: 56,
-                    '& .MuiAccordionSummary-content': { my: 1, display: 'flex', alignItems: 'center', gap: 1.5 }
-                }}
-            >
-                <div className="text-gray-400 opacity-60">{icon}</div>
-                <Typography sx={{ fontWeight: 700, color: '#1e293b', fontSize: '0.95rem' }}>{title}</Typography>
-            </AccordionSummary>
-            <AccordionDetails sx={{ px: 3, pb: 3, pt: 0 }}>
-                {children}
-            </AccordionDetails>
-        </Accordion>
-    );
-}
-
-function SearchInput({ value, onChange, placeholder }: any) {
-    return (
-        <TextField
-            fullWidth
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            size="small"
-            InputProps={{
-                startAdornment: <InputAdornment position="start"><Search size={14} className="text-gray-400" /></InputAdornment>,
-            }}
-            sx={{
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                    borderRadius: 3,
-                    bgcolor: '#f8fafc',
-                    '& fieldset': { borderColor: 'transparent' },
-                    '&:hover fieldset': { borderColor: '#e2e8f0' },
-                    '&.Mui-focused fieldset': { borderColor: '#e2e8f0' }
-                },
-                '& input': { fontSize: '0.8rem', fontWeight: 600 }
-            }}
-        />
-    );
-}
-
-function FilterList({ children, className }: any) {
-    return (
-        <Box className={className} sx={{ maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 0.5, ...scrollbarStyle }}>
-            {children}
-        </Box>
     );
 }

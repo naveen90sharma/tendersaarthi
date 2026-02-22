@@ -1,66 +1,44 @@
 import Link from 'next/link';
+import { supabase } from '@/services/supabase';
 
-const linkGroups = [
-    {
-        title: 'TENDER BY STATES',
-        viewAllPath: '/states',
-        links: [
-            { name: 'Uttar Pradesh', slug: 'uttar-pradesh' },
-            { name: 'Maharashtra', slug: 'maharashtra' },
-            { name: 'Madhya Pradesh', slug: 'madhya-pradesh' },
-            { name: 'Bihar', slug: 'bihar' },
-            { name: 'Rajasthan', slug: 'rajasthan' },
-            { name: 'Gujarat', slug: 'gujarat' },
-            { name: 'West Bengal', slug: 'west-bengal' },
-            { name: 'Karnataka', slug: 'karnataka' },
-            { name: 'Andhra Pradesh', slug: 'andhra-pradesh' },
-            { name: 'Assam', slug: 'assam' },
-            { name: 'Tamil Nadu', slug: 'tamil-nadu' },
-            { name: 'Haryana', slug: 'haryana' },
-            { name: 'Jharkhand', slug: 'jharkhand' },
-            { name: 'Odisha', slug: 'odisha' },
-            { name: 'Delhi', slug: 'delhi' },
-            { name: 'Jammu And Kashmir', slug: 'jammu-and-kashmir' },
-            { name: 'Telangana', slug: 'telangana' },
-            { name: 'Chhattisgarh', slug: 'chhattisgarh' },
-            { name: 'Himachal Pradesh', slug: 'himachal-pradesh' },
-            { name: 'Uttarakhand', slug: 'uttarakhand' }
-        ],
-        baseUrl: '/tenders/state'
-    },
-    {
-        title: 'TENDER BY CATEGORIES',
-        viewAllPath: '/tenders/category/construction',
-        links: [
-            { name: 'Road Construction', slug: 'road-construction' },
-            { name: 'Building Construction', slug: 'building-construction' },
-            { name: 'Civil Works', slug: 'civil-works' },
-            { name: 'Other Chemicals', slug: 'other-chemicals' },
-            { name: 'Pipeline Projects', slug: 'pipeline-projects' },
-            { name: 'Software Development', slug: 'development-software' },
-            { name: 'Furniture', slug: 'furniture' },
-            { name: 'Road Transportation', slug: 'road-transportation' },
-            { name: 'Electrical Components', slug: 'electrical-components' }
-        ],
-        baseUrl: '/tenders/category'
-    },
-    {
-        title: 'TENDER BY AUTHORITIES',
-        viewAllPath: '/authorities',
-        links: [
-            { name: 'NHAI', slug: 'national-highway-authority-of-india' },
-            { name: 'CPWD', slug: 'central-public-works-department' },
-            { name: 'PWD', slug: 'public-works-department' },
-            { name: 'ONGC', slug: 'oil-and-natural-gas-corporation-limited' },
-            { name: 'BPCL', slug: 'bharat-petroleum-corporation-limited' },
-            { name: 'BHEL', slug: 'bharat-heavy-electricals-limited' },
-            { name: 'Ministry of Defence', slug: 'ministry-of-defence' }
-        ],
-        baseUrl: '/tenders/authority'
-    }
-];
+async function getLinkGroups() {
+    const [statesRes, categoriesRes, authoritiesRes] = await Promise.all([
+        supabase.from('states').select('name, slug').eq('is_active', true).order('name').limit(20),
+        supabase.from('tender_categories').select('name, slug').eq('status', true).order('name').limit(10),
+        supabase.from('authorities').select('authority_name, slug').eq('status', true).order('authority_name').limit(8),
+    ]);
 
-export default function QuickLinks() {
+    return {
+        states: (statesRes.data || []).map(s => ({ name: s.name, slug: s.slug })),
+        categories: (categoriesRes.data || []).map(c => ({ name: c.name, slug: c.slug })),
+        authorities: (authoritiesRes.data || []).map(a => ({ name: a.authority_name, slug: a.slug })),
+    };
+}
+
+export default async function QuickLinks() {
+    const { states, categories, authorities } = await getLinkGroups();
+
+    const linkGroups = [
+        {
+            title: 'TENDER BY STATES',
+            viewAllPath: '/states',
+            links: states,
+            baseUrl: '/tenders/state'
+        },
+        {
+            title: 'TENDER BY CATEGORIES',
+            viewAllPath: '/active-tenders',
+            links: categories,
+            baseUrl: '/tenders/category'
+        },
+        {
+            title: 'TENDER BY AUTHORITIES',
+            viewAllPath: '/authorities',
+            links: authorities,
+            baseUrl: '/tenders/authority'
+        }
+    ];
+
     return (
         <section className="bg-white py-12 border-t border-gray-100">
             <div className="container mx-auto px-4">

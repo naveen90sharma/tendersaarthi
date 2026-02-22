@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Hero from '@/components/Hero';
 import CategoryGrid from '@/components/CategoryGrid';
 import TenderSection from '@/components/TenderSection';
@@ -7,7 +8,6 @@ import NewsSection from '@/components/NewsSection';
 import QuickLinks from '@/components/QuickLinks';
 import TrustSection from '@/components/TrustSection';
 import FloatingAssistant from '@/components/FloatingAssistant';
-import TenderHotspots from '@/components/TenderHotspots';
 
 export default function Home() {
   return (
@@ -20,10 +20,14 @@ export default function Home() {
           <TenderSection title="Top Market Opportunities" />
         </div>
 
-        {/* <TenderHotspots /> */}
-
         <div className="bg-slate-50">
-          <CategoryGrid />
+          <Suspense fallback={
+            <div className="py-10 md:py-16 bg-[#F8FAFC] flex justify-center">
+              <div className="animate-pulse w-10 h-10 bg-slate-200 rounded-full" />
+            </div>
+          }>
+            <CategoryGrid />
+          </Suspense>
         </div>
 
         <HowItWorks />
@@ -34,7 +38,11 @@ export default function Home() {
 
         <CTASection />
         <NewsSection />
-        <QuickLinks />
+
+        <Suspense fallback={<div className="h-32 bg-white" />}>
+          <QuickLinks />
+        </Suspense>
+
         <FloatingAssistant />
       </div>
     </main>

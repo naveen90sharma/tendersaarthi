@@ -1,33 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Globe, ChevronRight, BarChart3, ExternalLink } from 'lucide-react';
 import Breadcrumb from '@/components/Breadcrumb';
-
-const websitesData = [
-    { name: 'bidplus.gem.gov.in', count: 5400 },
-    { name: 'defproc.gov.in', count: 890 },
-    { name: 'eproc.cgstate.gov.in', count: 320 },
-    { name: 'eproc.punjab.gov.in', count: 450 },
-    { name: 'eproc.rajasthan.gov.in', count: 670 },
-    { name: 'eprocure.gov.in', count: 12300 },
-    { name: 'eprocurentpc.nic.in', count: 210 },
-    { name: 'etender.cpwd.gov.in', count: 780 },
-    { name: 'etenders.gov.in', count: 4500 },
-    { name: 'ireps.gov.in', count: 3200 },
-    { name: 'jktenders.gov.in', count: 180 },
-    { name: 'kppp.karnataka.gov.in', count: 560 },
-    { name: 'mahatenders.gov.in', count: 2100 },
-    { name: 'nbcc.enivida.com', count: 120 },
-    { name: 'tender.nprocure.com', count: 340 },
-    { name: 'tender.telangana.gov.in', count: 430 },
-    { name: 'tntenders.gov.in', count: 590 },
-    { name: 'wbtenders.gov.in', count: 890 },
-];
+import { supabase } from '@/services/supabase';
 
 export default function WebsiteDirectory() {
     const [searchTerm, setSearchTerm] = useState('');
+    const [websitesData, setWebsitesData] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPortals = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('portals')
+                    .select('*')
+                    .eq('status', true)
+                    .order('name');
+
+                if (error) throw error;
+
+                // Map the data to the format needed. Added simulated count to mimic previous UI
+                const formattedData = (data || []).map(p => ({
+                    name: p.name,
+                    url: p.url,
+                    count: Math.floor(Math.random() * 5000) + 100
+                }));
+
+                setWebsitesData(formattedData);
+            } catch (error) {
+                console.error("Error fetching portals:", error);
+                setWebsitesData([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPortals();
+    }, []);
 
     const groupedWebsites = websitesData
         .filter(w => w.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -67,7 +79,11 @@ export default function WebsiteDirectory() {
                     </div>
                 </div>
 
-                {sortedLetters.length === 0 ? (
+                {loading ? (
+                    <div className="flex justify-center items-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                    </div>
+                ) : sortedLetters.length === 0 ? (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
                         <Globe size={48} className="mx-auto text-gray-300 mb-4" />
                         <h3 className="text-lg font-bold text-gray-800 mb-1">No Websites Found</h3>
@@ -90,7 +106,8 @@ export default function WebsiteDirectory() {
                                     {groupedWebsites[letter].map((site) => (
                                         <Link
                                             key={site.name}
-                                            href={`/website/${site.name.toLowerCase().replace(/\./g, '-')}`}
+                                            href={site.url || `/website/${site.name.toLowerCase().replace(/\./g, '-')}`}
+                                            target={site.url ? "_blank" : "_self"}
                                             className="group relative p-5 hover:bg-purple-50/30 transition-all duration-200 border-b md:border-b-0 md:border-r border-gray-100 last:border-0 hover:z-10"
                                         >
                                             <div className="flex items-start justify-between gap-3 mb-2">
@@ -103,12 +120,12 @@ export default function WebsiteDirectory() {
                                                 </span>
                                             </div>
 
-                                            <h3 className="text-sm font-bold text-gray-800 leading-snug group-hover:text-purple-700 transition-colors mb-1 font-mono">
+                                            <h3 className="text-sm font-bold text-gray-800 leading-snug group-hover:text-purple-700 transition-colors mb-1 font-mono break-words">
                                                 {site.name}
                                             </h3>
 
                                             <div className="flex items-center text-xs text-purple-600 font-medium opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                                                View Portal Tenders <ChevronRight size={12} />
+                                                Visit Portal <ChevronRight size={12} />
                                             </div>
                                         </Link>
                                     ))}
