@@ -179,19 +179,20 @@ export default function TenderListing({
 
                 // 2. Powerful Full-Text Search (FTS) with Exact Match Fallback
                 if (effectiveQuery) {
-                    // Normalize query for matching
-                    const cleanQuery = effectiveQuery.trim();
+                    // Normalize query: remove characters that break PostgREST queries (quotes, backslashes, percent, comma)
+                    // We remove commas because PostgREST uses them to separate OR clauses, so a literal comma would break the query.
+                    const cleanQuery = effectiveQuery.trim().replace(/[",\\%]/g, '');
 
-                    // If it looks like a Tender ID or Ref (contains numbers/underscores), try exact match first
-                    if (/[\d_]/.test(cleanQuery)) {
-                        supabaseQuery = supabaseQuery.or(`tender_id.eq."${cleanQuery}",reference_no.eq."${cleanQuery}",title.ilike.%${cleanQuery}%`);
-                    } else {
-                        // Use textSearch for rank-based relevance
-                        supabaseQuery = supabaseQuery.textSearch('search_vector', cleanQuery, {
-                            config: 'english',
-                            type: 'websearch'
-                        });
-                    }
+                    // Split by spaces so every word is searched across all fields. 
+                    // This creates an AND of ORs (e.g. MUST have 'NHAI' somewhere AND MUST have 'Bridge' somewhere)
+                    const keywords = cleanQuery.split(/\s+/).filter(k => k.length > 0);
+
+                    keywords.forEach(kw => {
+                        const likeQuery = `%${kw}%`;
+                        supabaseQuery = supabaseQuery.or(
+                            `title.ilike.${likeQuery},authority.ilike.${likeQuery},tender_category.ilike.${likeQuery},reference_no.ilike.${likeQuery},tender_id.ilike.${likeQuery},location.ilike.${likeQuery}`
+                        );
+                    });
                 }
 
                 // 3. Sidebar Filters

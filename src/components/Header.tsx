@@ -343,8 +343,8 @@ export default function Header() {
                                 </div>
                             ) : (
                                 /* Sign In Button */
-                                <Link href="/login" className="hidden md:flex items-center gap-2 border border-slate-200 rounded-lg px-6 py-2 cursor-pointer hover:bg-slate-50 text-primary font-black text-sm transition-all uppercase tracking-tight">
-                                    <User size={18} className="text-primary font-bold" strokeWidth={2.5} />
+                                <Link href="/login" className={`hidden md:flex items-center gap-2 border rounded-lg px-6 py-2 cursor-pointer transition-all uppercase tracking-tight font-black text-[13px] group ${isHomePage && !scrolled ? 'border-white/30 text-white hover:bg-white hover:text-[#103e68]' : 'border-slate-200 text-[#103e68] hover:bg-[#103e68] hover:text-white'}`}>
+                                    <User size={18} className="font-bold group-hover:scale-110 transition-transform" strokeWidth={2.5} />
                                     Sign In
                                 </Link>
                             )

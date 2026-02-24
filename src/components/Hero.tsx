@@ -49,15 +49,18 @@ export default function Hero() {
                 const kw = `%${searchQuery.trim()}%`;
 
                 const [authRes, catRes] = await Promise.all([
-                    supabase.from('authorities').select('name, slug').ilike('name', kw).limit(4),
+                    supabase.from('authorities').select('authority_name, slug').ilike('authority_name', kw).limit(4),
                     supabase.from('tender_categories').select('name, slug').ilike('name', kw).limit(3)
                 ]);
 
                 const newSuggestions: Array<{ text: string, type: string, slug?: string }> = [];
 
+                // Always add the raw keyword as the first or last option
+                newSuggestions.push({ text: searchQuery.trim(), type: 'Keyword' });
+
                 if (authRes.data) {
                     authRes.data.forEach(auth => {
-                        newSuggestions.push({ text: auth.name, type: 'Authority', slug: auth.slug });
+                        newSuggestions.push({ text: auth.authority_name, type: 'Authority', slug: auth.slug });
                     });
                 }
 
@@ -207,14 +210,25 @@ export default function Hero() {
                                                     onClick={() => {
                                                         setSearchQuery(item.text);
                                                         setIsDropdownOpen(false);
-                                                        // Option to auto-search upon selection
-                                                        // router.push(`/active-tenders?q=${encodeURIComponent(item.text)}`);
+                                                        const params = new URLSearchParams();
+                                                        params.set('q', item.text);
+                                                        if (selectedState) params.set('state', selectedState);
+                                                        if (selectedCategory) params.set('category', selectedCategory);
+                                                        router.push(`/active-tenders?${params.toString()}`);
                                                     }}
                                                 >
                                                     <Search size={15} className="text-slate-300 shrink-0 mt-0.5" />
                                                     <div className="flex flex-col flex-1">
-                                                        <span className="text-sm font-semibold text-slate-800 line-clamp-1">{item.text}</span>
-                                                        <span className="text-[11px] font-medium text-blue-600/80 uppercase tracking-wider mt-0.5">in {item.type}</span>
+                                                        {item.type === 'Keyword' ? (
+                                                            <span className="text-sm font-semibold text-slate-800 line-clamp-1 italic">
+                                                                Search all fields for <span className="font-bold text-blue-600">"{item.text}"</span>
+                                                            </span>
+                                                        ) : (
+                                                            <>
+                                                                <span className="text-sm font-semibold text-slate-800 line-clamp-1">{item.text}</span>
+                                                                <span className="text-[11px] font-medium text-blue-600/80 uppercase tracking-wider mt-0.5">in {item.type}</span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             ))}
@@ -300,9 +314,10 @@ export default function Hero() {
                 <div className="mt-3 md:mt-14 -mx-4">
                     <LocationDetector />
                 </div>
-                <div className="mt-2 md:mt-16">
+                {/* Hide stats section for now as per user request */}
+                {/* <div className="mt-2 md:mt-16">
                     <StatsSection isDark={true} />
-                </div>
+                </div> */}
             </div>
         </section>
     );
