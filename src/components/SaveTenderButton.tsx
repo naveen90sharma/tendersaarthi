@@ -10,9 +10,10 @@ interface SaveTenderButtonProps {
     tenderId: string;
     variant?: 'full' | 'icon';
     className?: string;
+    onToggle?: (isSaved: boolean) => void;
 }
 
-export default function SaveTenderButton({ tenderId, variant = 'full', className = '' }: SaveTenderButtonProps) {
+export default function SaveTenderButton({ tenderId, variant = 'full', className = '', onToggle }: SaveTenderButtonProps) {
     const [isSaved, setIsSaved] = useState(false);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
@@ -47,6 +48,7 @@ export default function SaveTenderButton({ tenderId, variant = 'full', className
         const result = await toggleSaveTender(tenderId, userId);
         if (result.success) {
             setIsSaved(!!result.saved);
+            if (onToggle) onToggle(!!result.saved);
         }
         setActionLoading(false);
     };
@@ -79,8 +81,8 @@ export default function SaveTenderButton({ tenderId, variant = 'full', className
             onClick={handleToggle}
             disabled={actionLoading}
             className={`w-full group ${isSaved
-                    ? 'bg-tj-yellow/10 text-primary border-2 border-tj-yellow/30'
-                    : 'bg-primary text-white border-2 border-transparent'
+                ? 'bg-tj-yellow/10 text-primary border-2 border-tj-yellow/30'
+                : 'bg-primary text-white border-2 border-transparent'
                 } py-4 font-black text-[11px] uppercase tracking-[0.15em] flex items-center justify-center gap-3 transition-all rounded-2xl shadow-sm hover:shadow-lg active:scale-95 ${className}`}
         >
             <Bookmark

@@ -33,6 +33,10 @@ export default function WatchlistPage() {
         t.state?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const handleUnsave = (id: string) => {
+        setSavedTenders(prev => prev.filter(t => t.id.toString() !== id));
+    };
+
     if (loading) {
         return (
             <div className="h-full flex items-center justify-center">
@@ -89,7 +93,7 @@ export default function WatchlistPage() {
             ) : (
                 <div className="grid grid-cols-1 gap-6">
                     {filteredTenders.map((tender, index) => (
-                        <TenderCard key={tender.id} tender={tender} index={index + 1} />
+                        <TenderCard key={tender.id} tender={tender} index={index + 1} onUnsave={handleUnsave} />
                     ))}
                 </div>
             )}

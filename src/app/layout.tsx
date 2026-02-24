@@ -12,6 +12,8 @@ export const metadata: Metadata = {
     description: "India's leading digital marketplace for government and private tenders.",
 };
 
+import { ContractorProvider } from "@/context/ContractorContext";
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -20,14 +22,16 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                <Header />
-                <main className="min-h-screen pb-16 md:pb-0">
-                    {children}
-                </main>
-                <Footer />
-                <div className="md:hidden">
-                    <BottomNav />
-                </div>
+                <ContractorProvider>
+                    <Header />
+                    <main className="min-h-screen pb-16 md:pb-0">
+                        {children}
+                    </main>
+                    <Footer />
+                    <div className="md:hidden">
+                        <BottomNav />
+                    </div>
+                </ContractorProvider>
             </body>
         </html>
     );

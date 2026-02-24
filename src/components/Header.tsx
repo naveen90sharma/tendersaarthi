@@ -5,6 +5,7 @@ import { Search, User, ChevronDown, Globe, Menu, X, LogOut, FileText, Settings, 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { getCurrentUser, signOut } from '@/services/auth';
+import { getSavedTenders } from '@/services/tenderService';
 
 interface NavItem {
     label: string;
@@ -109,6 +110,7 @@ export default function Header() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
+    const [savedCount, setSavedCount] = useState(0);
     const router = useRouter();
     const pathname = usePathname();
 
@@ -135,6 +137,11 @@ export default function Header() {
         const { user } = await getCurrentUser();
         setCurrentUser(user);
         setIsLoadingUser(false);
+
+        if (user) {
+            const { data } = await getSavedTenders(user.id);
+            setSavedCount(data?.length || 0);
+        }
     };
 
     const handleSignOut = async () => {
@@ -280,8 +287,8 @@ export default function Header() {
                                 /* User Profile Dropdown */
                                 <div className="relative group hidden md:block">
                                     <div className="flex items-center gap-2.5 bg-white border border-slate-200 rounded-full pl-1.5 pr-4 py-1.5 cursor-pointer hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] hover:border-primary/30 transition-all duration-300">
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-blue-500 text-white flex items-center justify-center text-[13px] font-black shadow-sm uppercase ring-2 ring-white">
-                                            {currentUser.email?.[0] || 'U'}
+                                        <div className="w-8 h-8 rounded-full bg-[#103e68] text-white flex items-center justify-center text-[12px] font-black shadow-sm uppercase ring-2 ring-white">
+                                            {currentUser.user_metadata?.full_name?.[0]?.toUpperCase() || currentUser.email?.[0]?.toUpperCase() || 'U'}
                                         </div>
                                         <div className="flex flex-col">
                                             <p className="text-[13px] font-black text-slate-800 leading-none tracking-tight">
@@ -296,46 +303,69 @@ export default function Header() {
                                         <div className="bg-white border border-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] rounded-[20px] overflow-hidden">
                                             {/* User Header */}
                                             <div className="px-5 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
-                                                <div className="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center text-lg font-black shadow-lg shadow-primary/20 uppercase">
-                                                    {currentUser.email?.[0]}
+                                                <div className="w-12 h-12 rounded-[14px] bg-[#103e68] text-white flex items-center justify-center text-xl font-black shadow-lg shadow-[#103e68]/10 uppercase">
+                                                    {currentUser.user_metadata?.full_name?.[0]?.toUpperCase() || currentUser.email?.[0]?.toUpperCase() || 'U'}
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <p className="font-black text-slate-900 truncate tracking-tight text-sm">
-                                                        {currentUser.user_metadata?.full_name || 'My Account'}
+                                                <div className="min-w-0 flex flex-col justify-center">
+                                                    <p className="font-extrabold text-[#103e68] truncate tracking-tight text-[15px] leading-tight mb-0.5">
+                                                        {currentUser.user_metadata?.full_name || 'User Account'}
                                                     </p>
-                                                    <p className="text-[10px] text-slate-400 font-bold truncate">
-                                                        {currentUser.email}
-                                                    </p>
+                                                    <div className="flex flex-col gap-1.5 mt-0.5">
+                                                        <p className="text-[10px] text-slate-400 font-semibold truncate tracking-tight">
+                                                            {currentUser.email}
+                                                        </p>
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex justify-between items-center">
+                                                                <span className="text-[9px] font-black text-[#103e68]/40 uppercase tracking-tighter">Profile Mastery</span>
+                                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-tighter">85%</span>
+                                                            </div>
+                                                            <div className="w-full h-1 bg-slate-200 rounded-full overflow-hidden">
+                                                                <div className="h-full bg-emerald-500 rounded-full w-[85%] shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             <div className="p-2">
                                                 {[
                                                     { href: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard', color: 'text-primary' },
-                                                    { href: '/dashboard', icon: <Star size={18} />, label: 'Saved Tenders', color: 'text-tj-yellow' },
+                                                    { href: '/dashboard/watchlist', icon: <Star size={18} />, label: 'Saved Tenders', color: 'text-tj-yellow', count: savedCount },
                                                     { href: '/post-tender', icon: <PlusCircle size={18} />, label: 'Post Tender', color: 'text-emerald-500' },
-                                                    { href: '/dashboard', icon: <Settings size={18} />, label: 'Account Settings', color: 'text-slate-500' },
-                                                ].map((item, i) => (
-                                                    <Link
-                                                        key={i}
-                                                        href={item.href}
-                                                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all group/item"
-                                                    >
-                                                        <div className={`${item.color} transition-transform group-hover/item:scale-110`}>
-                                                            {item.icon}
-                                                        </div>
-                                                        <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{item.label}</span>
-                                                    </Link>
-                                                ))}
+                                                    { href: '/dashboard/settings', icon: <Settings size={18} />, label: 'Account Settings', color: 'text-slate-500' },
+                                                ].map((item, i) => {
+                                                    const isActive = pathname === item.href;
+                                                    return (
+                                                        <Link
+                                                            key={i}
+                                                            href={item.href}
+                                                            className={`flex items-center justify-between px-4 py-2.5 rounded-xl transition-all group/item ${isActive ? 'bg-slate-50' : 'hover:bg-slate-50/50'}`}
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div className={`${item.color} transition-transform group-hover/item:scale-110 ${isActive ? 'scale-110' : ''}`}>
+                                                                    {item.icon}
+                                                                </div>
+                                                                <span className={`text-[11px] uppercase tracking-widest transition-colors ${isActive ? 'text-[#103e68] font-black' : 'text-slate-600 font-bold'}`}>
+                                                                    {item.label}
+                                                                </span>
+                                                            </div>
+                                                            {item.count !== undefined && (
+                                                                <span className="bg-tj-yellow/10 text-tj-blue text-[10px] font-black px-2 py-0.5 rounded-full ring-1 ring-tj-yellow/20">
+                                                                    {item.count}
+                                                                </span>
+                                                            )}
+                                                        </Link>
+                                                    );
+                                                })}
                                             </div>
 
-                                            <div className="p-2 border-t border-slate-50 bg-slate-50/30">
+                                            <div className="p-3 border-t border-slate-50 bg-slate-50/50">
                                                 <button
                                                     onClick={handleSignOut}
-                                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl hover:bg-red-50 text-red-500 transition-all font-black uppercase text-[10px] tracking-widest"
+                                                    className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl hover:bg-red-50 text-[#ef4444] transition-all font-extrabold uppercase text-[11px] tracking-[0.05em] group/logout"
                                                 >
-                                                    <LogOut size={16} />
-                                                    Sign Out
+                                                    <LogOut size={18} className="transition-transform group-hover/logout:-translate-x-1" />
+                                                    SIGN OUT
                                                 </button>
                                             </div>
                                         </div>
@@ -356,8 +386,8 @@ export default function Header() {
                             onClick={() => setIsMobileMenuOpen(true)}
                         >
                             {currentUser ? (
-                                <div className="w-8 h-8 rounded-full bg-tj-yellow text-tj-blue flex items-center justify-center text-xs font-black ring-2 ring-white/20">
-                                    {currentUser.email?.[0] || 'U'}
+                                <div className="w-8 h-8 rounded-full bg-tj-yellow text-tj-blue flex items-center justify-center text-xs font-black ring-2 ring-white/20 uppercase">
+                                    {currentUser.user_metadata?.full_name?.[0]?.toUpperCase() || currentUser.email?.[0]?.toUpperCase() || 'U'}
                                 </div>
                             ) : (
                                 <User size={24} />
@@ -470,8 +500,8 @@ export default function Header() {
                         <div className="relative z-10">
                             {currentUser ? (
                                 <div className="flex items-center gap-3.5 bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10 shadow-lg">
-                                    <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-tj-yellow to-yellow-400 text-[#0a2742] flex items-center justify-center text-lg font-black shadow-inner shadow-white/20">
-                                        {currentUser.email?.[0] || 'U'}
+                                    <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-tj-yellow to-yellow-400 text-[#0a2742] flex items-center justify-center text-lg font-black shadow-inner shadow-white/20 uppercase">
+                                        {currentUser.user_metadata?.full_name?.[0]?.toUpperCase() || currentUser.email?.[0]?.toUpperCase() || 'U'}
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <p className="font-bold text-white text-[15px] truncate leading-tight mb-0.5">

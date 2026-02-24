@@ -6,6 +6,7 @@ import Link from 'next/link';
 import SaveTenderButton from '@/components/SaveTenderButton';
 import PrintButton from '@/components/PrintButton';
 import TenderIntelligence from '@/components/TenderIntelligence';
+import PersonalizedEligibility from '@/components/PersonalizedEligibility';
 import { headers } from 'next/headers';
 
 interface TenderDetailProps {
@@ -213,7 +214,26 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                             </div>
                         </div>
 
-                        {/* Market Intelligence Logic - Simulated for now */}
+                        {/* Market Intelligence Logic - Shared Context */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <PersonalizedEligibility
+                                tenderValue={tender.tender_value_numeric || tender.tender_value}
+                                tenderCategory={tender.tender_category}
+                            />
+                            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Pro Alerts</h4>
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                        <MessageSquare size={20} />
+                                    </div>
+                                    <p className="text-xs font-bold text-slate-700 leading-tight">Get similar tender alerts for <span className="text-primary">{tender.state}</span> directly on WhatsApp.</p>
+                                </div>
+                                <Link href="/dashboard/settings" className="block w-full text-center py-2.5 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 text-slate-400 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-slate-100">
+                                    Subscribe to WhatsApp Alerts
+                                </Link>
+                            </div>
+                        </div>
+
                         <TenderIntelligence tender={tender} />
 
                         {/* Eligibility & Requirements Section - Separate */}

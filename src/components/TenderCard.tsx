@@ -2,15 +2,19 @@
 
 import Link from 'next/link';
 import type { Tender } from '../types';
-import { MapPin, Share2, Building2, Wallet, ChevronRight, Clock } from 'lucide-react';
+import { MapPin, Share2, Building2, Wallet, ChevronRight, Clock, Sparkles } from 'lucide-react';
 import SaveTenderButton from './SaveTenderButton';
+import { useContractor } from '@/context/ContractorContext';
 
 interface TenderCardProps {
     tender: Tender;
     index?: number;
+    onUnsave?: (id: string) => void;
 }
 
-export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
+export default function TenderCard({ tender, index = 1, onUnsave }: TenderCardProps) {
+    const { profile, checkEligibility } = useContractor();
+
     const calculateDaysLeft = (dateStr?: string) => {
         if (!dateStr || dateStr === 'N/A') return null;
         try {
@@ -30,7 +34,7 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
     const formatDisplayAmount = (amount?: string) => {
         if (!amount || amount === 'N/A' || amount === '0') return null;
         const clean = amount.toString().trim();
-        if (clean.startsWith('₹') || clean.toLowerCase().includes('crore') || clean.toLowerCase().includes('lakh')) {
+        if (clean.startsWith('₹') || clean.toLowerCase().includes('crore') || clean.toLowerCase().includes('cr') || clean.toLowerCase().includes('lakh')) {
             return clean.replace(/Rs\.?/i, '₹').trim();
         }
         return `₹ ${clean}`;
@@ -40,6 +44,9 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
     const isClosingSoon = daysLeft && daysLeft !== 'Expired' && (daysLeft === 'Closing Today' || (typeof daysLeft === 'string' && parseInt(daysLeft) <= 5));
     const isExpired = daysLeft === 'Expired';
     const displayValue = formatDisplayAmount(tender.tender_value || tender.value);
+
+    // Get eligibility if profile exists
+    const match = profile ? checkEligibility(tender.tender_value || tender.value, tender.tender_category) : null;
 
     return (
         <div className="group relative bg-white border border-gray-200 rounded-xl mb-3 transition-all duration-200 hover:border-[#103e68]/30 hover:shadow-md flex flex-col lg:flex-row overflow-hidden w-full">
@@ -53,10 +60,19 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
             <div className="flex-1 p-4 min-w-0">
                 {/* Top Row: Badges + Days Left */}
                 <div className="flex items-center justify-between gap-2 mb-2">
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5 text-nowrap">
                         {tender.tender_type && (
                             <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-semibold rounded border border-blue-100 uppercase tracking-wide">
                                 {tender.tender_type}
+                            </span>
+                        )}
+                        {match && (
+                            <span className={`px-2 py-0.5 rounded border text-[10px] font-black uppercase tracking-widest flex items-center gap-1 ${match.score > 60 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                match.score > 30 ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                                    'bg-rose-50 text-rose-600 border-rose-100'
+                                }`}>
+                                <Sparkles size={10} className={match.score > 60 ? 'fill-emerald-600' : ''} />
+                                {match.eligible}
                             </span>
                         )}
                         {tender.tender_category && (
@@ -129,6 +145,7 @@ export default function TenderCard({ tender, index = 1 }: TenderCardProps) {
                         <SaveTenderButton
                             tenderId={tender.id.toString()}
                             variant="icon"
+                            onToggle={(saved) => !saved && onUnsave && onUnsave(tender.id.toString())}
                             className="!bg-transparent !border-0 !rounded-none !h-full !px-3 !w-auto text-gray-300 hover:!text-[#103e68] hover:!bg-gray-50 shadow-none"
                         />
                     </div>

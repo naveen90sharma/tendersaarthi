@@ -53,9 +53,9 @@ export default function DashboardLayout({
     const navItems = [
         { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
         { label: 'My Watchlist', path: '/dashboard/watchlist', icon: Bookmark },
-        { label: 'My Tenders', path: '/dashboard/tenders', icon: Briefcase },
-        { label: 'Analytics', path: '/dashboard/analytics', icon: TrendingUp },
-        { label: 'Documents', path: '/dashboard/documents', icon: FileText },
+        // { label: 'Documents', path: '/dashboard/documents', icon: FileText },
+        // { label: 'Capability Profile', path: '/dashboard/profile', icon: User },
+        // { label: 'Analytics', path: '/dashboard/analytics', icon: TrendingUp },
     ];
 
     const bottomNavItems = [

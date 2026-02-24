@@ -1,121 +1,137 @@
+'use client';
+
 import Link from 'next/link';
-import { Briefcase, Laptop, Heart, Truck, GraduationCap, Wrench, ShoppingBag, Zap, ArrowUpRight, Folder } from 'lucide-react';
+import { useRef } from 'react';
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { supabase } from '@/services/supabase';
+import { useEffect, useState } from 'react';
 
-// Map category names to icons - top categories get specific icons, rest get Folder
-const ICON_MAP: Record<string, any> = {
-    'infrastructure': Briefcase,
-    'civil': Briefcase,
-    'construction': Briefcase,
-    'technology': Laptop,
-    'it': Laptop,
-    'software': Laptop,
-    'healthcare': Heart,
-    'medical': Heart,
-    'health': Heart,
-    'logistics': Truck,
-    'transport': Truck,
-    'supply': Truck,
-    'education': GraduationCap,
-    'training': GraduationCap,
-    'industrial': Wrench,
-    'engineering': Wrench,
-    'mechanical': Wrench,
-    'defense': Zap,
-    'aerospace': Zap,
-    'security': Zap,
-    'procurement': ShoppingBag,
-    'goods': ShoppingBag,
-};
+// Helper to get fallback images if URL is missing
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=400&h=400';
 
-const COLOR_PALETTE = [
-    { color: 'text-blue-600', bg: 'bg-blue-50' },
-    { color: 'text-purple-600', bg: 'bg-purple-50' },
-    { color: 'text-red-500', bg: 'bg-red-50' },
-    { color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { color: 'text-amber-600', bg: 'bg-amber-50' },
-    { color: 'text-orange-600', bg: 'bg-orange-50' },
-    { color: 'text-indigo-600', bg: 'bg-indigo-50' },
-    { color: 'text-rose-500', bg: 'bg-rose-50' },
-    { color: 'text-teal-600', bg: 'bg-teal-50' },
-    { color: 'text-cyan-600', bg: 'bg-cyan-50' },
-];
+export default function CategoryGrid() {
+    const [categories, setCategories] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-function getIconForCategory(name: string) {
-    const lower = name.toLowerCase();
-    for (const [key, Icon] of Object.entries(ICON_MAP)) {
-        if (lower.includes(key)) return Icon;
-    }
-    return Folder;
-}
+    useEffect(() => {
+        async function fetchCategories() {
+            try {
+                const { data, error } = await supabase
+                    .from('tender_categories')
+                    .select('name, slug, image_url, status')
+                    .eq('status', true)
+                    .order('name')
+                    .limit(12);
 
-async function getCategories() {
-    const { data } = await supabase
-        .from('tender_categories')
-        .select('name, slug, status')
-        .eq('status', true)
-        .order('name')
-        .limit(12);
-    return data || [];
-}
+                if (!error && data) setCategories(data);
+            } catch (err) {
+                console.error('Error:', err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchCategories();
+    }, []);
 
-export default async function CategoryGrid() {
-    const categories = await getCategories();
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({
+                left: direction === 'left' ? -350 : 350,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     return (
-        <section className="py-10 md:py-16 bg-[#F8FAFC]">
-            <div className="container mx-auto px-4">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
+        <section className="py-10 md:py-16 bg-white overflow-hidden relative border-t border-slate-50">
+            <div className="container mx-auto px-4 relative z-10">
+                {/* Section Header - Exactly like TenderSection */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-1.5">
-                            <div className="h-0.5 w-8 bg-primary rounded-full" />
-                            <span className="text-[10px] font-semibold text-primary uppercase tracking-widest">Industry Mapping</span>
+                            <div className="h-0.5 w-8 bg-[#103E68] rounded-full" />
+                            <span className="text-[10px] font-semibold text-[#103E68] uppercase tracking-widest">Industry Mapping</span>
                         </div>
                         <h2 className="text-xl md:text-2xl font-bold text-[#0f172a] tracking-tight">Explore by Category</h2>
-                        <p className="text-xs text-slate-400 mt-0.5">AI-powered classification for precision matching</p>
+                        <p className="text-xs text-slate-400 mt-1">AI-powered classification for precision matching</p>
                     </div>
 
-                    <Link
-                        href="/active-tenders"
-                        className="flex items-center gap-2 bg-white hover:bg-primary text-primary hover:text-white px-4 py-2 rounded-lg font-semibold text-xs tracking-wide transition-all border border-slate-200 shadow-sm whitespace-nowrap"
-                    >
-                        View All
-                        <ArrowUpRight size={13} />
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => scroll('left')}
+                            className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#103E68] hover:border-[#103E68] transition-all shadow-sm"
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+                        <button
+                            onClick={() => scroll('right')}
+                            className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#103E68] hover:border-[#103E68] transition-all shadow-sm"
+                        >
+                            <ChevronRight size={20} />
+                        </button>
+                        <Link
+                            href="/active-tenders"
+                            className="flex items-center gap-2 bg-[#103E68]/5 hover:bg-[#103E68] text-[#103E68] hover:text-white px-5 py-2.5 rounded-xl font-bold transition-all text-xs tracking-wide border border-[#103E68]/10 ml-2"
+                        >
+                            View All Sectors
+                            <ArrowRight size={14} />
+                        </Link>
+                    </div>
                 </div>
 
-                {/* Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
-                    {categories.map((category, index) => {
-                        const Icon = getIconForCategory(category.name);
-                        const palette = COLOR_PALETTE[index % COLOR_PALETTE.length];
-                        return (
+                {/* Horizontal Scroll Area */}
+                <div
+                    ref={scrollContainerRef}
+                    className="overflow-x-auto scrollbar-hide snap-x snap-mandatory flex gap-5 pb-6"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                    {loading ? (
+                        [1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className="w-[300px] h-64 shrink-0 bg-slate-50 animate-pulse rounded-[2rem]" />
+                        ))
+                    ) : (
+                        categories.map((category) => (
                             <Link
                                 key={category.slug}
                                 href={`/tenders/category/${category.slug}`}
-                                className="group bg-white rounded-xl p-4 border border-slate-100 hover:border-primary/20 hover:shadow-md transition-all duration-200 flex flex-col items-center text-center"
+                                className="group relative w-[280px] md:w-[320px] h-64 shrink-0 rounded-[2rem] overflow-hidden snap-center transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200 hover:-translate-y-1"
                             >
-                                {/* Icon */}
-                                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${palette.bg} ${palette.color} mb-3 group-hover:scale-105 transition-transform duration-200`}>
-                                    <Icon className="w-5 h-5" strokeWidth={1.5} />
+                                {/* Background Image */}
+                                <img
+                                    src={category.image_url || FALLBACK_IMAGE}
+                                    alt={category.name}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                />
+
+                                {/* Gradient Overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/20 to-transparent opacity-70 group-hover:opacity-85 transition-opacity" />
+
+                                {/* Content Layer */}
+                                <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                                    <div className="flex items-center gap-1.5 mb-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-tj-yellow animate-pulse" />
+                                        <span className="text-[9px] font-black text-tj-yellow uppercase tracking-widest">Active Market</span>
+                                    </div>
+                                    <h3 className="text-xl font-black text-white leading-tight">
+                                        {category.name}
+                                    </h3>
+                                    <div className="h-0.5 w-0 group-hover:w-full bg-tj-yellow transition-all duration-500 mt-2" />
                                 </div>
 
-                                {/* Name */}
-                                <h3 className="text-[13px] font-semibold text-[#0B2C4A] leading-tight mb-1.5 line-clamp-2">
-                                    {category.name}
-                                </h3>
-
-                                {/* Live indicator */}
-                                <div className="flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                                    <span className="text-[10px] font-medium text-slate-400">Active</span>
+                                {/* Floating Icon */}
+                                <div className="absolute top-5 right-5 w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-500 scale-90 group-hover:scale-100">
+                                    <ArrowRight size={20} />
                                 </div>
                             </Link>
-                        );
-                    })}
+                        ))
+                    )}
                 </div>
             </div>
+
+            <style jsx>{`
+                .scrollbar-hide::-webkit-scrollbar { display: none; }
+            `}</style>
         </section>
     );
 }
