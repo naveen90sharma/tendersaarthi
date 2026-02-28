@@ -180,12 +180,12 @@ export default function Hero() {
                         <div className="bg-white rounded-xl flex flex-col md:flex-row items-stretch md:items-center relative">
 
                             {/* Keyword Search */}
-                            <div className="flex-1 flex items-center gap-2.5 px-4 py-3 md:py-0 md:min-h-[52px]">
+                            <div className="flex-[1.5] flex items-center gap-2.5 px-4 py-3 md:py-0 md:min-h-[52px] min-w-0">
                                 <Search size={15} className="text-slate-300 shrink-0" strokeWidth={2} />
                                 <input
                                     type="text"
                                     placeholder="Keyword, project, department..."
-                                    className="w-full bg-transparent outline-none text-slate-700 placeholder:text-slate-300 text-sm"
+                                    className="w-full bg-transparent outline-none text-slate-700 placeholder:text-slate-300 text-sm truncate"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleKeyDown}
@@ -218,7 +218,7 @@ export default function Hero() {
                                                     }}
                                                 >
                                                     <Search size={15} className="text-slate-300 shrink-0 mt-0.5" />
-                                                    <div className="flex flex-col flex-1">
+                                                    <div className="flex flex-col flex-1 min-w-0">
                                                         {item.type === 'Keyword' ? (
                                                             <span className="text-sm font-semibold text-slate-800 line-clamp-1 italic">
                                                                 Search all fields for <span className="font-bold text-blue-600">"{item.text}"</span>
@@ -242,12 +242,12 @@ export default function Hero() {
                             )}
 
                             {/* State Dropdown */}
-                            <div className="relative flex items-center border-t md:border-t-0 md:border-l border-slate-100 px-3 py-2.5 md:py-0 md:min-w-[130px]">
+                            <div className="relative flex items-center border-t md:border-t-0 md:border-l border-slate-100 px-3 py-2.5 md:py-0 md:w-[150px] shrink-0">
                                 <MapPin size={12} className="text-slate-300 mr-2 shrink-0" />
                                 <select
                                     value={selectedState}
                                     onChange={(e) => setSelectedState(e.target.value)}
-                                    className="appearance-none w-full bg-transparent outline-none text-xs text-slate-500 cursor-pointer font-medium pr-5"
+                                    className="appearance-none w-full bg-transparent outline-none text-xs text-slate-500 cursor-pointer font-medium pr-5 truncate"
                                 >
                                     <option value="">All States</option>
                                     {states.map(s => <option key={s} value={s}>{s}</option>)}
@@ -256,12 +256,12 @@ export default function Hero() {
                             </div>
 
                             {/* Category Dropdown */}
-                            <div className="relative flex items-center border-t md:border-t-0 md:border-l border-slate-100 px-3 py-2.5 md:py-0 md:min-w-[140px]">
+                            <div className="relative flex items-center border-t md:border-t-0 md:border-l border-slate-100 px-3 py-2.5 md:py-0 md:w-[160px] shrink-0">
                                 <Tag size={11} className="text-slate-300 mr-2 shrink-0" />
                                 <select
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="appearance-none w-full bg-transparent outline-none text-xs text-slate-500 cursor-pointer font-medium pr-5"
+                                    className="appearance-none w-full bg-transparent outline-none text-xs text-slate-500 cursor-pointer font-medium pr-5 truncate"
                                 >
                                     <option value="">All Categories</option>
                                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
@@ -274,7 +274,8 @@ export default function Hero() {
                                 onClick={handleSearch}
                                 className="m-1 bg-[#0B2C4A] hover:bg-tj-yellow hover:text-[#0B2C4A] text-white px-5 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all group/btn text-sm shrink-0"
                             >
-                                Search Tenders
+                                <span className="hidden sm:inline">Search Tenders</span>
+                                <span className="sm:hidden">Search</span>
                                 <ArrowRight size={15} className="group-hover/btn:translate-x-0.5 transition-transform" strokeWidth={2} />
                             </button>
                         </div>
