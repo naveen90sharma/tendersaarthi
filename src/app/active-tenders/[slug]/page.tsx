@@ -21,6 +21,9 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
     } else if (slug === 'closing-soon') {
         title = 'Tenders Closing Soon';
         description = 'Don\'t miss out! View active government tenders that are closing in the next 24-48 hours. Submit your bids now.';
+    } else if (slug === 'opening' || slug === 'evaluation') {
+        title = 'Tenders Under Evaluation';
+        description = 'View government tenders whose bid submission has ended and are currently in the technical or financial opening stage.';
     }
 
     return {
@@ -45,6 +48,9 @@ export default async function ActiveTendersCategoryPage({ params }: Props) {
     } else if (slug === 'closing-soon') {
         type = 'closing-soon';
         titleOverride = 'Closing Soon';
+    } else if (slug === 'opening' || slug === 'evaluation') {
+        type = 'opening';
+        titleOverride = 'Evaluation / Opening Stage';
     } else {
         initialQuery = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         titleOverride = initialQuery;

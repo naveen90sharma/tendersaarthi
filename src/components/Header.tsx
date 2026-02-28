@@ -206,7 +206,7 @@ export default function Header() {
                     <Link href="/" className="flex-shrink-0 cursor-pointer hover:opacity-90 transition">
                         <div className="text-xl md:text-2xl font-black flex items-center tracking-tighter">
                             <span className="text-tj-yellow">Tender</span>
-                            <span className={`${isHomePage && !scrolled ? 'text-white' : 'text-slate-800'}`}>Saarthi</span>
+                            <span className={`${isHomePage && !scrolled ? 'text-white' : 'text-primary'}`}>Saarthi</span>
                         </div>
                     </Link>
 

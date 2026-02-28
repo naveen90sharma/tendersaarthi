@@ -207,9 +207,22 @@ export default function TenderResultsPage() {
             {/* Results */}
             <div className="max-w-7xl mx-auto px-4 mt-6">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-24 gap-3">
-                        <Loader2 className="animate-spin text-primary" size={28} />
-                        <p className="text-slate-400 text-xs">Loading results...</p>
+                    <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <div key={i} className="bg-white rounded-xl border border-slate-100 p-4 animate-pulse">
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="w-10 h-10 bg-slate-100 rounded-xl shrink-0" />
+                                    <div className="flex-1">
+                                        <div className="h-2 bg-slate-100 rounded w-1/4 mb-2" />
+                                        <div className="h-4 bg-slate-100 rounded w-3/4" />
+                                    </div>
+                                </div>
+                                <div className="flex gap-4">
+                                    <div className="h-3 bg-slate-50 rounded w-24" />
+                                    <div className="h-3 bg-slate-50 rounded w-24" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : filteredResults.length === 0 ? (
                     <div className="text-center py-20 bg-white rounded-xl border border-dashed border-slate-200">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     FileText,
     Upload,
@@ -8,14 +9,32 @@ import {
     Trash2,
     Download,
     AlertCircle,
-    FileCheck,
+    Search,
+    Loader2,
     CheckCircle2,
-    Loader2
+    ExternalLink
 } from 'lucide-react';
 import { getCurrentUser } from '@/services/auth';
 import { dashboardService } from '@/services/dashboardService';
 
 export default function DocumentsPage() {
+    const router = useRouter();
+
+    useEffect(() => {
+        // Redirect to dashboard as this feature is currently hidden
+        router.push('/dashboard');
+    }, [router]);
+
+    return (
+        <div className="flex items-center justify-center min-h-[60vh]">
+            <Loader2 className="animate-spin text-primary" size={32} />
+        </div>
+    );
+}
+
+/* Original code commented out to allow easy restoration later */
+/*
+export function DocumentsPageContent() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [documents, setDocuments] = useState<any[]>([]);
@@ -212,3 +231,4 @@ export default function DocumentsPage() {
         </div>
     );
 }
+*/

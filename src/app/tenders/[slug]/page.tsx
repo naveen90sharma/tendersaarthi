@@ -7,6 +7,7 @@ import SaveTenderButton from '@/components/SaveTenderButton';
 import PrintButton from '@/components/PrintButton';
 import TenderIntelligence from '@/components/TenderIntelligence';
 import PersonalizedEligibility from '@/components/PersonalizedEligibility';
+import SmallTenderCard from '@/components/SmallTenderCard';
 import { headers } from 'next/headers';
 
 interface TenderDetailProps {
@@ -26,7 +27,7 @@ async function getTenderBySlug(slug: string) {
     // Fetch 6 similar tenders from same category and state
     const { data: similar } = await supabase
         .from('tenders')
-        .select('id, slug, title, tender_value, bid_submission_end, state')
+        .select('id, slug, title, tender_value, bid_submission_end, state, authority, location, tender_category')
         .eq('tender_category', (tender as any).tender_category)
         .neq('id', tender.id)
         .order('created_at', { ascending: false })
@@ -54,6 +55,42 @@ export async function generateMetadata({ params }: TenderDetailProps): Promise<M
             canonical: `/tenders/${slug}`
         }
     };
+}
+
+// Format helpers
+const formatCurrency = (amount: string | number | null | undefined) => {
+    if (!amount) return 'N/A';
+    // Remove non-numeric characters except dots
+    const numStr = typeof amount === 'string' ? amount.replace(/[^0-9.]/g, '') : amount;
+    const num = Number(numStr);
+
+    if (isNaN(num) || num === 0) return amount.toString();
+
+    if (num >= 10000000) {
+        return `₹ ${(num / 10000000).toFixed(2)} Cr`;
+    } else if (num >= 100000) {
+        return `₹ ${(num / 100000).toFixed(2)} Lakh`;
+    } else {
+        return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(num);
+    }
+}
+
+const formatDate = (dateStr: string | null | undefined) => {
+    if (!dateStr) return 'N/A';
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        return new Intl.DateTimeFormat('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        }).format(date);
+    } catch (e) {
+        return dateStr;
+    }
 }
 
 export default async function TenderDetailPage({ params }: TenderDetailProps) {
@@ -137,13 +174,13 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                     </h1>
 
                     <div className="flex flex-wrap items-center gap-4 text-xs text-blue-100/50">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 bg-white/5 py-1.5 px-3 rounded-full border border-white/5">
                             <Calendar size={12} className="text-tj-yellow" />
-                            <span>Published: <span className="text-white/80">{tender.published_date || 'N/A'}</span></span>
+                            <span>Published: <span className="text-white/80 font-medium ml-1">{formatDate(tender.published_date)}</span></span>
                         </div>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 bg-white/5 py-1.5 px-3 rounded-full border border-white/5">
                             <Building2 size={12} className="text-tj-yellow" />
-                            <span className="truncate max-w-[200px] text-white/80">{tender.authority}</span>
+                            <span className="truncate max-w-[200px] text-white/80 font-medium">{tender.authority}</span>
                         </div>
                     </div>
                 </div>
@@ -155,10 +192,10 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                         {/* Highlights Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {[
-                                { label: 'Tender Value', value: tender.tender_value, icon: <IndianRupee size={15} />, color: 'bg-white' },
-                                { label: 'EMD Amount', value: tender.emd_amount, icon: <Wallet size={15} />, color: 'bg-white' },
-                                { label: 'Tender Fee', value: tender.tender_fee, icon: <FileCheck size={15} />, color: 'bg-white' },
-                                { label: 'Bid Deadline', value: tender.bid_submission_end, icon: <Clock size={15} />, color: isUrgent ? 'bg-red-50' : 'bg-white', text: isUrgent ? 'text-red-600' : 'text-primary' },
+                                { label: 'Tender Value', value: formatCurrency(tender.tender_value), icon: <IndianRupee size={15} />, color: 'bg-white' },
+                                { label: 'EMD Amount', value: formatCurrency(tender.emd_amount), icon: <Wallet size={15} />, color: 'bg-white' },
+                                { label: 'Tender Fee', value: formatCurrency(tender.tender_fee), icon: <FileCheck size={15} />, color: 'bg-white' },
+                                { label: 'Bid Deadline', value: formatDate(tender.bid_submission_end), icon: <Clock size={15} />, color: isUrgent ? 'bg-red-50' : 'bg-white', text: isUrgent ? 'text-red-600' : 'text-primary' },
                             ].map((item, i) => (
                                 <div key={i} className={`${item.color} p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-2`}>
                                     <div className={`${item.text || 'text-slate-300'}`}>
@@ -237,7 +274,7 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                         <TenderIntelligence tender={tender} />
 
                         {/* Eligibility & Requirements Section - Separate */}
-                        {tender.eligibility_requirements && (
+                        {(tender.eligibility_requirements || tender.similar_work_clause_exact_text || tender.turnover_requirement_exact_text || tender.net_worth_requirement_exact_text) && (
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <div className="flex items-center gap-2">
@@ -249,11 +286,43 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                                     <div className="flex-1 h-[1px] bg-gradient-to-r from-slate-200 to-transparent" />
                                 </div>
 
-                                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
-                                    <div
-                                        className="eligibility-html-content prose prose-slate max-w-none"
-                                        dangerouslySetInnerHTML={{ __html: tender.eligibility_requirements }}
-                                    />
+                                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm space-y-6">
+                                    {tender.eligibility_requirements && (
+                                        <div>
+                                            <h4 className="text-sm font-bold text-slate-800 mb-2">General Requirements</h4>
+                                            <div
+                                                className="eligibility-html-content prose prose-slate max-w-none text-sm text-slate-600"
+                                                dangerouslySetInnerHTML={{ __html: tender.eligibility_requirements.replace(/\n/g, '<br/>') }}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {tender.similar_work_clause_exact_text && (
+                                        <div>
+                                            <h4 className="text-sm font-bold text-slate-800 mb-2">Similar Work Experience</h4>
+                                            <div
+                                                className="prose prose-slate max-w-none text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100"
+                                                dangerouslySetInnerHTML={{ __html: tender.similar_work_clause_exact_text.replace(/\n/g, '<br/>') }}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {(tender.turnover_requirement_exact_text || tender.net_worth_requirement_exact_text) && (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {tender.turnover_requirement_exact_text && (
+                                                <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                                                    <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1.5">Turnover Requirement</h4>
+                                                    <div className="text-sm text-blue-900 font-semibold whitespace-pre-wrap">{tender.turnover_requirement_exact_text}</div>
+                                                </div>
+                                            )}
+                                            {tender.net_worth_requirement_exact_text && (
+                                                <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                                                    <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1.5">Net Worth Requirement</h4>
+                                                    <div className="text-sm text-emerald-900 font-semibold whitespace-pre-wrap">{tender.net_worth_requirement_exact_text}</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -309,24 +378,23 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
 
                         {/* Same similar tenders section but with updated styling */}
                         {similar.length > 0 && (
-                            <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm">
-                                <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-4">
-                                    <div className="w-1 h-4 bg-orange-400 rounded-full" />
-                                    Related Opportunities
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {similar.map((t: any) => (
-                                        <Link key={t.slug} href={`/tenders/${t.slug}`} className="group p-3 bg-slate-50 rounded-lg border border-transparent hover:border-orange-100 hover:bg-white hover:shadow-md transition-all">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <span className="text-[9px] font-medium text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wide">Similar</span>
-                                                <span className="text-[10px] text-slate-400">{t.state || 'National'}</span>
-                                            </div>
-                                            <h4 className="text-xs font-medium text-slate-600 group-hover:text-primary transition-colors line-clamp-2 mb-2 leading-relaxed">{t.title}</h4>
-                                            <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
-                                                <span className="font-semibold text-slate-500 text-[11px]">₹ {t.tender_value || 'N/A'}</span>
-                                                <ArrowRight size={12} className="text-slate-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                                            </div>
-                                        </Link>
+                            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm transition-all duration-300">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-lg font-black text-slate-800 tracking-tight flex items-center gap-2">
+                                        <div className="w-1.5 h-6 bg-tj-yellow rounded-full" />
+                                        Related Opportunities
+                                    </h3>
+                                    <Link
+                                        href="/active-tenders"
+                                        className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-tj-blue transition-colors flex items-center gap-1 group"
+                                    >
+                                        View All
+                                        <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                                    </Link>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    {similar.map((t: any, index: number) => (
+                                        <SmallTenderCard key={t.slug || t.id} tender={t} index={index} />
                                     ))}
                                 </div>
                             </div>

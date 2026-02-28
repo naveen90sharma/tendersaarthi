@@ -23,7 +23,17 @@ export default function TenderCard({ tender, index = 1, onUnsave }: TenderCardPr
             const now = new Date();
             if (isNaN(targetDate.getTime())) return null;
             const diff = targetDate.getTime() - now.getTime();
-            if (diff <= 0) return 'Expired';
+
+            if (diff <= 0) {
+                // If it ended in the last 15 days, it's in opening/evaluation stage
+                const fifteenDaysAgo = new Date();
+                fifteenDaysAgo.setDate(now.getDate() - 15);
+                if (targetDate > fifteenDaysAgo) {
+                    return 'Opening Stage';
+                }
+                return 'Expired';
+            }
+
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             return days > 0 ? `${days}d left` : 'Closing Today';
         } catch (e) {
@@ -40,8 +50,9 @@ export default function TenderCard({ tender, index = 1, onUnsave }: TenderCardPr
         return `₹ ${clean}`;
     };
 
-    const daysLeft = calculateDaysLeft(tender.bid_submission_end);
-    const isClosingSoon = daysLeft && daysLeft !== 'Expired' && (daysLeft === 'Closing Today' || (typeof daysLeft === 'string' && parseInt(daysLeft) <= 5));
+    const daysLeft = calculateDaysLeft(tender.bid_submission_end || tender.bid_end_ts);
+    const isOpeningStage = daysLeft === 'Opening Stage';
+    const isClosingSoon = daysLeft && daysLeft !== 'Expired' && daysLeft !== 'Opening Stage' && (daysLeft === 'Closing Today' || (typeof daysLeft === 'string' && parseInt(daysLeft) <= 5));
     const isExpired = daysLeft === 'Expired';
     const displayValue = formatDisplayAmount(tender.tender_value || tender.value);
 
@@ -83,8 +94,9 @@ export default function TenderCard({ tender, index = 1, onUnsave }: TenderCardPr
                     </div>
                     {daysLeft && (
                         <span className={`hidden lg:flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded shrink-0 ${isExpired ? 'bg-red-50 text-red-500 border border-red-100' :
-                            isClosingSoon ? 'bg-amber-50 text-amber-600 border border-amber-100' :
-                                'bg-green-50 text-green-600 border border-green-100'
+                            isOpeningStage ? 'bg-blue-50 text-blue-600 border border-blue-100' :
+                                isClosingSoon ? 'bg-amber-50 text-amber-600 border border-amber-100' :
+                                    'bg-green-50 text-green-600 border border-green-100'
                             }`}>
                             <Clock size={10} strokeWidth={2.5} />
                             {daysLeft}

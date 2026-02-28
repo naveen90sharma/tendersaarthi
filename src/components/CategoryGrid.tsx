@@ -43,10 +43,12 @@ export default function CategoryGrid() {
         }
     };
 
+    if (!loading && categories.length === 0) return null;
+
     return (
-        <section className="py-10 md:py-16 bg-white overflow-hidden relative border-t border-slate-50">
+        <section className={`py-10 md:py-16 bg-white overflow-hidden relative border-t border-slate-50 ${loading ? 'opacity-50' : 'opacity-100'} transition-opacity duration-500`}>
             <div className="container mx-auto px-4 relative z-10">
-                {/* Section Header - Exactly like TenderSection */}
+                {/* Section Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-1.5">
@@ -57,27 +59,29 @@ export default function CategoryGrid() {
                         <p className="text-xs text-slate-400 mt-1">AI-powered classification for precision matching</p>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => scroll('left')}
-                            className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#103E68] hover:border-[#103E68] transition-all shadow-sm"
-                        >
-                            <ChevronLeft size={20} />
-                        </button>
-                        <button
-                            onClick={() => scroll('right')}
-                            className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#103E68] hover:border-[#103E68] transition-all shadow-sm"
-                        >
-                            <ChevronRight size={20} />
-                        </button>
-                        <Link
-                            href="/active-tenders"
-                            className="flex items-center gap-2 bg-[#103E68]/5 hover:bg-[#103E68] text-[#103E68] hover:text-white px-5 py-2.5 rounded-xl font-bold transition-all text-xs tracking-wide border border-[#103E68]/10 ml-2"
-                        >
-                            View All Sectors
-                            <ArrowRight size={14} />
-                        </Link>
-                    </div>
+                    {!loading && (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => scroll('left')}
+                                className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#103E68] hover:border-[#103E68] transition-all shadow-sm"
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+                            <button
+                                onClick={() => scroll('right')}
+                                className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#103E68] hover:border-[#103E68] transition-all shadow-sm"
+                            >
+                                <ChevronRight size={20} />
+                            </button>
+                            <Link
+                                href="/active-tenders"
+                                className="flex items-center gap-2 bg-[#103E68]/5 hover:bg-[#103E68] text-[#103E68] hover:text-white px-5 py-2.5 rounded-xl font-bold transition-all text-xs tracking-wide border border-[#103E68]/10 ml-2"
+                            >
+                                View All Sectors
+                                <ArrowRight size={14} />
+                            </Link>
+                        </div>
+                    )}
                 </div>
 
                 {/* Horizontal Scroll Area */}
@@ -87,8 +91,11 @@ export default function CategoryGrid() {
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {loading ? (
-                        [1, 2, 3, 4, 5].map(i => (
-                            <div key={i} className="w-[300px] h-64 shrink-0 bg-slate-50 animate-pulse rounded-[2rem]" />
+                        [1, 2, 3, 4, 5, 6].map(i => (
+                            <div key={i} className="w-[280px] md:w-[320px] h-64 shrink-0 bg-slate-50 animate-pulse rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center gap-4">
+                                <div className="w-12 h-12 bg-slate-100 rounded-2xl" />
+                                <div className="h-4 bg-slate-100 w-1/2 rounded" />
+                            </div>
                         ))
                     ) : (
                         categories.map((category) => (
