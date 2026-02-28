@@ -124,6 +124,23 @@ export default function Hero() {
         { icon: <Zap size={12} />, text: 'Free to Browse' },
     ];
 
+    const [stars, setStars] = useState<any[]>([]);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        const newStars = [...Array(40)].map((_, i) => ({
+            id: i,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            size: `${Math.random() * 3}px`,
+            delay: `${Math.random() * 5}s`,
+            duration: `${2 + Math.random() * 4}s`,
+            opacity: 0.1 + Math.random() * 0.4
+        }));
+        setStars(newStars);
+    }, []);
+
     return (
         <section className="relative w-full bg-[#0B2C4A] overflow-hidden min-h-screen flex flex-col justify-center pt-14 pb-4 md:pt-24 md:pb-16">
 
@@ -142,6 +159,25 @@ export default function Hero() {
                         backgroundSize: '40px 40px'
                     }}
                 />
+
+                {/* Twinkling Stars */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {mounted && stars.map((star) => (
+                        <div
+                            key={star.id}
+                            className="absolute bg-white rounded-full animate-twinkle"
+                            style={{
+                                top: star.top,
+                                left: star.left,
+                                width: star.size,
+                                height: star.size,
+                                animationDelay: star.delay,
+                                animationDuration: star.duration,
+                                opacity: star.opacity
+                            }}
+                        />
+                    ))}
+                </div>
             </div>
 
             <div className="container mx-auto px-4 relative z-10 text-center max-w-5xl">
