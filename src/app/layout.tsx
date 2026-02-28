@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
     title: "TenderSaarthi - Find Government & Private Tenders Online",
     description: "India's leading digital marketplace for government and private tenders.",
+    icons: {
+        icon: "/favicon.svg",
+    },
 };
 
 import { ContractorProvider } from "@/context/ContractorContext";

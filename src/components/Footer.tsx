@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Send, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -46,14 +47,14 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 border-b border-white/10 pb-16 mb-12">
                     {/* Brand Column */}
                     <div className="lg:col-span-4 space-y-8">
-                        <Link href="/" className="inline-block">
-                            <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 bg-tj-yellow rounded-lg flex items-center justify-center text-primary font-black text-xl">TS</div>
-                                <div className="text-2xl font-black tracking-tighter">
-                                    <span className="text-tj-yellow">Tender</span>
-                                    <span className="text-white">Saarthi</span>
-                                </div>
-                            </div>
+                        <Link href="/" className="inline-block hover:opacity-90 transition">
+                            <Image
+                                src="/logo-light.svg"
+                                alt="TenderSaarthi Logo"
+                                width={200}
+                                height={50}
+                                className="h-10 md:h-12 w-auto"
+                            />
                         </Link>
                         <p className="text-blue-100/70 text-sm leading-relaxed font-medium max-w-sm">
                             India's most trusted digital gateway for government and private procurement opportunities. We bridge the gap between businesses and opportunities with precision and speed.

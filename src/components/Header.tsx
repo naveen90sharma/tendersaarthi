@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { getCurrentUser, signOut } from '@/services/auth';
 import { getSavedTenders } from '@/services/tenderService';
+import Image from 'next/image';
 
 interface NavItem {
     label: string;
@@ -204,10 +205,14 @@ export default function Header() {
 
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0 cursor-pointer hover:opacity-90 transition">
-                        <div className="text-xl md:text-2xl font-black flex items-center tracking-tighter">
-                            <span className="text-tj-yellow">Tender</span>
-                            <span className={`${isHomePage && !scrolled ? 'text-white' : 'text-primary'}`}>Saarthi</span>
-                        </div>
+                        <Image
+                            src={isHomePage && !scrolled ? "/logo-light.svg" : "/logo.svg"}
+                            alt="TenderSaarthi Logo"
+                            width={180}
+                            height={45}
+                            className="h-9 md:h-11 w-auto"
+                            priority
+                        />
                     </Link>
 
                     {/* Right Actions */}
@@ -483,10 +488,13 @@ export default function Header() {
 
                         <div className="flex justify-between items-start relative z-10 mb-6">
                             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                                <div className="text-xl font-black flex items-center tracking-tighter shadow-sm">
-                                    <span className="text-tj-yellow">Tender</span>
-                                    <span className="text-white">Saarthi</span>
-                                </div>
+                                <Image
+                                    src="/logo-light.svg"
+                                    alt="TenderSaarthi Logo"
+                                    width={140}
+                                    height={35}
+                                    className="h-8 w-auto"
+                                />
                             </Link>
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
