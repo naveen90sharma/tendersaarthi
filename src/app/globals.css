@@ -221,3 +221,26 @@ body {
 .animate-marquee-slow {
     animation: marquee 40s linear infinite;
 }
+
+@keyframes reveal-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reveal-on-scroll {
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal-on-scroll.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation: reveal-up 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}

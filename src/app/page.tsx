@@ -8,19 +8,23 @@ import NewsSection from '@/components/NewsSection';
 import QuickLinks from '@/components/QuickLinks';
 import TrustSection from '@/components/TrustSection';
 import FloatingAssistant from '@/components/FloatingAssistant';
+import ScrollReveal from '@/components/ScrollReveal';
 
 export default function Home() {
   return (
     <main className="overflow-hidden relative bg-white">
       <div className="relative z-10">
         <Hero />
-        <TrustSection />
 
-        <div className="bg-white">
+        <ScrollReveal>
+          <TrustSection />
+        </ScrollReveal>
+
+        <ScrollReveal className="bg-white" delay={100}>
           <TenderSection title="Top Market Opportunities" />
-        </div>
+        </ScrollReveal>
 
-        <div className="bg-slate-50">
+        <ScrollReveal className="bg-slate-50" delay={200}>
           <Suspense fallback={
             <div className="py-10 md:py-16 bg-[#F8FAFC] flex justify-center">
               <div className="animate-pulse w-10 h-10 bg-slate-200 rounded-full" />
@@ -28,23 +32,33 @@ export default function Home() {
           }>
             <CategoryGrid />
           </Suspense>
-        </div>
+        </ScrollReveal>
 
-        <HowItWorks />
+        <ScrollReveal delay={100}>
+          <HowItWorks />
+        </ScrollReveal>
 
-        <div className="bg-white">
+        <ScrollReveal className="bg-white" delay={200}>
           <TenderSection title="Critical: Closing Soon" />
-        </div>
+        </ScrollReveal>
 
-        <CTASection />
-        <NewsSection />
+        <ScrollReveal>
+          <CTASection />
+        </ScrollReveal>
 
-        <Suspense fallback={<div className="h-32 bg-white" />}>
-          <QuickLinks />
-        </Suspense>
+        <ScrollReveal delay={100}>
+          <NewsSection />
+        </ScrollReveal>
+
+        <ScrollReveal delay={200}>
+          <Suspense fallback={<div className="h-32 bg-white" />}>
+            <QuickLinks />
+          </Suspense>
+        </ScrollReveal>
 
         <FloatingAssistant />
       </div>
     </main>
   );
 }
+
