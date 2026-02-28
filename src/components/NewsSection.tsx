@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, RefreshCw, Newspaper } from 'lucide-react';
 import NewsCard from './NewsCard';
 import { supabase } from '@/services/supabase';
+import NewsSkeleton from './NewsSkeleton';
 
 export default function NewsSection() {
     const [news, setNews] = useState<any[]>([]);
@@ -61,8 +62,8 @@ export default function NewsSection() {
 
                 {/* News Cards Grid */}
                 {loading ? (
-                    <div className="flex justify-center py-20">
-                        <RefreshCw className="animate-spin text-primary" size={32} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                        {[1, 2, 3, 4, 5].map(i => <NewsSkeleton key={i} />)}
                     </div>
                 ) : news.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Calendar, RefreshCw, Newspaper } from 'lucide-react';
 import { supabase } from '@/services/supabase';
 import NewsImage from '@/components/NewsImage';
+import NewsSkeleton, { FeaturedNewsSkeleton } from '@/components/NewsSkeleton';
 
 const CATEGORIES = ['ALL', 'NEWS', 'ARTICLE', 'PRESS RELEASE'];
 
@@ -106,9 +107,11 @@ export default function NewsListing() {
             {/* ── Content Area ── */}
             <div className="container mx-auto px-4 py-12">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4">
-                        <RefreshCw className="animate-spin text-primary" size={40} />
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading latest insights...</p>
+                    <div className="space-y-12">
+                        {activeCategory === 'ALL' && <FeaturedNewsSkeleton />}
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {[1, 2, 3, 4, 5, 6].map(i => <NewsSkeleton key={i} />)}
+                        </div>
                     </div>
                 ) : news.length === 0 ? (
                     <div className="text-center py-32 bg-white rounded-3xl border-2 border-dashed border-slate-200">
