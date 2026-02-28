@@ -126,6 +126,8 @@ export default function Hero() {
 
     const [stars, setStars] = useState<any[]>([]);
     const [mounted, setMounted] = useState(false);
+    const [rotatingIndex, setRotatingIndex] = useState(0);
+    const rotatingTexts = ["Government Tenders", "Defense Projects", "Civil Infrastructure", "Smart City Tenders", "Railway Projects"];
 
     useEffect(() => {
         setMounted(true);
@@ -139,7 +141,16 @@ export default function Hero() {
             opacity: 0.1 + Math.random() * 0.4
         }));
         setStars(newStars);
+
+        const interval = setInterval(() => {
+            setRotatingIndex((prev) => (prev + 1) % rotatingTexts.length);
+        }, 3000);
+        return () => clearInterval(interval);
     }, []);
+
+    const authorities = [
+        "CPPP", "GeM Portal", "NHAI", "Indian Railways", "MES", "PWD", "ISRO", "DRDO", "GAIL", "BHEL", "NTPC", "ONGC", "NHPC", "IOCL"
+    ];
 
     return (
         <section className="relative w-full bg-[#0B2C4A] overflow-hidden min-h-screen flex flex-col justify-center pt-14 pb-4 md:pt-24 md:pb-16">
@@ -149,9 +160,9 @@ export default function Hero() {
                 {/* Diagonal subtle gradient stripe */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#0d3459] via-[#0B2C4A] to-[#071e33]" />
                 {/* Glow blobs */}
-                <div className="absolute -top-[15%] -left-[10%] w-[70%] h-[55%] bg-tj-yellow/5 rounded-full blur-[120px]" />
-                <div className="absolute top-[20%] -right-[5%] w-[50%] h-[50%] bg-blue-500/5 rounded-full blur-[100px]" />
-                <div className="absolute bottom-0 left-[30%] w-[40%] h-[30%] bg-primary/10 rounded-full blur-[80px]" />
+                <div className="absolute -top-[15%] -left-[10%] w-[70%] h-[55%] bg-tj-yellow/10 rounded-full blur-[120px]" />
+                <div className="absolute top-[20%] -right-[5%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[100px]" />
+                <div className="absolute bottom-0 left-[30%] w-[40%] h-[30%] bg-primary/15 rounded-full blur-[80px]" />
                 {/* Grid texture */}
                 <div className="absolute inset-0 opacity-[0.025]"
                     style={{
@@ -183,20 +194,27 @@ export default function Hero() {
             <div className="container mx-auto px-4 relative z-10 text-center max-w-5xl">
 
                 {/* AI Badge */}
-                <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1 md:px-4 md:py-1.5 rounded-full mb-3 md:mb-6 text-tj-yellow">
+                <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1 md:px-4 md:py-1.5 rounded-full mb-3 md:mb-6 text-tj-yellow group cursor-default hover:bg-white/10 transition-colors">
                     <div className="w-1.5 h-1.5 bg-tj-yellow rounded-full animate-pulse" />
                     <span className="uppercase text-[8px] md:text-[10px] font-semibold tracking-[0.2em]">AI Intelligence · Updated Daily</span>
+                    <ChevronDown size={10} className="opacity-40 group-hover:translate-y-0.5 transition-transform" />
                 </div>
 
-                {/* ── Step 1: Headline ────────────────────────────────────── */}
-                <h1 className="text-2xl md:text-5xl lg:text-[3rem] font-black text-white mb-2 md:mb-4 leading-tight tracking-tight px-2">
-                    India's #1 Platform to
-                    <br className="hidden md:block" />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-tj-yellow via-yellow-200 to-tj-yellow italic"> Win Government Tenders</span>
-                </h1>
+                {/* ── Step 1: Headline with Rotating Text ─────────────────── */}
+                <div className="min-h-[100px] md:min-h-[160px] flex flex-col justify-center">
+                    <h1 className="text-3xl md:text-5xl lg:text-[3.5rem] font-black text-white mb-2 md:mb-4 leading-tight tracking-tight px-2">
+                        India's #1 Platform to
+                        <br />
+                        <div className="relative inline-block mt-2">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-tj-yellow via-yellow-200 to-tj-yellow italic transition-all duration-700 inline-block">
+                                Win {rotatingTexts[rotatingIndex]}
+                            </span>
+                        </div>
+                    </h1>
+                </div>
 
-                <p className="text-[9px] md:text-sm text-blue-100/50 mb-3 md:mb-6 max-w-xl mx-auto px-6 leading-relaxed">
-                    Search <span className="text-white font-semibold">2.1M+</span> live tenders across 28 states, 500+ categories — filtered for your business.
+                <p className="text-[10px] md:text-base text-blue-100/60 mb-6 md:mb-10 max-w-2xl mx-auto px-6 leading-relaxed">
+                    Access <span className="text-white font-bold border-b border-tj-yellow/30">2.1 Million+</span> live tenders from every state and department — indexed, analyzed and ready for your bid.
                 </p>
 
                 {/* ── Step 4: Inline Stats Row ─────────────────────────────── */}
@@ -211,9 +229,25 @@ export default function Hero() {
                 </div>
 
                 {/* ── Step 2: Search Bar with State + Category Dropdowns ────── */}
-                <div className="relative max-w-3xl mx-auto mb-3 md:mb-8 px-2" ref={wrapperRef}>
-                    <div className="bg-white/8 backdrop-blur-xl p-1 rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
-                        <div className="bg-white rounded-xl flex flex-col md:flex-row items-stretch md:items-center relative">
+                <div className="relative max-w-3xl mx-auto mb-3 md:mb-8 px-2 group/searchbar" ref={wrapperRef}>
+                    <div
+                        className="bg-white/8 backdrop-blur-xl p-1 rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative overflow-hidden transition-all duration-500 hover:shadow-primary/20"
+                        onMouseMove={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+                            e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+                        }}
+                    >
+                        {/* Interactive Spotlight Glow */}
+                        <div className="absolute inset-0 z-0 opacity-0 group-hover/searchbar:opacity-100 transition-opacity duration-500 pointer-events-none"
+                            style={{
+                                background: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(253, 224, 71, 0.15), transparent 40%)`
+                            }}
+                        />
+
+                        <div className="bg-white rounded-xl flex flex-col md:flex-row items-stretch md:items-center relative z-10">
 
                             {/* Keyword Search */}
                             <div className="flex-[1.5] flex items-center gap-2.5 px-4 py-3 md:py-0 md:min-h-[52px] min-w-0">
@@ -348,14 +382,38 @@ export default function Hero() {
                 </div>
 
                 {/* Location + Stats */}
-                <div className="mt-3 md:mt-14 -mx-4">
-                    <LocationDetector />
+                <div className="mt-8 md:mt-16 -mx-4 group">
+                    <div className="relative">
+                        <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                        <LocationDetector />
+                        <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    </div>
                 </div>
-                {/* Hide stats section for now as per user request */}
-                {/* <div className="mt-2 md:mt-16">
-                    <StatsSection isDark={true} />
-                </div> */}
+
+                {/* ── Brand Marquee Section ────────────────────────────────── */}
+                <div className="mt-12 md:mt-20 overflow-hidden relative py-6">
+                    <div className="flex items-center gap-4 mb-4 justify-center">
+                        <div className="h-px w-8 bg-gradient-to-r from-transparent to-white/20" />
+                        <span className="text-[10px] text-white/30 uppercase tracking-[0.3em] font-medium">Trusted by Authorities & Departments</span>
+                        <div className="h-px w-8 bg-gradient-to-l from-transparent to-white/20" />
+                    </div>
+
+                    <div className="flex overflow-hidden group select-none">
+                        <div className="flex animate-marquee-slow whitespace-nowrap min-w-full items-center">
+                            {[...authorities, ...authorities].map((auth, idx) => (
+                                <div key={idx} className="mx-8 md:mx-12 px-6 py-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all cursor-default group/item">
+                                    <span className="text-sm md:text-lg font-bold text-white/40 group-hover/item:text-tj-yellow/80 transition-colors uppercase tracking-wider">{auth}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Shadow overlays for smooth fade */}
+                    <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0B2C4A] to-transparent z-10" />
+                    <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#0B2C4A] to-transparent z-10" />
+                </div>
             </div>
         </section>
+
     );
 }
