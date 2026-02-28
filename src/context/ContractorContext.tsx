@@ -37,24 +37,31 @@ export function ContractorProvider({ children }: { children: React.ReactNode }) 
     const checkEligibility = (tenderValue: string | number | undefined, tenderCategory?: string) => {
         if (!profile) return { eligible: 'Profile Missing', score: 0 };
 
-        // 1. Value Matching
-        const val = typeof tenderValue === 'string' ? parseFloat(tenderValue.replace(/[^0-9.]/g, '')) || 0 : tenderValue || 0;
-        const adjustedValue = tenderValue?.toString().toLowerCase().includes('cr') ? val * 100 : val;
+        // 1. Value Normalization to Rupees
+        let tenderValRupees = 0;
+        const numeric = typeof tenderValue === 'string' ? parseFloat(tenderValue.replace(/[^0-9.]/g, '')) || 0 : tenderValue || 0;
 
+        const stringVal = tenderValue?.toString().toLowerCase() || '';
+        if (stringVal.includes('cr')) tenderValRupees = numeric * 10000000;
+        else if (stringVal.includes('lakh')) tenderValRupees = numeric * 100000;
+        else if (numeric < 1000) tenderValRupees = numeric * 100000; // Assume Lakhs if small number
+        else tenderValRupees = numeric;
+
+        // Ensure comparisons are made against Rupee values
         const maxExperience = profile.contractor_projects?.reduce((max: number, p: any) => Math.max(max, p.value || 0), 0) || 0;
         const turnover = profile.turnover || 0;
 
         let score = 0;
 
-        // Experience Score (Up to 40 points)
-        if (maxExperience >= adjustedValue * 0.7) score += 40;
-        else if (maxExperience >= adjustedValue * 0.4) score += 25;
-        else if (maxExperience >= adjustedValue * 0.2) score += 10;
+        // Experience Score (Up to 40 points) - Compare Rupees to Rupees
+        if (maxExperience >= tenderValRupees * 0.7) score += 40;
+        else if (maxExperience >= tenderValRupees * 0.4) score += 25;
+        else if (maxExperience >= tenderValRupees * 0.1) score += 10;
 
         // Turnover Score (Up to 40 points)
-        if (turnover >= adjustedValue * 3) score += 40;
-        else if (turnover >= adjustedValue * 1.5) score += 25;
-        else if (turnover >= adjustedValue * 0.5) score += 10;
+        if (turnover >= tenderValRupees * 3) score += 40;
+        else if (turnover >= tenderValRupees * 1) score += 25;
+        else if (turnover >= tenderValRupees * 0.3) score += 10;
 
         // Category Match (Up to 20 points)
         if (tenderCategory && profile.main_category) {

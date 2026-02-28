@@ -155,17 +155,24 @@ export default function TenderListing({
                         supabaseQuery = supabaseQuery.lt('bid_end_ts', now);
                     }
                 } else if (type === 'latest') {
-                    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-                    supabaseQuery = supabaseQuery.gt('created_at', yesterday).gt('bid_end_ts', now);
+                    // Show tenders published today or created today
+                    const today = new Date();
+                    const todayISO = today.toISOString().split('T')[0];
+                    const startOfToday = new Date();
+                    startOfToday.setHours(0, 0, 0, 0);
+
+                    supabaseQuery = supabaseQuery.or(`created_at.gte.${startOfToday.toISOString()},published_date.ilike.%${todayISO}%`);
+                } else if (type === 'opening' || type === 'evaluation') {
+                    // Tenders where bid has ended recently
+                    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
+                    supabaseQuery = supabaseQuery.lt('bid_end_ts', now).gt('bid_end_ts', fifteenDaysAgo);
                 } else if (type === 'closing-soon') {
                     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
                     supabaseQuery = supabaseQuery.gt('bid_end_ts', now).lt('bid_end_ts', tomorrow);
                 } else {
-                    // Default to active unless specifically searching (standard search often wants active results)
-                    // If we have an effectiveQuery, we still mostly want active tenders by default
-                    // unless the search is broad.
+                    // Default to active: Everything where bid_end_ts is in the future or NULL
                     if (!effectiveQuery || type === 'active') {
-                        supabaseQuery = supabaseQuery.gt('bid_end_ts', now);
+                        supabaseQuery = supabaseQuery.or(`bid_end_ts.gt.${now},bid_end_ts.is.null`);
                     }
                 }
 

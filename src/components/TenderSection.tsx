@@ -74,7 +74,8 @@ export default function TenderSection({ title }: { title: string }) {
                                 const isUrgent = daysLeft !== null && daysLeft <= 5;
 
                                 const aiTags = ['High Success Rate', 'Limited Competition', 'MSME Eligible', 'Top Tier Authority'];
-                                const randomTag = aiTags[Math.floor((tender.id.length + index) % aiTags.length)];
+                                const safeId = tender.id?.toString() || '';
+                                const randomTag = aiTags[Math.floor((safeId.length + index) % aiTags.length)];
 
                                 return (
                                     <div

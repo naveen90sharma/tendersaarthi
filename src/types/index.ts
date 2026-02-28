@@ -28,4 +28,5 @@ export interface Tender {
     referenceNo?: string;
     category?: string;
     tenderFee?: string;
+    bid_end_ts?: string;
 }
