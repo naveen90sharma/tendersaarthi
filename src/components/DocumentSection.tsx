@@ -125,7 +125,7 @@ export default function DocumentSection({ tender }: DocumentSectionProps) {
         <div className="space-y-6">
             {/* Main Documents Card */}
             <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <h3 className="text-lg font-black text-slate-800 tracking-tight flex items-center gap-2">
                             <Download className="text-primary" size={20} />
@@ -136,11 +136,11 @@ export default function DocumentSection({ tender }: DocumentSectionProps) {
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-3">
                         <button
                             disabled={isZipping}
                             onClick={handleDownloadAll}
-                            className={`flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-sm ${isZipping
+                            className={`flex items-center gap-2 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-sm shrink-0 ${isZipping
                                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                                 : 'bg-tj-yellow text-slate-900 border border-tj-yellow/50 hover:bg-white hover:border-tj-yellow'
                                 }`}
@@ -159,7 +159,12 @@ export default function DocumentSection({ tender }: DocumentSectionProps) {
                         </button>
 
                         {tender.official_link && (
-                            <a href={tender.official_link} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase text-primary hover:underline bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 transition-all hover:bg-primary/10">
+                            <a
+                                href={tender.official_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center text-[10px] font-black uppercase text-primary hover:underline bg-primary/5 px-4 py-2.5 rounded-xl border border-primary/10 transition-all hover:bg-primary/10 shrink-0 whitespace-nowrap"
+                            >
                                 Open Official Portal
                             </a>
                         )}
