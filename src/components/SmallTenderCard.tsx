@@ -3,6 +3,26 @@
 import Link from 'next/link';
 import { MapPin, Building2, ArrowRight, Clock, ShieldCheck } from 'lucide-react';
 
+const formatCurrency = (amount: string | number | null | undefined) => {
+    if (!amount) return '—';
+    const numStr = typeof amount === 'string' ? amount.replace(/[^0-9.]/g, '') : amount.toString();
+    const num = Number(numStr);
+
+    if (isNaN(num) || num === 0) return amount.toString();
+
+    if (num >= 10000000) {
+        return `₹ ${(num / 10000000).toFixed(2)} Cr`;
+    } else if (num >= 100000) {
+        return `₹ ${(num / 100000).toFixed(2)} Lakh`;
+    } else {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 0
+        }).format(num);
+    }
+}
+
 interface SmallTenderCardProps {
     tender: {
         id: string | number;
@@ -92,7 +112,7 @@ export default function SmallTenderCard({ tender, index = 0 }: SmallTenderCardPr
                     <div>
                         <span className="text-[8px] font-semibold text-blue-200/40 uppercase tracking-widest block mb-0.5">Est. Value</span>
                         <div className="text-sm font-bold text-white leading-none">
-                            {tender.tender_value || tender.value || '—'}
+                            {formatCurrency(tender.tender_value || tender.value)}
                         </div>
                     </div>
 
