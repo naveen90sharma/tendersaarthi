@@ -41,13 +41,33 @@ export default function TenderCard({ tender, index = 1, onUnsave }: TenderCardPr
         }
     };
 
-    const formatDisplayAmount = (amount?: string) => {
+    const formatDisplayAmount = (amount?: string | number) => {
         if (!amount || amount === 'N/A' || amount === '0') return null;
+
         const clean = amount.toString().trim();
-        if (clean.startsWith('₹') || clean.toLowerCase().includes('crore') || clean.toLowerCase().includes('cr') || clean.toLowerCase().includes('lakh')) {
+
+        // If it already has currency symbols or words, return as is (but replace Rs. with ₹)
+        if (clean.toLowerCase().includes('crore') || clean.toLowerCase().includes('cr') || clean.toLowerCase().includes('lakh')) {
             return clean.replace(/Rs\.?/i, '₹').trim();
         }
-        return `₹ ${clean}`;
+
+        // Try to parse numeric value
+        const numStr = clean.replace(/[^0-9.]/g, '');
+        const num = Number(numStr);
+
+        if (isNaN(num) || num === 0) return clean.replace(/Rs\.?/i, '₹').trim();
+
+        if (num >= 10000000) {
+            return `₹ ${(num / 10000000).toFixed(2)} Cr`;
+        } else if (num >= 100000) {
+            return `₹ ${(num / 100000).toFixed(2)} Lakh`;
+        } else {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(num);
+        }
     };
 
     const daysLeft = calculateDaysLeft(tender.bid_submission_end || tender.bid_end_ts);
