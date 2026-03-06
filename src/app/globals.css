@@ -244,3 +244,158 @@ body {
     transform: translateY(0) scale(1);
     animation: reveal-up 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
+
+/* 
+  =========================================
+  PROFESSIONAL PRINT & PDF STYLES
+  =========================================
+*/
+@media print {
+
+    /* Hide all non-essential web UI elements */
+    header,
+    footer,
+    aside,
+    nav,
+    .no-print,
+    .fixed,
+    .sticky,
+    button,
+    button.save-tender-button,
+    .print-button,
+    iframe,
+    #PDFViewerModal {
+        display: none !important;
+    }
+
+    /* Reset background and layout for paper */
+    body,
+    html {
+        background: #fff !important;
+        color: #000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Show the hidden print-only header */
+    .print-header {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid #0B2C4A;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+    }
+
+    /* Show the hidden print-only footer */
+    .print-footer {
+        display: block !important;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 8pt;
+        color: #94a3b8;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 5px;
+        background: #fff;
+    }
+
+    .container {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Force visibility of essential text sections */
+    .tender-header-section,
+    .container,
+    main {
+        background-color: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        top: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    .tender-header-section {
+        padding: 20px 0 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    h1 {
+        font-size: 20pt !important;
+        color: #0B2C4A !important;
+        margin: 0 !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Grid layouts back to flex/columns logic for paper */
+    .grid {
+        display: block !important;
+    }
+
+    .highlights-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+        margin-bottom: 25px !important;
+    }
+
+    .highlights-grid>div {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
+        background: #f8fafc !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        break-inside: avoid;
+    }
+
+    /* Force readable text */
+    p,
+    span,
+    div,
+    strong {
+        color: #334155 !important;
+    }
+
+    .text-primary,
+    .text-tj-yellow,
+    .text-blue-200,
+    h3 {
+        color: #0B2C4A !important;
+    }
+
+    /* Main Section Logic */
+    .space-y-8>div {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 30px !important;
+    }
+
+    .project-specification-content,
+    .eligibility-html-content {
+        font-size: 11pt !important;
+        color: #1e293b !important;
+    }
+
+    .bg-white {
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    /* Sidebar or hidden sections we might have accidentally included */
+    .tender-layout-grid {
+        display: block !important;
+    }
+}
+
+/* Print Only Helper Classes - Hidden during web browsing */
+.print-header,
+.print-footer {
+    display: none;
+}

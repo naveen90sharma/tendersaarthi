@@ -135,10 +135,6 @@ export default function CategoryGrid() {
                     )}
                 </div>
             </div>
-
-            <style jsx>{`
-                .scrollbar-hide::-webkit-scrollbar { display: none; }
-            `}</style>
         </section>
     );
 }

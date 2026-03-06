@@ -9,9 +9,31 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
     title: "TenderSaarthi - Find Government & Private Tenders Online",
-    description: "India's leading digital marketplace for government and private tenders.",
+    description: "India's leading digital marketplace for government and private tenders. Discover opportunities in Road, Railway, Solar, Building, and more.",
+    keywords: ["Tenders", "Government Tenders", "Private Tenders", "TenderSaarthi", "India Tenders", "E-procurement"],
     icons: {
         icon: "/favicon.svg",
+    },
+    openGraph: {
+        title: "TenderSaarthi - Tender Discovery Platform",
+        description: "Explore thousands of active government and private tenders across India.",
+        url: 'https://tendersaarthi.com',
+        siteName: 'TenderSaarthi',
+        images: [
+            {
+                url: '/logo.png',
+                width: 1200,
+                height: 630,
+            },
+        ],
+        locale: 'en_IN',
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'TenderSaarthi',
+        description: 'India\'s digital marketplace for tenders.',
+        images: ['/logo.png'],
     },
 };
 

@@ -292,3 +292,30 @@ export async function getSavedTenders(userId: string) {
         return { success: false, data: null, error: error.message };
     }
 }
+// Get recommended tenders for a user based on their profile
+export async function getRecommendedTenders(category: string, state?: string, limit: number = 4) {
+    try {
+        let query = supabase
+            .from('tenders')
+            .select('*')
+            .eq('status', 'Active')
+            .order('published_date', { ascending: false });
+
+        if (category) {
+            query = query.ilike('tender_category', `%${category}%`);
+        }
+
+        if (state) {
+            query = query.eq('state', state);
+        }
+
+        const { data, error } = await query.limit(limit);
+
+        if (error) throw error;
+
+        return { success: true, data: data || [], error: null };
+    } catch (error: any) {
+        console.error('Error fetching recommended tenders:', error);
+        return { success: false, data: null, error: error.message };
+    }
+}

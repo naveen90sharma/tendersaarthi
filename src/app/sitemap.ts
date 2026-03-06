@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next';
 import { supabase } from '@/services/supabase';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://tendersaarthi.in';
+    const baseUrl = 'https://tendersaarthi.com';
 
     // 1. Fetch all tenders slugs
     const { data: tenders } = await supabase

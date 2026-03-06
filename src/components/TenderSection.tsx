@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import Link from 'next/link';
 import { useRef } from 'react';
 import { useLatestTenders } from '../hooks/useTenders';
@@ -156,11 +158,6 @@ export default function TenderSection({ title }: { title: string }) {
                     </div>
                 )}
             </div>
-
-            <style jsx>{`
-                .scrollbar-hide::-webkit-scrollbar { display: none; }
-                .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-            `}</style>
         </section>
     );
 }

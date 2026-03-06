@@ -23,19 +23,20 @@ export default function BrandSection() {
                     <a href="#" className="hidden md:block px-4 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50 transition font-medium text-gray-600">View All Authorities</a>
                 </div>
 
-                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                     {brands.map((brand) => (
-                        <div key={brand.name} className="border border-gray-200 rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition cursor-pointer group bg-white">
-                            <div className={`w-14 h-14 ${brand.color} rounded-full flex items-center justify-center text-white font-bold text-sm mb-3 shadow-sm`}>
+                        <div key={brand.name} className="relative border border-gray-100 rounded-2xl p-6 flex flex-col items-center hover:shadow-2xl hover:border-tj-yellow transition-all duration-300 cursor-pointer group bg-white hover:-translate-y-2">
+                            <div className={`w-16 h-16 ${brand.color} rounded-2xl flex items-center justify-center text-white font-bold text-lg mb-4 shadow-lg group-hover:rotate-6 transition-transform`}>
                                 {brand.initials}
                             </div>
-                            <span className="text-sm font-semibold text-gray-700 group-hover:text-primary text-center">{brand.name}</span>
+                            <span className="text-sm font-bold text-gray-800 group-hover:text-primary text-center tracking-tight uppercase">{brand.name}</span>
+                            <div className="absolute inset-0 bg-tj-yellow/5 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity pointer-events-none" />
                         </div>
                     ))}
                 </div>
 
-                <div className="mt-6 md:hidden text-center">
-                    <a href="#" className="inline-block px-6 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 transition">View All Authorities</a>
+                <div className="mt-10 md:hidden text-center">
+                    <a href="/authorities" className="inline-flex items-center gap-2 px-8 py-3 bg-white border border-gray-200 rounded-full text-sm font-bold hover:bg-gray-50 transition shadow-sm text-gray-700">View All Authorities</a>
                 </div>
 
                 {/* Banner Ad below brands */}

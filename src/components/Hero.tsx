@@ -108,28 +108,38 @@ export default function Hero() {
         if (e.key === 'Enter') handleSearch();
     };
 
-    // ── Step 4: Inline stat numbers ─────────────────────────────────────────
-    const heroStats = [
-        { value: '2.1M+', label: 'Live Tenders' },
-        { value: '28', label: 'States Covered' },
-        { value: '500+', label: 'Categories' },
-        { value: 'Daily', label: 'Updated' },
-    ];
-
-    // ── Step 6: Trust badges ────────────────────────────────────────────────
-    const trustBadges = [
-        { icon: <ShieldCheck size={12} />, text: 'CPPP Verified' },
-        { icon: <Globe size={12} />, text: 'GeM Portal Synced' },
-        { icon: <RefreshCw size={12} />, text: 'Updated Hourly' },
-        { icon: <Zap size={12} />, text: 'Free to Browse' },
-    ];
 
     const [stars, setStars] = useState<any[]>([]);
     const [mounted, setMounted] = useState(false);
     const [rotatingIndex, setRotatingIndex] = useState(0);
     const rotatingTexts = ["Government Tenders", "Defense Projects", "Civil Infrastructure", "Smart City Tenders", "Railway Projects"];
 
+    const [liveCounts, setLiveCounts] = useState({ tenders: '2.1M+', states: '28', categories: '500+' });
+
+    // Fetch live counts from DB
     useEffect(() => {
+        const fetchLiveStats = async () => {
+            try {
+                const now = new Date().toISOString();
+                const [tRes, sRes, cRes] = await Promise.all([
+                    supabase.from('tenders').select('id', { count: 'exact', head: true }).gt('bid_end_ts', now),
+                    supabase.from('tenders').select('state', { count: 'exact', head: true }).not('state', 'is', null), // Note: this is a simplified count
+                    supabase.from('tender_categories').select('id', { count: 'exact', head: true })
+                ]);
+
+                if (tRes.count) {
+                    setLiveCounts({
+                        tenders: (tRes.count).toLocaleString() + '+',
+                        states: '28', // Usually static or higher, keep or refine
+                        categories: (cRes.count || 500).toString() + '+'
+                    });
+                }
+            } catch (err) {
+                console.error("Error fetching live stats:", err);
+            }
+        };
+        fetchLiveStats();
+
         setMounted(true);
         const newStars = [...Array(40)].map((_, i) => ({
             id: i,
@@ -147,6 +157,22 @@ export default function Hero() {
         }, 3000);
         return () => clearInterval(interval);
     }, []);
+
+    // ── Step 4: Inline stat numbers ─────────────────────────────────────────
+    const heroStats = [
+        { value: liveCounts.tenders, label: 'Live Tenders' },
+        { value: liveCounts.states, label: 'States Covered' },
+        { value: liveCounts.categories, label: 'Categories' },
+        { value: 'Daily', label: 'Updated' },
+    ];
+
+    // ── Step 6: Trust badges ────────────────────────────────────────────────
+    const trustBadges = [
+        { icon: <ShieldCheck size={12} />, text: 'CPPP Verified' },
+        { icon: <Globe size={12} />, text: 'GeM Portal Synced' },
+        { icon: <RefreshCw size={12} />, text: 'Updated Hourly' },
+        { icon: <Zap size={12} />, text: 'Free to Browse' },
+    ];
 
 
     return (
@@ -211,7 +237,7 @@ export default function Hero() {
                 </div>
 
                 <p className="text-[10px] md:text-base text-blue-100/60 mb-6 md:mb-10 max-w-2xl mx-auto px-6 leading-relaxed">
-                    Access <span className="text-white font-bold border-b border-tj-yellow/30">2.1 Million+</span> live tenders from every state and department — indexed, analyzed and ready for your bid.
+                    Access <span className="text-white font-bold border-b border-tj-yellow/30">{liveCounts.tenders}</span> live tenders from every state and department — indexed, analyzed and ready for your bid.
                 </p>
 
                 {/* ── Step 4: Inline Stats Row ─────────────────────────────── */}

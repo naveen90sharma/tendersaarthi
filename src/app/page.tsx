@@ -8,6 +8,7 @@ import NewsSection from '@/components/NewsSection';
 import QuickLinks from '@/components/QuickLinks';
 import TrustSection from '@/components/TrustSection';
 import FloatingAssistant from '@/components/FloatingAssistant';
+import TestimonialsSection from '@/components/TestimonialsSection';
 
 export default function Home() {
   return (
@@ -36,6 +37,7 @@ export default function Home() {
           <TenderSection title="Critical: Closing Soon" />
         </div>
 
+        <TestimonialsSection />
         <CTASection />
         <NewsSection />
 

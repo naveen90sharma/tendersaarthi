@@ -57,16 +57,19 @@ export default function TenderIntelligence({ tender }: TenderIntelligenceProps) 
 
                 <div className="flex items-center justify-between mb-8 relative z-10">
                     <div>
-                        <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-3 mb-1">
-                            <Sparkles className="text-tj-yellow fill-tj-yellow" size={24} />
-                            Market Intelligence
-                        </h2>
+                        <div className="flex items-center gap-2 mb-1">
+                            <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-3">
+                                <Sparkles className="text-tj-yellow fill-tj-yellow" size={24} />
+                                Market Intelligence
+                            </h2>
+                            <span className="px-2 py-0.5 bg-tj-yellow/20 text-tj-yellow border border-tj-yellow/30 rounded text-[8px] font-black uppercase tracking-widest h-fit">BETA AI-PREDICTIVE</span>
+                        </div>
                         <p className="text-blue-200 text-xs font-bold tracking-widest uppercase">
                             Analysis of {tender.state} • {tender.tender_category} Sector
                         </p>
                     </div>
                     <div className="hidden md:block bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-                        <span className="text-tj-yellow font-black text-xs uppercase tracking-widest">Historical Data</span>
+                        <span className="text-tj-yellow font-black text-xs uppercase tracking-widest">Historical Estimate</span>
                     </div>
                 </div>
 
@@ -119,12 +122,12 @@ export default function TenderIntelligence({ tender }: TenderIntelligenceProps) 
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between">
-                    <p className="text-xs text-blue-200 font-medium">
-                        <span className="text-tj-yellow">*</span> Predictions based on historical data.
+                    <p className="text-[10px] text-blue-200/60 font-medium leading-tight max-w-[70%]">
+                        <span className="text-tj-yellow font-black">* Intelligence Note:</span> These insights are currently powered by AI-driven estimations based on industry patterns. Accuracy will increase as more actual data is aggregated.
                     </p>
                     <button
                         onClick={() => setShowAnalytics(true)}
-                        className="text-xs font-black uppercase tracking-widest text-white hover:text-tj-yellow transition-colors flex items-center gap-2"
+                        className="text-xs font-black uppercase tracking-widest text-white hover:text-tj-yellow transition-colors flex items-center gap-2 shrink-0"
                     >
                         View Full Analysis <ArrowRight size={12} />
                     </button>

@@ -12,29 +12,13 @@ import {
     Search,
     Loader2,
     CheckCircle2,
-    ExternalLink
+    ExternalLink,
+    FileCheck
 } from 'lucide-react';
 import { getCurrentUser } from '@/services/auth';
 import { dashboardService } from '@/services/dashboardService';
 
 export default function DocumentsPage() {
-    const router = useRouter();
-
-    useEffect(() => {
-        // Redirect to dashboard as this feature is currently hidden
-        router.push('/dashboard');
-    }, [router]);
-
-    return (
-        <div className="flex items-center justify-center min-h-[60vh]">
-            <Loader2 className="animate-spin text-primary" size={32} />
-        </div>
-    );
-}
-
-/* Original code commented out to allow easy restoration later */
-/*
-export function DocumentsPageContent() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [documents, setDocuments] = useState<any[]>([]);
@@ -109,17 +93,22 @@ export function DocumentsPageContent() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-7xl mx-auto pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-800 tracking-tight">Document Vault</h1>
-                    <p className="text-slate-500 font-medium">Your secure digital repository for bid-ready documents.</p>
+                    <h1 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-xl text-primary">
+                            <FileText size={24} />
+                        </div>
+                        Document Vault
+                    </h1>
+                    <p className="text-slate-500 font-medium mt-2">Your secure digital repository for bid-ready documents.</p>
                 </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex items-start gap-4">
-                <div className="p-2 bg-white rounded-xl text-blue-600 shadow-sm">
-                    <Shield size={20} />
+            <div className="bg-blue-50 border border-blue-100 p-4 rounded-3xl flex items-start gap-4">
+                <div className="p-3 bg-white rounded-2xl text-blue-600 shadow-sm">
+                    <Shield size={24} />
                 </div>
                 <div>
                     <h4 className="text-sm font-black text-blue-900 leading-none mb-1">Secure & Encrypted</h4>
@@ -139,22 +128,22 @@ export function DocumentsPageContent() {
                                     <h3 className="text-lg font-black text-slate-800">{category.title}</h3>
                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{category.description}</p>
                                 </div>
-                                <span className="text-[10px] font-black text-slate-400 bg-slate-50 px-2 py-1 rounded">
+                                <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100/50">
                                     {catDocs.length} FILES
                                 </span>
                             </div>
 
                             <div className="mb-6">
-                                <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-3xl cursor-pointer transition-all ${isCurrentUploading ? 'bg-slate-50 border-primary/20 cursor-wait' : 'hover:bg-slate-50 border-slate-100 hover:border-primary/30'
+                                <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-3xl cursor-pointer transition-all ${isCurrentUploading ? 'bg-slate-50 border-[#103e68]/20 cursor-wait' : 'hover:bg-slate-50 border-slate-200 hover:border-[#103e68]/30'
                                     }`}>
                                     {isCurrentUploading ? (
                                         <div className="flex flex-col items-center gap-2">
-                                            <Loader2 className="animate-spin text-primary" size={24} />
-                                            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Uploading...</span>
+                                            <Loader2 className="animate-spin text-[#103e68]" size={24} />
+                                            <span className="text-[10px] font-black text-[#103e68] uppercase tracking-widest">Uploading...</span>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center gap-2">
-                                            <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary">
+                                            <div className="w-10 h-10 rounded-2xl bg-[#103e68]/5 flex items-center justify-center text-[#103e68]">
                                                 <Upload size={18} />
                                             </div>
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Drop file or click to upload</p>
@@ -172,7 +161,7 @@ export function DocumentsPageContent() {
                             <div className="space-y-3">
                                 {catDocs.map((doc) => (
                                     <div key={doc.id} className="group flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 border border-transparent hover:border-slate-100 hover:bg-white transition-all">
-                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary border border-slate-100">
+                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#103e68] border border-slate-100">
                                             <FileCheck size={20} />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -189,7 +178,7 @@ export function DocumentsPageContent() {
                                                     href={doc.file_url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                                                    className="p-2 text-slate-400 hover:text-[#103e68] hover:bg-[#103e68]/5 rounded-lg transition-all"
                                                     title="View/Download"
                                                 >
                                                     <Download size={16} />
@@ -210,19 +199,19 @@ export function DocumentsPageContent() {
                     );
                 })}
 
-                <div className="lg:col-span-2 bg-[#0a2742] rounded-3xl p-8 text-white relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl opacity-50" />
+                <div className="lg:col-span-2 bg-gradient-to-br from-[#103e68] to-[#0a2742] rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-[#103e68]/10">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-tj-yellow/10 rounded-full blur-3xl opacity-50" />
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="flex-1">
                             <h3 className="text-2xl font-black italic tracking-tight mb-2 flex items-center gap-3">
                                 <CheckCircle2 className="text-tj-yellow" />
                                 One-Click Bid Packager
                             </h3>
-                            <p className="text-slate-400 text-sm font-medium max-w-xl">
+                            <p className="text-white/70 text-sm font-medium max-w-xl">
                                 Select a tender from your watchlist and let our AI assemble all required documents into a submission-ready ZIP file automatically.
                             </p>
                         </div>
-                        <button className="px-8 py-4 bg-tj-yellow text-[#0a2742] rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-tj-yellow/10 hover:shadow-tj-yellow/30 hover:-translate-y-1 transition-all">
+                        <button className="px-8 py-4 bg-tj-yellow text-[#103e68] rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-tj-yellow/20 hover:scale-105 transition-all">
                             Start Packaging
                         </button>
                     </div>
@@ -231,4 +220,3 @@ export function DocumentsPageContent() {
         </div>
     );
 }
-*/

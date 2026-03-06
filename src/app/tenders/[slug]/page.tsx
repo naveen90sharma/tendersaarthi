@@ -1,5 +1,5 @@
 
-import { MapPin, Calendar, FileText, Download, Building2, Clock, ShieldCheck, Briefcase, ExternalLink, MessageSquare, ChevronRight, FileCheck, IndianRupee, AlertCircle, Copy, Wallet, Sparkles, ArrowRight } from 'lucide-react';
+import { MapPin, Calendar, FileText, Download, Building2, Clock, ShieldCheck, Briefcase, ExternalLink, MessageSquare, ChevronRight, FileCheck, IndianRupee, AlertCircle, Copy, Wallet, Sparkles, ArrowRight, History, Layers } from 'lucide-react';
 import { supabase } from '@/services/supabase';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -8,7 +8,11 @@ import PrintButton from '@/components/PrintButton';
 import TenderIntelligence from '@/components/TenderIntelligence';
 import PersonalizedEligibility from '@/components/PersonalizedEligibility';
 import SmallTenderCard from '@/components/SmallTenderCard';
+import CopyButton from '@/components/CopyButton';
+import DocumentSection from '@/components/DocumentSection';
+import TenderAIChat from '@/components/TenderAIChat';
 import { headers } from 'next/headers';
+import Image from 'next/image';
 
 interface TenderDetailProps {
     params: Promise<{ slug: string }>;
@@ -126,9 +130,21 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
     const isExpired = daysLeft !== null && daysLeft <= 0;
 
     return (
-        <div className="bg-[#f8fafc] min-h-screen pb-24 md:pb-16">
+        <div className="bg-[#f8fafc] min-h-screen pb-24 md:pb-16 print:bg-white">
+            {/* Professional Print Branding Header (Only visible when printing/saving PDF) */}
+            <div className="print-header hidden">
+                <div className="flex flex-col">
+                    <Image src="/logo.svg" alt="TenderSaarthi Logo" width={220} height={55} className="mb-2" />
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">India's leading tender intelligence platform</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-xs font-black text-slate-800 uppercase tracking-tighter">Generated on {new Date().toLocaleDateString('en-IN')}</p>
+                    <p className="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">Authorized Digitally by TenderSaarthi</p>
+                </div>
+            </div>
+
             {/* Immersive Header Section */}
-            <div className="bg-[#1e293b] text-white pt-6 pb-20 md:py-12 relative overflow-hidden">
+            <div className="tender-header-section bg-[#1e293b] text-white pt-6 pb-20 md:py-12 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent pointer-events-none" />
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32" />
 
@@ -187,22 +203,30 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
             </div>
 
             <div className="container mx-auto px-4 -mt-12 relative z-20">
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+                <div className="tender-layout-grid grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
                     <div className="space-y-8">
-                        {/* Highlights Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div className="highlights-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                             {[
                                 { label: 'Tender Value', value: formatCurrency(tender.tender_value), icon: <IndianRupee size={15} />, color: 'bg-white' },
                                 { label: 'EMD Amount', value: formatCurrency(tender.emd_amount), icon: <Wallet size={15} />, color: 'bg-white' },
                                 { label: 'Tender Fee', value: formatCurrency(tender.tender_fee), icon: <FileCheck size={15} />, color: 'bg-white' },
                                 { label: 'Bid Deadline', value: formatDate(tender.bid_submission_end), icon: <Clock size={15} />, color: isUrgent ? 'bg-red-50' : 'bg-white', text: isUrgent ? 'text-red-600' : 'text-primary' },
+                                { label: 'Completion Period', value: tender.completion_period_months ? `${tender.completion_period_months} Months` : 'N/A', icon: <History size={15} />, color: 'bg-white' },
+                                { label: 'Tender ID', value: tender.tender_id || 'N/A', icon: <Layers size={15} />, color: 'bg-white', copyable: !!tender.tender_id },
                             ].map((item, i) => (
-                                <div key={i} className={`${item.color} p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-2`}>
+                                <div key={i} className={`${item.color} p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-2 relative group`}>
                                     <div className={`${item.text || 'text-slate-300'}`}>
                                         {item.icon}
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">{item.label}</p>
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-wide mb-0.5">{item.label}</p>
+                                            {(item as any).copyable && (
+                                                <span className="no-print">
+                                                    <CopyButton value={item.value?.toString() || ''} label="Copy ID" />
+                                                </span>
+                                            )}
+                                        </div>
                                         <p className={`text-sm font-semibold leading-tight break-words ${item.text || 'text-slate-700'}`}>
                                             {item.value || 'N/A'}
                                         </p>
@@ -211,45 +235,8 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                             ))}
                         </div>
 
-                        {/* Important Downloads Section */}
-                        <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm space-y-4">
-                            <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                                <Download className="text-primary" size={15} />
-                                Official Documents
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="group bg-slate-50 hover:bg-white border border-slate-100 hover:border-primary/20 rounded-lg p-3 transition-all">
-                                    <div className="flex items-start gap-3">
-                                        <div className="bg-red-50 text-red-400 p-2 rounded-lg shrink-0">
-                                            <FileText size={16} />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-slate-700 text-xs mb-0.5">Notice Inviting Tender (NIT)</p>
-                                            <p className="text-[9px] text-slate-400 uppercase tracking-wide mb-2">PDF • Official</p>
-                                            <a href={tender.official_link || '#'} target="_blank" rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-1 text-[10px] font-medium text-primary hover:underline">
-                                                Download <ArrowRight size={9} />
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="group bg-slate-50 hover:bg-white border border-slate-100 hover:border-emerald-300/30 rounded-lg p-3 transition-all">
-                                    <div className="flex items-start gap-3">
-                                        <div className="bg-emerald-50 text-emerald-500 p-2 rounded-lg shrink-0">
-                                            <FileCheck size={16} />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-slate-700 text-xs mb-0.5">Bill of Quantities (BoQ)</p>
-                                            <p className="text-[9px] text-slate-400 uppercase tracking-wide mb-2">XLS • Financial</p>
-                                            <a href={tender.official_link || '#'} target="_blank" rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 hover:underline">
-                                                Download <ArrowRight size={9} />
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Documents Section (Interative Client Component) */}
+                        <DocumentSection tender={tender} />
 
                         {/* Market Intelligence Logic - Shared Context */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -351,6 +338,36 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                                 />
                             </div>
                         </div>
+
+                        {/* FAQ Section */}
+                        {tender.faq_json && Array.isArray(tender.faq_json) && tender.faq_json.length > 0 && (
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1 h-8 bg-tj-yellow rounded-full" />
+                                        <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight">
+                                            Common Questions (FAQs)
+                                        </h3>
+                                    </div>
+                                    <div className="flex-1 h-[1px] bg-gradient-to-r from-slate-200 to-transparent" />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {tender.faq_json.map((faq: any, i: number) => (
+                                        <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-primary/20 transition-all">
+                                            <p className="text-sm font-bold text-slate-800 mb-2 flex items-start gap-2">
+                                                <span className="text-tj-yellow shrink-0">Q.</span>
+                                                {faq.question}
+                                            </p>
+                                            <p className="text-xs text-slate-500 leading-relaxed flex items-start gap-2">
+                                                <span className="text-primary font-bold shrink-0">A.</span>
+                                                {faq.answer}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Procurement Context & Regional Intelligence */}
                         <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
@@ -476,6 +493,13 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                 </div>
             </div>
 
+            {/* Print Footer Branding (Only visible when printing) */}
+            <div className="print-footer hidden">
+                <p className="font-bold">Generated from TenderSaarthi.in • India's #1 Tender Information Portal</p>
+                <p className="text-[7px] mt-1 italic">This is an auto-generated document summarizing the public tender data from authority portals.</p>
+            </div>
+
+            <TenderAIChat tender={tender} />
         </div>
     );
 }
