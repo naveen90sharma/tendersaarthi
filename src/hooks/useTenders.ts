@@ -20,6 +20,8 @@ export interface Tender {
     category?: string;
     published_date?: string;
     bid_end_ts?: string;
+    slug?: string;
+    authority_name?: string;
 }
 
 export function useLatestTenders(limit = 5) {

@@ -87,7 +87,7 @@ export default function CategoryGrid() {
                 {/* Horizontal Scroll Area */}
                 <div
                     ref={scrollContainerRef}
-                    className="overflow-x-auto scrollbar-hide snap-x snap-mandatory flex gap-5 pb-6"
+                    className="overflow-x-auto no-scrollbar snap-x snap-mandatory flex gap-5 pb-6"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {loading ? (
