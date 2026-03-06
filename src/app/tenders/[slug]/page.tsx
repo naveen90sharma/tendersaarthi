@@ -129,6 +129,22 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
     const isUrgent = daysLeft !== null && daysLeft <= 5;
     const isExpired = daysLeft !== null && daysLeft <= 0;
 
+    // Fetch User AI Access status
+    let aiAccess = false;
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const { data: profile } = await supabase
+                .from('contractor_profiles')
+                .select('ai_access')
+                .eq('user_id', user.id)
+                .single();
+            aiAccess = !!profile?.ai_access;
+        }
+    } catch (e) {
+        console.error("Auth check failed", e);
+    }
+
     return (
         <div className="bg-[#f8fafc] min-h-screen pb-24 md:pb-16 print:bg-white">
             {/* Professional Print Branding Header (Only visible when printing/saving PDF) */}
@@ -211,7 +227,15 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                                 { label: 'EMD Amount', value: formatCurrency(tender.emd_amount), icon: <Wallet size={15} />, color: 'bg-white' },
                                 { label: 'Tender Fee', value: formatCurrency(tender.tender_fee), icon: <FileCheck size={15} />, color: 'bg-white' },
                                 { label: 'Bid Deadline', value: formatDate(tender.bid_submission_end), icon: <Clock size={15} />, color: isUrgent ? 'bg-red-50' : 'bg-white', text: isUrgent ? 'text-red-600' : 'text-primary' },
-                                { label: 'Completion Period', value: tender.completion_period_months ? `${tender.completion_period_months} Months` : 'N/A', icon: <History size={15} />, color: 'bg-white' },
+                                {
+                                    label: 'Completion Period',
+                                    value: [
+                                        tender.completion_period_months ? `${tender.completion_period_months} Months` : null,
+                                        tender.period_of_work ? `${tender.period_of_work} Days` : null
+                                    ].filter(Boolean).join(' / ') || 'N/A',
+                                    icon: <History size={15} />,
+                                    color: 'bg-white'
+                                },
                                 { label: 'Tender ID', value: tender.tender_id || 'N/A', icon: <Layers size={15} />, color: 'bg-white', copyable: !!tender.tender_id },
                             ].map((item, i) => (
                                 <div key={i} className={`${item.color} p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-2 relative group`}>
@@ -258,7 +282,7 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                             </div>
                         </div>
 
-                        <TenderIntelligence tender={tender} />
+                        {aiAccess && <TenderIntelligence tender={tender} />}
 
                         {/* Eligibility & Requirements Section - Separate */}
                         {(tender.eligibility_requirements || tender.similar_work_clause_exact_text || tender.turnover_requirement_exact_text || tender.net_worth_requirement_exact_text) && (
@@ -499,7 +523,7 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                 <p className="text-[7px] mt-1 italic">This is an auto-generated document summarizing the public tender data from authority portals.</p>
             </div>
 
-            <TenderAIChat tender={tender} />
+            {aiAccess && <TenderAIChat tender={tender} />}
         </div>
     );
 }
