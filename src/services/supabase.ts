@@ -4,13 +4,21 @@
  * Uses absolute URL on server to avoid ECONNREFUSED during build.
  */
 
-function getBaseUrl(): string {
+const getBaseUrl = () => {
+    // If we are on the client, use relative URL
+    if (typeof window !== 'undefined') return '';
+
+    // If we are on the server, we need an absolute URL
+    // Try environment variable first (should be set in Cloud Run)
     if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
-    if (typeof window !== 'undefined') return ''; // browser: relative URL is fine
-    // SSR / build: use absolute URL
-    const port = process.env.PORT || 3000;
-    return `http://localhost:${port}`;
-}
+
+    // Fallback for internal Cloud Run environment if needed
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+
+    return 'http://localhost:3000';
+};
+
+const BASE_URL = getBaseUrl();
 
 async function fetchTable(table: string, params?: URLSearchParams): Promise<any[]> {
     const base = getBaseUrl();
