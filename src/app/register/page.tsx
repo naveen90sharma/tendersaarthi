@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { User, Lock, Mail, Eye, EyeOff, Phone, Loader2, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signUp, signInWithGoogle, signInWithFacebook } from '@/services/auth';
+import { signUp, signInWithGoogle } from '@/services/auth';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -70,14 +70,6 @@ export default function RegisterPage() {
         }
     };
 
-    const handleFacebookSignup = async () => {
-        setIsLoading(true);
-        const result = await signInWithFacebook();
-        if (!result.success) {
-            setMessage({ type: 'error', text: result.error || 'Facebook sign up failed' });
-            setIsLoading(false);
-        }
-    };
 
     return (
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#0a2742] font-sans selection:bg-tj-yellow/30">
