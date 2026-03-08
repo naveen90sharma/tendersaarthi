@@ -24,8 +24,9 @@ export interface RegisterData {
 
 // Sign up new user
 export async function signUp(data: RegisterData) {
+    if (!auth) return { success: false, user: null, error: 'Auth not initialized' };
     try {
-        const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        const userCredential = await createUserWithEmailAndPassword(auth!, data.email, data.password);
         const user = userCredential.user;
 
         // Add to profiles table in Cloud SQL via our shim
@@ -47,8 +48,9 @@ export async function signUp(data: RegisterData) {
 
 // Sign in existing user
 export async function signIn(credentials: LoginCredentials) {
+    if (!auth) return { success: false, user: null, session: null, error: 'Auth not initialized' };
     try {
-        const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+        const userCredential = await signInWithEmailAndPassword(auth!, credentials.email, credentials.password);
         const user = userCredential.user;
         return { success: true, user, session: { user }, error: null };
     } catch (error: any) {
@@ -58,8 +60,9 @@ export async function signIn(credentials: LoginCredentials) {
 
 // Sign out
 export async function signOut() {
+    if (!auth) return { success: false, error: 'Auth not initialized' };
     try {
-        await firebaseSignOut(auth);
+        await firebaseSignOut(auth!);
         return { success: true, error: null };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -68,8 +71,9 @@ export async function signOut() {
 
 // Get current user
 export async function getCurrentUser() {
+    if (!auth) return { user: null, error: 'Auth not initialized' };
     return new Promise((resolve) => {
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth!, (user) => {
             resolve({ user, error: null });
         });
     });
@@ -77,14 +81,15 @@ export async function getCurrentUser() {
 
 // Check if user is logged in
 export async function isAuthenticated() {
-    return !!auth.currentUser;
+    return !!auth?.currentUser;
 }
 
 // Sign in with Google
 export async function signInWithGoogle() {
+    if (!auth) return { success: false, user: null, error: 'Auth not initialized' };
     try {
         const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
+        const result = await signInWithPopup(auth!, provider);
         const user = result.user;
 
         // Check/Upsert profile in Cloud SQL
