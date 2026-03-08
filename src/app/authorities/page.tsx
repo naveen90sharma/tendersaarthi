@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { Building2, ChevronRight, BarChart3, Search } from 'lucide-react';
@@ -105,4 +107,3 @@ export default async function AuthorityDirectory() {
     );
 }
 
-export const revalidate = 3600;

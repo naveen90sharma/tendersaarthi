@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { load } from 'cheerio';
-import PDFParser from 'pdf-parse/lib/pdf-parse.js';
+import { PDFParse } from 'pdf-parse';
 import OpenAI from 'openai';
 
 export async function POST(req: Request) {
@@ -21,13 +21,15 @@ export async function POST(req: Request) {
 
         if (nitFile) {
             const buf = await nitFile.arrayBuffer();
-            const data = await PDFParser(Buffer.from(buf));
+            const parser = new PDFParse({ data: Buffer.from(buf) });
+            const data = await parser.getText();
             combinedText += "--- NIT PDF CONTENT ---\n" + data.text.replace(/\s+/g, ' ').trim() + "\n\n";
         }
 
         if (boqFile) {
             const buf = await boqFile.arrayBuffer();
-            const data = await PDFParser(Buffer.from(buf));
+            const parser = new PDFParse({ data: Buffer.from(buf) });
+            const data = await parser.getText();
             combinedText += "--- BOQ PDF CONTENT ---\n" + data.text.replace(/\s+/g, ' ').trim() + "\n\n";
         }
 

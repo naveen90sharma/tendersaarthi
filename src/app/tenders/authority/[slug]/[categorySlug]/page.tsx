@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import TenderListing from '@/components/TenderListing';
 import { RefreshCw } from 'lucide-react';

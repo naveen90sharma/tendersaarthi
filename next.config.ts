@@ -1,12 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   output: 'standalone',
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Keep pg (PostgreSQL) server-side only — prevents "Can't resolve dns/net/tls/fs" errors.
+  // This is the Turbopack-compatible way (Next.js 15+)
+  serverExternalPackages: ['pg', 'pg-pool', 'pg-native', 'pg-connection-string'],
   async redirects() {
     return [
       {
@@ -24,10 +25,8 @@ const nextConfig = {
         destination: '/tenders/authority/:slug',
         permanent: true,
       },
-      // Note: Tender ID redirection will happen via a logical fallback in the page itself 
-      // or we could add a specific route for ID if needed.
-    ]
-  }
+    ];
+  },
 };
 
 export default nextConfig;

@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import TenderListing from '@/components/TenderListing';
 import { RefreshCw, Building2, FileText, CheckCircle2, TrendingUp, MapPin } from 'lucide-react';

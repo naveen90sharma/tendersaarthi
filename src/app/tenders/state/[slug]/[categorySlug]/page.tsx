@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import TenderListing from '@/components/TenderListing';
 import { RefreshCw } from 'lucide-react';
@@ -49,4 +51,4 @@ export default async function StateCategoryTendersPage({ params }: { params: Pro
     );
 }
 
-export const revalidate = 3600; // ISR
+

@@ -1,14 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Tag, BookOpen, Clock } from 'lucide-react';
 import { Metadata } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/services/supabase';
 import { notFound } from 'next/navigation';
 import NewsImage from '@/components/NewsImage';
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 const SITE_URL = 'https://tendersaarthi.com';
 const SITE_NAME = 'TenderSaarthi';

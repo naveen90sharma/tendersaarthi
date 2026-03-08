@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { MapPin, Calendar, FileText, Download, Building2, Clock, ShieldCheck, Briefcase, ExternalLink, MessageSquare, ChevronRight, FileCheck, IndianRupee, AlertCircle, Copy, Wallet, Sparkles, ArrowRight, History, Layers } from 'lucide-react';
 import { supabase } from '@/services/supabase';
 import { Metadata } from 'next';

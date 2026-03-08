@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { Search, MapPin, ChevronRight, BarChart3, RefreshCw } from 'lucide-react';
@@ -104,4 +106,3 @@ export default async function StateDirectory() {
     );
 }
 
-export const revalidate = 3600;

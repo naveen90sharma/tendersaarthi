@@ -1,4 +1,7 @@
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
+
 import Hero from '@/components/Hero';
 import CategoryGrid from '@/components/CategoryGrid';
 import TenderSection from '@/components/TenderSection';

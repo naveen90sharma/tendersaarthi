@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import TenderListing from '@/components/TenderListing';
 import { RefreshCw, MapPin, FileText, CheckCircle2, TrendingUp } from 'lucide-react';
@@ -146,4 +148,4 @@ export default async function StateTendersPage({ params }: { params: Promise<{ s
     );
 }
 
-export const revalidate = 3600; // ISR: 1 hour
+

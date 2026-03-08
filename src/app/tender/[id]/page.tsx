@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { supabase } from '@/services/supabase';
 import { redirect } from 'next/navigation';
 
