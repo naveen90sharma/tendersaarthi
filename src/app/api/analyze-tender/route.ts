@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { load } from 'cheerio';
-import PDFParser from 'pdf-parse';
+import PDFParser from 'pdf-parse/lib/pdf-parse.js';
 import OpenAI from 'openai';
 
 export async function POST(req: Request) {
