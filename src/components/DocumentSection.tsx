@@ -59,7 +59,7 @@ export default function DocumentSection({ tender }: DocumentSectionProps) {
                 docsToDownload.push({ url: tender.boq_document, name: `BOQ_Pricing_Sheet.${ext}` });
             }
 
-            // 3. Add S3 Documents
+            // 3. Add Google Cloud Documents
             if (tender.documents && Array.isArray(tender.documents)) {
                 tender.documents.forEach((doc: any) => {
                     docsToDownload.push({ url: doc.url, name: doc.name || 'Document' });

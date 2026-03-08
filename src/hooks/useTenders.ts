@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '../services/supabase';
 
 export interface Tender {
     id: number;
@@ -31,16 +30,11 @@ export function useLatestTenders(limit = 5) {
     useEffect(() => {
         async function fetchTenders() {
             try {
-                const now = new Date().toISOString();
-                const { data, error } = await supabase
-                    .from('tenders')
-                    .select('*')
-                    .gt('bid_end_ts', now)
-                    .order('created_at', { ascending: false })
-                    .limit(limit);
+                const response = await fetch(`/api/tenders?limit=${limit}`);
+                const data = await response.json();
 
-                if (error) {
-                    console.error('Error fetching latest tenders:', error);
+                if (data.error) {
+                    console.error('Error fetching latest tenders:', data.error);
                 } else {
                     setTenders(data || []);
                 }

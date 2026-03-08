@@ -1,4 +1,14 @@
-import { supabase } from './supabase';
+import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut as firebaseSignOut,
+    onAuthStateChanged,
+    updateProfile,
+    GoogleAuthProvider,
+    signInWithPopup
+} from 'firebase/auth';
+import { auth } from './firebase';
+import { supabase } from './supabase'; // This is now our shim hitting Cloud SQL
 
 export interface LoginCredentials {
     email: string;
@@ -15,20 +25,21 @@ export interface RegisterData {
 // Sign up new user
 export async function signUp(data: RegisterData) {
     try {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        const user = userCredential.user;
+
+        // Add to profiles table in Cloud SQL via our shim
+        await supabase.from('profiles').insert([{
+            id: user.uid,
+            full_name: data.fullName,
             email: data.email,
-            password: data.password,
-            options: {
-                data: {
-                    full_name: data.fullName,
-                    phone: data.phone,
-                }
-            }
-        });
+            phone: data.phone,
+            role: 'user'
+        }]);
 
-        if (authError) throw authError;
+        await updateProfile(user, { displayName: data.fullName });
 
-        return { success: true, user: authData.user, error: null };
+        return { success: true, user, error: null };
     } catch (error: any) {
         return { success: false, user: null, error: error.message };
     }
@@ -37,14 +48,9 @@ export async function signUp(data: RegisterData) {
 // Sign in existing user
 export async function signIn(credentials: LoginCredentials) {
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: credentials.email,
-            password: credentials.password,
-        });
-
-        if (error) throw error;
-
-        return { success: true, user: data.user, session: data.session, error: null };
+        const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+        const user = userCredential.user;
+        return { success: true, user, session: { user }, error: null };
     } catch (error: any) {
         return { success: false, user: null, session: null, error: error.message };
     }
@@ -53,8 +59,7 @@ export async function signIn(credentials: LoginCredentials) {
 // Sign out
 export async function signOut() {
     try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
+        await firebaseSignOut(auth);
         return { success: true, error: null };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -63,75 +68,35 @@ export async function signOut() {
 
 // Get current user
 export async function getCurrentUser() {
-    try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) throw error;
-        return { user, error: null };
-    } catch (error: any) {
-        return { user: null, error: error.message };
-    }
+    return new Promise((resolve) => {
+        onAuthStateChanged(auth, (user) => {
+            resolve({ user, error: null });
+        });
+    });
 }
 
 // Check if user is logged in
 export async function isAuthenticated() {
-    const { data: { session } } = await supabase.auth.getSession();
-    return !!session;
-}
-
-// Reset password
-export async function resetPassword(email: string) {
-    try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/reset-password`,
-        });
-        if (error) throw error;
-        return { success: true, error: null };
-    } catch (error: any) {
-        return { success: false, error: error.message };
-    }
-}
-
-// Update password
-export async function updatePassword(newPassword: string) {
-    try {
-        const { error } = await supabase.auth.updateUser({
-            password: newPassword
-        });
-        if (error) throw error;
-        return { success: true, error: null };
-    } catch (error: any) {
-        return { success: false, error: error.message };
-    }
+    return !!auth.currentUser;
 }
 
 // Sign in with Google
 export async function signInWithGoogle() {
     try {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`
-            }
-        });
-        if (error) throw error;
-        return { success: true, data, error: null };
-    } catch (error: any) {
-        return { success: false, data: null, error: error.message };
-    }
-}
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
-// Sign in with Facebook
-export async function signInWithFacebook() {
-    try {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'facebook',
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`
-            }
-        });
-        if (error) throw error;
-        return { success: true, data, error: null };
+        // Check/Upsert profile in Cloud SQL
+        await supabase.from('profiles').insert([{
+            id: user.uid,
+            full_name: user.displayName,
+            email: user.email,
+            role: 'user'
+        }]);
+
+        return { success: true, user, error: null };
     } catch (error: any) {
-        return { success: false, data: null, error: error.message };
+        return { success: false, user: null, error: error.message };
     }
 }

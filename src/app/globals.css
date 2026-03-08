@@ -138,39 +138,41 @@ body {
 .project-specification-content {
     font-size: 15px;
     line-height: 1.8;
-    color: #334155;
-    text-align: justify;
-    hyphens: auto;
+    color: #475569;
 }
 
 .project-specification-content h1,
 .project-specification-content h2,
 .project-specification-content h3,
 .project-specification-content h4 {
-    font-weight: 800;
+    font-weight: 700;
     color: #0f172a;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     margin-bottom: 1rem;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
+    line-height: 1.3;
 }
 
 .project-specification-content h1 {
     font-size: 1.5rem;
-    color: #1e40af;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 0.5rem;
+    color: #dc2626;
+}
+
+.project-specification-content h2 {
+    font-size: 1.25rem;
+}
+
+.project-specification-content h3 {
+    font-size: 1.125rem;
 }
 
 .project-specification-content p {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
     line-height: 1.8;
 }
 
 .project-specification-content strong {
     font-weight: 700;
-    color: #0f172a;
-    background: linear-gradient(to bottom, transparent 60%, #fef9c3 60%);
+    color: #1e293b;
 }
 
 .project-specification-content ul,

@@ -338,37 +338,22 @@ export default async function TenderDetailPage({ params }: TenderDetailProps) {
                             </div>
                         )}
 
+                        {/* Detailed Description */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-8 bg-gradient-to-b from-primary to-blue-400 rounded-full" />
-                                    <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                                        <Sparkles className="text-tj-yellow" size={18} />
+                                    <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight">
                                         Full Project Specification
                                     </h3>
                                 </div>
                                 <div className="flex-1 h-[1px] bg-gradient-to-r from-slate-200 to-transparent" />
                             </div>
 
-                            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-lg shadow-slate-200/50 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
-                                    <FileText size={120} />
-                                </div>
-
-                                {/* Premium Insight Badge */}
-                                <div className="flex items-center gap-2 mb-6 p-3 bg-blue-50/50 rounded-2xl border border-blue-100/50 relative z-10 w-fit">
-                                    <div className="w-8 h-8 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
-                                        <Sparkles size={16} className="fill-blue-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest leading-none">Smart Project Analysis</p>
-                                        <p className="text-[9px] text-blue-400 font-bold uppercase tracking-tight mt-0.5">Key specifications & requirements extracted by AI</p>
-                                    </div>
-                                </div>
-
+                            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
                                 {/* Render HTML description with improved styling */}
                                 <div
-                                    className="project-specification-content prose prose-slate max-w-none relative z-10"
+                                    className="project-specification-content prose prose-slate max-w-none"
                                     dangerouslySetInnerHTML={{
                                         __html: tender.description?.includes('<')
                                             ? tender.description

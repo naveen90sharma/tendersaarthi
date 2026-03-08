@@ -80,7 +80,10 @@ export default function Hero() {
         };
 
         const timer = setTimeout(() => {
-            fetchSuggestions();
+            if (searchQuery.trim().length >= 2) {
+                setIsDropdownOpen(true);
+                fetchSuggestions();
+            }
         }, 300);
 
         return () => clearTimeout(timer);
@@ -286,54 +289,6 @@ export default function Hero() {
                                 />
                             </div>
 
-                            {/* Autocomplete Dropdown */}
-                            {isDropdownOpen && (searchQuery.trim().length >= 2) && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden z-50 text-left">
-                                    {isLoadingSuggestions ? (
-                                        <div className="p-4 flex items-center justify-center text-slate-400 gap-2">
-                                            <Loader2 size={16} className="animate-spin" />
-                                            <span className="text-sm font-medium">Searching...</span>
-                                        </div>
-                                    ) : suggestions.length > 0 ? (
-                                        <div className="max-h-[300px] overflow-y-auto w-full no-scrollbar">
-                                            {suggestions.map((item, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 flex items-start gap-3 transition-colors"
-                                                    onClick={() => {
-                                                        setSearchQuery(item.text);
-                                                        setIsDropdownOpen(false);
-                                                        const params = new URLSearchParams();
-                                                        params.set('q', item.text);
-                                                        if (selectedState) params.set('state', selectedState);
-                                                        if (selectedCategory) params.set('category', selectedCategory);
-                                                        router.push(`/active-tenders?${params.toString()}`);
-                                                    }}
-                                                >
-                                                    <Search size={15} className="text-slate-300 shrink-0 mt-0.5" />
-                                                    <div className="flex flex-col flex-1 min-w-0">
-                                                        {item.type === 'Keyword' ? (
-                                                            <span className="text-sm font-semibold text-slate-800 line-clamp-1 italic">
-                                                                Search all fields for <span className="font-bold text-blue-600">"{item.text}"</span>
-                                                            </span>
-                                                        ) : (
-                                                            <>
-                                                                <span className="text-sm font-semibold text-slate-800 line-clamp-1">{item.text}</span>
-                                                                <span className="text-[11px] font-medium text-blue-600/80 uppercase tracking-wider mt-0.5">in {item.type}</span>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="p-4 text-center text-slate-500 text-sm">
-                                            No matches found for "{searchQuery}"
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
                             {/* State Dropdown */}
                             <div className="relative flex items-center border-t md:border-t-0 md:border-l border-slate-100 px-3 py-2.5 md:py-0 md:w-[150px] shrink-0">
                                 <MapPin size={12} className="text-slate-300 mr-2 shrink-0" />
@@ -373,7 +328,56 @@ export default function Hero() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Autocomplete Dropdown - Moved OUTSIDE overflow-hidden container */}
+                    {isDropdownOpen && (searchQuery.trim().length >= 2) && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden z-50 text-left">
+                            {isLoadingSuggestions ? (
+                                <div className="p-4 flex items-center justify-center text-slate-400 gap-2">
+                                    <Loader2 size={16} className="animate-spin" />
+                                    <span className="text-sm font-medium">Searching...</span>
+                                </div>
+                            ) : suggestions.length > 0 ? (
+                                <div className="max-h-[300px] overflow-y-auto w-full no-scrollbar">
+                                    {suggestions.map((item, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 flex items-start gap-3 transition-colors"
+                                            onClick={() => {
+                                                setSearchQuery(item.text);
+                                                setIsDropdownOpen(false);
+                                                const params = new URLSearchParams();
+                                                params.set('q', item.text);
+                                                if (selectedState) params.set('state', selectedState);
+                                                if (selectedCategory) params.set('category', selectedCategory);
+                                                router.push(`/active-tenders?${params.toString()}`);
+                                            }}
+                                        >
+                                            <Search size={15} className="text-slate-300 shrink-0 mt-0.5" />
+                                            <div className="flex flex-col flex-1 min-w-0">
+                                                {item.type === 'Keyword' ? (
+                                                    <span className="text-sm font-semibold text-slate-800 line-clamp-1 italic">
+                                                        Search all fields for <span className="font-bold text-blue-600">"{item.text}"</span>
+                                                    </span>
+                                                ) : (
+                                                    <>
+                                                        <span className="text-sm font-semibold text-slate-800 line-clamp-1">{item.text}</span>
+                                                        <span className="text-[11px] font-medium text-blue-600/80 uppercase tracking-wider mt-0.5">in {item.type}</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-4 text-center text-slate-500 text-sm">
+                                    No matches found for "{searchQuery}"
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
+
 
                 {/* ── Step 3: Trending Tags — Mobile + Desktop ─────────────── */}
                 <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar px-2 pb-1 mb-2 md:mb-0">
