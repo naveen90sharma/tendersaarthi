@@ -16,10 +16,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
+# Build-time environment variables (Public keys)
+ARG NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyBi5bRrUjPe4U7u68WgHLpuGmCpoYoPr6M
+ARG NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=project-15be9eb5-10a3-4470-bd1.firebaseapp.com
+ARG NEXT_PUBLIC_FIREBASE_PROJECT_ID=project-15be9eb5-10a3-4470-bd1
+
+ENV NEXT_PUBLIC_FIREBASE_API_KEY=$NEXT_PUBLIC_FIREBASE_API_KEY
+ENV NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID=$NEXT_PUBLIC_FIREBASE_PROJECT_ID
 
 RUN npm run build
 
