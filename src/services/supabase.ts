@@ -31,6 +31,8 @@ async function fetchTable(table: string, params?: URLSearchParams): Promise<any[
 function buildQuery(table: string) {
     const state: {
         eqFilters: Record<string, any>;
+        neqFilters: Record<string, any>;
+        ilikeFilters: Record<string, any>;
         orderCol?: string;
         orderAsc?: boolean;
         limitVal?: number;
@@ -39,14 +41,22 @@ function buildQuery(table: string) {
         isSingle?: boolean;
         isHead?: boolean;
         isCount?: boolean;
-    } = { eqFilters: {} };
+    } = { eqFilters: {}, neqFilters: {}, ilikeFilters: {} };
 
     const execute = async (): Promise<{ data: any; count: number | null; error: any }> => {
         try {
             const params = new URLSearchParams();
             Object.entries(state.eqFilters).forEach(([k, v]) => params.set(k, String(v)));
+            Object.entries(state.neqFilters).forEach(([k, v]) => params.set(k, `neq.${v}`));
+            Object.entries(state.ilikeFilters).forEach(([k, v]) => params.set(k, `ilike.${v}`));
+
             if (state.orderCol) params.set('order', `${state.orderCol}.${state.orderAsc === false ? 'asc' : 'desc'}`);
             if (state.limitVal) params.set('limit', String(state.limitVal));
+
+            if (state.rangeFrom !== undefined && state.rangeTo !== undefined) {
+                params.set('offset', String(state.rangeFrom));
+                params.set('limit', String(state.rangeTo - state.rangeFrom + 1));
+            }
 
             const rows = await fetchTable(table, params);
             let data: any = state.isSingle ? (rows[0] || null) : rows;
@@ -66,7 +76,8 @@ function buildQuery(table: string) {
             return q;
         },
         eq: (col: string, val: any) => { state.eqFilters[col] = val; return q; },
-        ilike: (_col: string, _val: any) => q,
+        neq: (col: string, val: any) => { state.neqFilters[col] = val; return q; },
+        ilike: (col: string, val: any) => { state.ilikeFilters[col] = val; return q; },
         not: (_col: string, _op: string, _val: any) => q,
         in: (_col: string, _arr: any[]) => q,
         or: (_cond: string) => q,
